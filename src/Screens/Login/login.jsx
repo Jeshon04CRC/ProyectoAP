@@ -30,7 +30,15 @@ const LoginScreen = () => {
       );
       
       if (response.status === 200) { // Verifica si la respuesta es exitosa
-        alert("Login exitoso");
+        alert("Login exitoso para modulo #1 estudiantes");
+        navigation.navigate("homePage");
+      }
+      else if (response.status === 201) {
+        alert("Login para modulo #1(escuelas),Modulo #2(profesores) de administradores");
+        navigation.navigate("homePage");
+      }
+      else if (response.status === 202) {
+        alert("Login para modulo #4 de admin");
         navigation.navigate("homePage");
       }
        else {
