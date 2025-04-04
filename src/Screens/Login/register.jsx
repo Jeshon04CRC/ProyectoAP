@@ -32,19 +32,12 @@ const LoginScreen = () => {
       if (response.status === 200) { // Verifica si la respuesta es exitosa
         alert("Login exitoso");
         navigation.navigate("homePage");
-      }
-       else {
+      } else {
         alert("Error: " + response.data.message);
       }
-    } 
-    catch (error) {
-      if (error.response?.status === 401) {
-        alert("Credenciales incorrectas. Intenta de nuevo.");
-      } 
-      else {
-        console.error("Error al hacer la solicitud:", error);
-        alert("Error de red o del servidor.");
-      }
+    } catch (error) {
+      console.error("Error al hacer la solicitud:", error);
+      alert("Error de red o servidor.");
     }
   };
 
