@@ -39,7 +39,8 @@ const LoginScreen = () => {
     } 
     catch (error) {
       if (error.response?.status === 401) {
-        alert("Credenciales incorrectas. Intenta de nuevo.");
+        const mensaje = error.response.data.message;
+        alert(mensaje);
       } 
       else {
         console.error("Error al hacer la solicitud:", error);
