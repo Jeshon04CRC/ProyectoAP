@@ -41,7 +41,7 @@ const LoginScreen = () => {
         alert("Login para modulo #4 de admin");
         navigation.navigate("homePage");
       }
-       else {
+      else {
         alert("Error: " + response.data.message);
       }
     } 
