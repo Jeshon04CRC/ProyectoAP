@@ -12,7 +12,7 @@
 - Para obtener tu IPv4:
   - Abrir una terminal y ejecutar `ipconfig` (Windows)
   - Copiar la dirección que aparece en el campo "IPv4"
-  - Pegarla en la constante mencionada
+  - Pegarla en la constante mencionada ('http://*********')
 
 ### 2) Iniciar el servidor para los routers
 - Abrir una terminal nueva
