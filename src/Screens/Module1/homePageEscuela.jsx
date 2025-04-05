@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, SafeAreaView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { styles } from '../../Style/Login/homePage';
+import { styles } from '../../Style/Module1/homePageEscuela';
 
 
 export default function HomePageScreen() {

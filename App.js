@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/Screens/Login/login'; // Asegúrate de que la ruta sea correcta
-import HomePageScreen  from './src/Screens/Login/homePage';
+import HomePageScreen  from './src/Screens/Module1/homePage';
 import RegisterScrreen from './src/Screens/Login/register'; // Asegúrate de que la ruta sea correcta
 
 const Stack = createStackNavigator();

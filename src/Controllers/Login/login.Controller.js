@@ -9,8 +9,8 @@ export const postLogin = async (req, res) => {
   console.log("Password:", password);
 
   if(email.endsWith("@estudiantec.cr") || email.endsWith("@itcr.ac.cr")){ 
-    if (email.endsWith("@estudiantec.cr")){
-
+    if (email.endsWith("@estudiantec.cr") && (email === '1234@estudiantec.cr' && password === "1234") ){
+      /*
       await transporter.sendMail({
         from: '"Inicio seccion " <salascordero2003@gmail.com>', // sender address
         to: email, // list of receivers
@@ -21,7 +21,7 @@ export const postLogin = async (req, res) => {
                 <p>Te informamos que tu sesión en <strong>email</strong> ha sido iniciada correctamente.</p>
                 <p>Si no fuiste tú, por favor cambia tu contraseña lo antes posible.</p>`, // html body
       });
-
+      */
       res.status(200).json({
         message: "Login exitoso",
         status: "success",
