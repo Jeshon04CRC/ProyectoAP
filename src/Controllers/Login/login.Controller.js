@@ -1,4 +1,7 @@
-export const postLogin = (req, res) => {
+import { transporter } from "../../Services/emails.js"; // Importa la función trasposter desde utils
+
+
+export const postLogin = async (req, res) => {
   const { email, password } = req.body; // Aquí se extraen los datos enviados desde el frontend
 
   console.log("Solicitud recibida en login");
@@ -6,7 +9,16 @@ export const postLogin = (req, res) => {
   console.log("Password:", password);
 
   if(email.endsWith("@estudiantec.cr") || email.endsWith("@itcr.ac.cr")){ 
-    if (email.endsWith("@estudiantec.cr") && (email === '1234@estudiantec.cr' && password === "1234")){
+    if (email.endsWith("@estudiantec.cr")){
+
+      await transporter.sendMail({
+        from: '"Inicio seccion " <salascordero2003@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: "Inicio seccion", // Subject line
+        text: "HOLA MUNDO", // plain text body
+        html: "<b>Hello world?</b>", // html body
+      });
+
       res.status(200).json({
         message: "Login exitoso",
         status: "success",
