@@ -1,4 +1,4 @@
-import { transporter } from "../../Services/emails.js"; // Importa la función trasposter desde utils
+import { transporter } from "../Services/emails.js"; // Importa la función trasposter desde utils
 
 
 export const postLogin = async (req, res) => {
