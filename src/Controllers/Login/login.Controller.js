@@ -15,8 +15,11 @@ export const postLogin = async (req, res) => {
         from: '"Inicio seccion " <salascordero2003@gmail.com>', // sender address
         to: email, // list of receivers
         subject: "Inicio seccion", // Subject line
-        text: "HOLA MUNDO", // plain text body
-        html: "<b>Hello world?</b>", // html body
+        text: "Te informamos que tu sesión en tu cuenta ha sido iniciada.", // plain text body
+        html: ` <h1>¡Has iniciado sesión en tu cuenta!</h1>
+                <p>Hola,</p>
+                <p>Te informamos que tu sesión en <strong>email</strong> ha sido iniciada correctamente.</p>
+                <p>Si no fuiste tú, por favor cambia tu contraseña lo antes posible.</p>`, // html body
       });
 
       res.status(200).json({
