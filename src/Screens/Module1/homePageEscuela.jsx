@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, SafeAreaView } from "react-native"
+import { View, Text, ScrollView, Image, SafeAreaView, TouchableOpacity} from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { styles } from '../../Style/Module1/homePageEscuela';
 
@@ -34,15 +34,15 @@ export default function HomePageScreen() {
         <Text style={styles.sectionTitle}>Publicaciones de Ofertas de Asistencias, Tutorías y Proyectos</Text>
 
         <View style={styles.menuContainer}>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("publiOferta")}>
             <Text style={styles.menuItemText}>Publicación de ofertas</Text>
-          </View>
-          <View style={styles.menuItem}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("listaOfertas")}>
             <Text style={styles.menuItemText}>Control de Resultados</Text>
-          </View>
-          <View style={styles.menuItem}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => handleAsignacionTutorias()}>
             <Text style={styles.menuItemText}>Asignación de Estudiantes a Tutorías</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionTitle}>Publicaciones de Evaluaciones</Text>
