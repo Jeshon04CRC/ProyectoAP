@@ -16,6 +16,8 @@ import HomePage from './src/Screens/Profesores/homePage';
 import RegistroEdicion from './src/Screens/Profesores/registroEdicion';
 import GestionAsignaturas from './src/Screens/Profesores/gestionAsignaturas';
 import EvaluacionRetroalimentacion from './src/Screens/Profesores/evaluacionRetroalimentacion'; 
+import creacionOfertas from './src/Screens/Profesores/creacionOfertas';  
+
 
 const Stack = createStackNavigator();
 
@@ -38,10 +40,11 @@ export default function App() {
         <Stack.Screen name="cursosEscuela" component={cursosEscuelaScreen} />
 
         {/* Module Profesores*/}
-        <Stack.Screen name="HomePageProfesores" component={HomePage} />
-        <Stack.Screen name="registroEdicion" component={RegistroEdicion} />
-        <Stack.Screen name="gestionAsignaturas" component={GestionAsignaturas} />
-        <Stack.Screen name="evaluacionRetroalimentacion" component={EvaluacionRetroalimentacion} />
+        <Stack.Screen name="HomePageProfesores" component={HomePage} options={{title: "Inicio"}} />
+        <Stack.Screen name="registroEdicion" component={RegistroEdicion} options={{title: "Registro y edición"}}/>
+        <Stack.Screen name="gestionAsignaturas" component={GestionAsignaturas} options={{title: "Gestión de Asignaturas"}}/>
+        <Stack.Screen name="evaluacionRetroalimentacion" component={EvaluacionRetroalimentacion} options={{title: "Evaluación"}}/>
+        <Stack.Screen name="creacionOfertasProfesores" component={creacionOfertas} options={{title: "Crear Oferta"}}/>
 
 
 

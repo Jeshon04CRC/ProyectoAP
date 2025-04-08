@@ -10,11 +10,13 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    marginTop: 30,
+    marginTop: 10,
     textAlign: 'center'
   },
   carouselContainer: {
-    marginBottom: 20
+    marginBottom: 20,
+    padding: 30,
+    backgroundColor: '#405F9021',
   },
   card: {
     backgroundColor: '#fff',
@@ -38,7 +40,8 @@ export const styles = StyleSheet.create({
     marginBottom: 2
   },
   formGroup: {
-    marginBottom: 15
+    marginBottom: 15,
+    marginTop: 10
   },
   label: {
     fontSize: 16,

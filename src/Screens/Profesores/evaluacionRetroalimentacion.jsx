@@ -76,7 +76,7 @@ const EvaluacionRetroalimentacion = () => {
       <Text style={styles.label}>Seleccione un número de carnet:</Text>
       <Picker
         selectedValue={selectedCarnet}
-        style={styles.picker}
+        style={[styles.picker, { padding: 10, backgroundColor: '#405F9021', borderRadius: 5 }]}
         onValueChange={(itemValue) => setSelectedCarnet(itemValue)}
       >
         <Picker.Item label="Todos" value="" />
