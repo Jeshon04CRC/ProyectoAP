@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { styles } from '../../Style/Profesores/creacionOfertas'; // Asegúrate de que la ruta sea correcta
+import { styles } from '../../Style/Profesores/creacionOfertas'; 
+import { Alert } from 'react-native';
+
+
 const CreacionOfertas = () => {
   // Estados para cada campo del formulario
   const [nombrePrograma, setNombrePrograma] = useState('');
@@ -30,6 +33,13 @@ const CreacionOfertas = () => {
       descripcion,
       requisitos,
     });
+    Alert.alert(
+        "Oferta creada",
+        "La oferta ha sido creada exitosamente.",
+        [{ text: "OK" }],
+        { cancelable: false }
+    );
+    
   };
 
   const handleRegresar = () => {
