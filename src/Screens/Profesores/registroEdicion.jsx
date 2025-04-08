@@ -63,7 +63,7 @@ const registroEdicion = () => {
           <Text style={styles.label}>3. Correo Institucional</Text>
           <TextInput
             style={styles.input}
-            placeholder="usuario@institucion.edu"
+            placeholder="usuario@itcr.ac.cr"
             value={correo}
             onChangeText={setCorreo}
             keyboardType="email-address"
