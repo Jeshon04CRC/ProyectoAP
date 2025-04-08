@@ -23,9 +23,9 @@ export default function HomePageScreen() {
           <View style={styles.menuItem}>
             <Text style={styles.menuItemText}>Información del usuario</Text>
           </View>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela")}>
             <Text style={styles.menuItemText}>Áreas Académicas</Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.menuItem}>
             <Text style={styles.menuItemText}>Asignar Estudiantes y Grupos profesores</Text>
           </View>

@@ -8,6 +8,7 @@ import HomePageEscuelaScreen  from './src/Screens/Module1/homePageEscuela';
 import publiOfertaScreen from './src/Screens/Module1/publiOferta';
 import listaOfertasScreen from './src/Screens/Module1/listaOfertas';
 import crearOfertaScreen from './src/Screens/Module1/crearOferta';
+import cursosEscuelaScreen from './src/Screens/Module1/cursosEscuela';  
 
 
 //Modulo de Profesores
@@ -23,9 +24,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-      {/** Comentar y descomentar la ruta inicial a necesidad de cada uno */}
-      {/*<Stack.Navigator initialRouteName="login">*/}
-      <Stack.Navigator initialRouteName="HomePageProfesores" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="login">
 
         {/* Login and Registration Screens */}
         <Stack.Screen name="login" component={LoginScreen} />
@@ -36,6 +35,7 @@ export default function App() {
         <Stack.Screen name="publiOferta" component={publiOfertaScreen} />
         <Stack.Screen name="listaOfertas" component={listaOfertasScreen} />
         <Stack.Screen name="crearOferta" component={crearOfertaScreen} />
+        <Stack.Screen name="cursosEscuela" component={cursosEscuelaScreen} />
 
         {/* Module Profesores*/}
         <Stack.Screen name="HomePageProfesores" component={HomePage} />

@@ -89,6 +89,10 @@ const LoginScreen = () => {
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomePageProfesores")}>
+        <Text style={styles.buttonText}>Profesores</Text>
+      </TouchableOpacity>
+
       <Image source={require('../../../assets/Login/ImagenLogin.png')} style={styles.image} />
     </View>
   );
