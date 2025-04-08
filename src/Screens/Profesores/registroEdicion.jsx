@@ -9,7 +9,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Profesores/registroEdicion'; 
 
-const registroEdicion = () => {
+const RegistroEdicion = () => {
   const [nombre, setNombre] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [correo, setCorreo] = useState('');
@@ -129,5 +129,5 @@ const registroEdicion = () => {
   );
 };
 
-export default registroEdicion;
+export default RegistroEdicion;
 

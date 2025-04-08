@@ -9,11 +9,11 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import data from './mockData.json'; 
 import { styles } from '../../Style/Profesores/homePage'; 
-import { navigate } from 'expo-router/build/global-state/routing';
 
 const HomePage = () => {
   const navigation = useNavigation(); // Usar useNavigation para la navegación
   const { contactInfo, options } = data; 
+
   const screenMapping = {
     "Registro y edición del perfil": "registroEdicion",
     "Gestión de asignaturas y proyectos": "gestionAsignaturas",

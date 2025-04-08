@@ -12,7 +12,9 @@ import crearOfertaScreen from './src/Screens/Module1/crearOferta';
 
 //Modulo de Profesores
 import HomePage from './src/Screens/Profesores/homePage';
-import registroEdicion from './src/Screens/Profesores/registroEdicion';
+import RegistroEdicion from './src/Screens/Profesores/registroEdicion';
+import GestionAsignaturas from './src/Screens/Profesores/gestionAsignaturas';
+import EvaluacionRetroalimentacion from './src/Screens/Profesores/evaluacionRetroalimentacion'; 
 
 const Stack = createStackNavigator();
 
@@ -37,7 +39,11 @@ export default function App() {
 
         {/* Module Profesores*/}
         <Stack.Screen name="HomePageProfesores" component={HomePage} />
-        <Stack.Screen name="registroEdicion" component={registroEdicion} />
+        <Stack.Screen name="registroEdicion" component={RegistroEdicion} />
+        <Stack.Screen name="gestionAsignaturas" component={GestionAsignaturas} />
+        <Stack.Screen name="evaluacionRetroalimentacion" component={EvaluacionRetroalimentacion} />
+
+
 
       </Stack.Navigator>
     </NavigationContainer>

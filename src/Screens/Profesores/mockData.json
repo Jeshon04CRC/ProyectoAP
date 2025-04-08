@@ -1,4 +1,3 @@
-
 {
     "contactInfo": {
       "correo": "sanchaves@itcr.ac.cr",
@@ -16,5 +15,73 @@
       "Edición y eliminación de ofertas",
       "Gestión de Postulaciones",
       "Seguimiento de estudiantes"
-    ]
+    ],
+    "gestionAsignaturas": {
+      "courses": [
+        {
+          "id": 101,
+          "nombre": "Introducción a la Programación",
+          "codigo": "IC1802",
+          "creditos": 3,
+          "semestre": 1,
+          "aula": "B3-07",
+          "profesor": "Santiago Chaves Garbanzo"
+        },
+        {
+          "id": 102,
+          "nombre": "Estructuras de Datos",
+          "codigo": "IC2001",
+          "creditos": 4,
+          "semestre": 2,
+          "aula": "B3-08",
+          "profesor": "Santiago Chaves Garbanzo"
+        }
+      ],
+      "proyectos": [
+        {
+          "id": 201,
+          "nombre": "Proyecto de Software",
+          "codigo": "IC3001",
+          "creditos": 3,
+          "semestre": 3,
+          "aula": "B3-09",
+          "profesor": "Santiago Chaves Garbanzo"
+        },
+        {
+          "id": 202,
+          "nombre": "Desarrollo de Aplicaciones Móviles",
+          "codigo": "IC4001",
+          "creditos": 4,
+          "semestre": 4,
+          "aula": "B3-10",
+          "profesor": "Santiago Chaves Garbanzo"
+        }
+      ],
+      "historial": [
+        {
+          "id": 301,
+          "nombre": "Tomas Alvarez",
+          "carnet": "2022124567",
+          "tipo": "Tutoría",
+          "curso": "Estructuras de Datos",
+          "semestre": "2",
+          "estado": "Completado",
+          "año": "2023",
+          "comentario": "",
+          "desempeño": ""
+        },
+        {
+          "id": 302,
+          "nombre": "Maria Gonzalez",
+          "carnet": "2022123456",
+          "tipo": "Asistencia",
+          "curso": "Introducción a la Programación",
+          "semestre": "1",
+          "estado": "En Progreso",
+          "año": "2025",
+          "comentario": "",
+          "desempeño": ""
+        }
+      ]
+    }
   }
