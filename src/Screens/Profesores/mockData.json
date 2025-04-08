@@ -1,0 +1,20 @@
+
+{
+    "contactInfo": {
+      "correo": "sanchaves@itcr.ac.cr",
+      "telefono": "87789002",
+      "nombreResponsable": "Santiago",
+      "apellidosResponsable": "Chaves Garbanzo",
+      "escuelaDepartamento": "Escuela de Computación",
+      "sede": "Campus Tecnológico Central Cartago"
+    },
+    "options": [
+      "Registro y edición del perfil",
+      "Gestión de asignaturas y proyectos",
+      "Evaluación y retroalimentación",
+      "Creación de nuevas ofertas académicas",
+      "Edición y eliminación de ofertas",
+      "Gestión de Postulaciones",
+      "Seguimiento de estudiantes"
+    ]
+  }
