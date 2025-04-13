@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 import { styles } from '../../Style/Module1/cursoEscuela';
 
@@ -22,6 +24,7 @@ export default function App() {
   const [busqueda, setBusqueda] = useState('');
   const [vista, setVista] = useState('todos');
   const [cantidadMostrar, setCantidadMostrar] = useState(10);
+  const navigator = useNavigation();
 
   const filtrado = useMemo(() => {
     const datosFiltrados = DATA.filter(item => {
@@ -92,8 +95,8 @@ export default function App() {
           <Text>Estudiantes requeridos: {item.estudiantes}</Text>
           <Text>Profesor: {item.profesor}</Text>
           <Text>{item.semestre}</Text>
-          <TouchableOpacity>
-            <Text style={styles.updateLink}>Actualizar políticas</Text>
+          <TouchableOpacity onPress={() => navigator.navigate('actualizarPoliticas')}>
+            <Text style={styles.updateLink}>Actualizar políticas </Text>
           </TouchableOpacity>
         </View>
       )}

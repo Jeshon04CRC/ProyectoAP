@@ -17,19 +17,20 @@ export default function HomePageScreen() {
         <Text style={styles.sectionTitle}>Perfiles de Escuela/Departamento</Text>
 
         <View style={styles.menuContainer}>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("adminPerfinEscuela")}>
             <Text style={styles.menuItemText}>Registro y Administración de Perfiles</Text>
-          </View>
-          <View style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Información del usuario</Text>
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela")}>
+            <Text style={styles.menuItemText}>Información de escuela/departamento</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela")}>
             <Text style={styles.menuItemText}>Áreas Académicas</Text>
           </TouchableOpacity>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialAsistencia")}>
             <Text style={styles.menuItemText}>Asignar Estudiantes y Grupos profesores</Text>
-          </View>
+          </TouchableOpacity>
         </View>
+
 
         <Text style={styles.sectionTitle}>Publicaciones de Ofertas de Asistencias, Tutorías y Proyectos</Text>
 
@@ -40,7 +41,7 @@ export default function HomePageScreen() {
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("listaOfertas")}>
             <Text style={styles.menuItemText}>Control de Resultados</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => handleAsignacionTutorias()}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPostulantes")}>
             <Text style={styles.menuItemText}>Asignación de Estudiantes a Tutorías</Text>
           </TouchableOpacity>
         </View>
@@ -48,12 +49,12 @@ export default function HomePageScreen() {
         <Text style={styles.sectionTitle}>Publicaciones de Evaluaciones</Text>
 
         <View style={styles.menuContainer}>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("asistenciaTotalHist")}>
             <Text style={styles.menuItemText}>Publicación de evaluaciones</Text>
-          </View>
-          <View style={styles.menuItem}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPagoAsis")}>
             <Text style={styles.menuItemText}>Análisis de evaluaciones</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionTitle}>Gestión de Proyectos</Text>

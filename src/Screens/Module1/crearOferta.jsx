@@ -6,7 +6,7 @@ import { styles } from '../../Style/Module1/crearOferta';  // Importamos los est
 import axios from 'axios'; 
 import URL from '../../Services/url'
 
-const CrearOfertaScreen = () => {
+export default function CrearOfertaScreen () {
     const [nombreCurso, setNombreCurso] = useState('');
     const [profesor, setProfesor] = useState('');
     const [tipo, setTipo] = useState('');
@@ -124,5 +124,3 @@ const CrearOfertaScreen = () => {
         </ScrollView>
     );
 };
-
-export default CrearOfertaScreen;

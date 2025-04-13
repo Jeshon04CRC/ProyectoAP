@@ -90,8 +90,11 @@ export default function OfertasScreen() {
                 <Text>Horas: {item.horas}</Text>
                 <Text>Fecha límite: {item.fechaLimite}</Text>
                 <Text>Beneficio: {item.beneficio}</Text>
-                <TouchableOpacity style={styles.editButton}>
-                <Text style={styles.editText}>Editar</Text>
+                <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => navigation.navigate("editarOferta", { oferta: item })}
+                    >
+                    <Text style={styles.editText}>Editar</Text>
                 </TouchableOpacity>
             </View>
             )}

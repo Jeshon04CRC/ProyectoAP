@@ -9,6 +9,15 @@ import publiOfertaScreen from './src/Screens/Module1/publiOferta';
 import listaOfertasScreen from './src/Screens/Module1/listaOfertas';
 import crearOfertaScreen from './src/Screens/Module1/crearOferta';
 import cursosEscuelaScreen from './src/Screens/Module1/cursosEscuela';  
+import infoEscuelaScreen from './src/Screens/Module1/infoEscuela'; 
+import actualizarPoliticasScreen from './src/Screens/Module1/actualizarPoliticas';
+import adminPerfinEscuelaScreen from './src/Screens/Module1/adminPerfinEscuela'; // Asegúrate de que la ruta sea correcta
+import historialAsistenciaScreen from './src/Screens/Module1/historialAsistencia';
+import editarOfertaScreen from './src/Screens/Module1/editarOferta';
+import historialPostulantesScreen from './src/Screens/Module1/historialPostulantes'; // Asegúrate de que la ruta sea correcta
+import perfilEstudianteScreen from './src/Screens/Module1/perfilPostulante';
+import asistenciaTotalHistScreen from './src/Screens/Module1/asistenciaTotalHist'; // Asegúrate de que la ruta sea correcta
+import historialPagoAsisScreen from './src/Screens/Module1/historialPagoAsis'; // Asegúrate de que la ruta sea correcta
 
 
 //Modulo de Profesores
@@ -41,6 +50,15 @@ export default function App() {
         <Stack.Screen name="listaOfertas" component={listaOfertasScreen} />
         <Stack.Screen name="crearOferta" component={crearOfertaScreen} />
         <Stack.Screen name="cursosEscuela" component={cursosEscuelaScreen} />
+        <Stack.Screen name="infoEscuela" component={infoEscuelaScreen} />
+        <Stack.Screen name="actualizarPoliticas" component={actualizarPoliticasScreen} />
+        <Stack.Screen name="adminPerfinEscuela" component={adminPerfinEscuelaScreen} />
+        <Stack.Screen name="historialAsistencia" component={historialAsistenciaScreen} />
+        <Stack.Screen name="editarOferta" component={editarOfertaScreen} />
+        <Stack.Screen name="historialPostulantes" component={historialPostulantesScreen} />
+        <Stack.Screen name="perfilEstudiante" component={perfilEstudianteScreen} />
+        <Stack.Screen name="asistenciaTotalHist" component={asistenciaTotalHistScreen} />
+        <Stack.Screen name="historialPagoAsis" component={historialPagoAsisScreen} />
 
         {/* Module Profesores*/}
         <Stack.Screen name="HomePageProfesores" component={HomePage} options={{title: "Inicio"}} />
