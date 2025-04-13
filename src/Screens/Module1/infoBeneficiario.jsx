@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Button, Card, Avatar } from 'react-native-paper';
-import { styles } from '../../Style/Module1/perfilPostulante';
+import { styles } from '../../Style/Module1/infoBeneficiario.js'; // Importa los estilos desde el archivo de estilos
 
 // 🔹 Datos del estudiante
 const datosEstudiante = {

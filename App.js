@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+
 import LoginScreen from './src/Screens/Login/login'; // Asegúrate de que la ruta sea correcta
 import RegisterScrreen from './src/Screens/Login/register'; // Asegúrate de que la ruta sea correcta
 
@@ -11,14 +12,16 @@ import crearOfertaScreen from './src/Screens/Module1/crearOferta';
 import cursosEscuelaScreen from './src/Screens/Module1/cursosEscuela';  
 import infoEscuelaScreen from './src/Screens/Module1/infoEscuela'; 
 import actualizarPoliticasScreen from './src/Screens/Module1/actualizarPoliticas';
-import adminPerfinEscuelaScreen from './src/Screens/Module1/adminPerfinEscuela'; // Asegúrate de que la ruta sea correcta
+import adminPerfilEscuelaScreen from './src/Screens/Module1/adminPerfilEscuela'; // Asegúrate de que la ruta sea correcta
 import historialAsistenciaScreen from './src/Screens/Module1/historialAsistencia';
 import editarOfertaScreen from './src/Screens/Module1/editarOferta';
 import historialPostulantesScreen from './src/Screens/Module1/historialPostulantes'; // Asegúrate de que la ruta sea correcta
 import perfilEstudianteScreen from './src/Screens/Module1/perfilPostulante';
 import asistenciaTotalHistScreen from './src/Screens/Module1/asistenciaTotalHist'; // Asegúrate de que la ruta sea correcta
 import historialPagoAsisScreen from './src/Screens/Module1/historialPagoAsis'; // Asegúrate de que la ruta sea correcta
-
+import crearPagoEstudianteScreen from './src/Screens/Module1/crearPagoEstudiante'; // Asegúrate de que la ruta sea correcta
+import historialPagosScreen from './src/Screens/Module1/historialPagos'; // Asegúrate de que la ruta sea correcta
+import perfilPostulanteScreen from './src/Screens/Module1/perfilPostulante'; // Asegúrate de que la ruta sea correcta
 
 //Modulo de Profesores
 import HomePage from './src/Screens/Profesores/homePage';
@@ -52,13 +55,17 @@ export default function App() {
         <Stack.Screen name="cursosEscuela" component={cursosEscuelaScreen} />
         <Stack.Screen name="infoEscuela" component={infoEscuelaScreen} />
         <Stack.Screen name="actualizarPoliticas" component={actualizarPoliticasScreen} />
-        <Stack.Screen name="adminPerfinEscuela" component={adminPerfinEscuelaScreen} />
+        <Stack.Screen name="adminPerfilEscuela" component={adminPerfilEscuelaScreen} />
         <Stack.Screen name="historialAsistencia" component={historialAsistenciaScreen} />
         <Stack.Screen name="editarOferta" component={editarOfertaScreen} />
         <Stack.Screen name="historialPostulantes" component={historialPostulantesScreen} />
         <Stack.Screen name="perfilEstudiante" component={perfilEstudianteScreen} />
         <Stack.Screen name="asistenciaTotalHist" component={asistenciaTotalHistScreen} />
         <Stack.Screen name="historialPagoAsis" component={historialPagoAsisScreen} />
+        <Stack.Screen name="crearPagoEstudiante" component={crearPagoEstudianteScreen} />
+        <Stack.Screen name="historialPagos" component={historialPagosScreen} />
+        <Stack.Screen name="perfilPostulante" component={perfilPostulanteScreen} />
+
 
         {/* Module Profesores*/}
         <Stack.Screen name="HomePageProfesores" component={HomePage} options={{title: "Inicio"}} />

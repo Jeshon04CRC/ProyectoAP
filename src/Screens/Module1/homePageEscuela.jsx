@@ -17,7 +17,7 @@ export default function HomePageScreen() {
         <Text style={styles.sectionTitle}>Perfiles de Escuela/Departamento</Text>
 
         <View style={styles.menuContainer}>
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("adminPerfinEscuela")}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("adminPerfilEscuela")}>
             <Text style={styles.menuItemText}>Registro y Administración de Perfiles</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela")}>
@@ -60,12 +60,12 @@ export default function HomePageScreen() {
         <Text style={styles.sectionTitle}>Gestión de Proyectos</Text>
 
         <View style={styles.menuContainer}>
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("crearPagoEstudiante")}>
             <Text style={styles.menuItemText}>Control de proyectos</Text>
-          </View>
-          <View style={styles.menuItem}>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPagos")}>
             <Text style={styles.menuItemText}>Gestión de pagos y presupuestos</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.statsContainer}>
