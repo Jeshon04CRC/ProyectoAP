@@ -34,6 +34,17 @@ import GestionPostulaciones from './src/Screens/Profesores/gestionPostulaciones'
 import InfoEstudiante from './src/Screens/Profesores/infoEstudiante';
 
 
+
+
+//Modulo de Estudiantes
+import HomePageEstudiantes from './src/Screens/Estudiantes/homePageEstudiantes';
+import RegistroEdicionEstudiantes from './src/Screens/Estudiantes/registroEdicionEstudiantes';
+import BusquedaOportunidades from './src/Screens/Estudiantes/busquedaApliOportunidades';
+import FormularioAplicacion from './src/Screens/Estudiantes/formularioAplicacion';
+import DetalleOportunidad from './src/Screens/Estudiantes/detallesOportunidad';
+import SeguimientoSolicitudes from './src/Screens/Estudiantes/seguimientoSolicitudes';
+
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -41,7 +52,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-        <Stack.Navigator initialRouteName="login">
+        <Stack.Navigator initialRouteName="HomePageEstudiantes">
 
         {/* Login and Registration Screens */}
         <Stack.Screen name="login" component={LoginScreen} />
@@ -76,6 +87,22 @@ export default function App() {
         <Stack.Screen name="edicionOfertas" component={EdicionOfertas} options={{title: "Edición de Ofertas"}}/>
         <Stack.Screen name="gestionPostulaciones" component={GestionPostulaciones} options={{title: "Gestión de Postulaciones"}}/>
         <Stack.Screen name="InfoEstudiante" component={InfoEstudiante} options={{title: "Información del Estudiante"}}/>
+
+
+
+
+
+        {/* Module Estudiantes*/}
+        <Stack.Screen name="HomePageEstudiantes" component={HomePageEstudiantes} options={{title: "Inicio"}} />
+        <Stack.Screen name="RegistroEdicionEstudiantes" component={RegistroEdicionEstudiantes} options={{title: "Registro y edición"}}/>
+        <Stack.Screen name="busquedaApliOportunidades" component={BusquedaOportunidades} options={{title: "Busqueda y Aplicacion de Oportunidades"}}/>
+        <Stack.Screen name="formularioAplicacion" component={FormularioAplicacion} options={{ title: "Aplicar a oportunidad" }} />
+        <Stack.Screen name="detallesOportunidad" component={DetalleOportunidad} options={{ title: "Detalles Oportunidad" }} />
+        <Stack.Screen name="seguimientoSolicitudes" component={SeguimientoSolicitudes} options={{ title: "Seguimiento Solicitudes" }} />
+
+
+
+
 
 
 
