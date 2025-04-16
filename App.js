@@ -41,6 +41,17 @@ import FormularioAplicacion from './src/Screens/Estudiantes/formularioAplicacion
 import DetalleOportunidad from './src/Screens/Estudiantes/detallesOportunidad';
 import SeguimientoSolicitudes from './src/Screens/Estudiantes/seguimientoSolicitudes';
 
+//Modulo de Administradores 
+import HomePageAdmin from './src/Screens/Administradores/homePageAdmin';
+import GestionRolesUsuarios from './src/Screens/Administradores/gestionRolesUsuarios';
+import CambioRol from './src/Screens/Administradores/cambioRol';
+import CrearUsuario from './src/Screens/Administradores/crearUsuario';
+import EditarUsuario from './src/Screens/Administradores/editarUsuario';
+import MonitoreoActividades from './src/Screens/Administradores/monitoreoActividades';
+import ValidacionOfertas from './src/Screens/Administradores/validacionOfertas';
+import EditarOferta from './src/Screens/Administradores/editarOfertas';
+
+
 
 const Stack = createStackNavigator();
 
@@ -49,7 +60,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-        <Stack.Navigator initialRouteName="login">
+        <Stack.Navigator initialRouteName="HomePageAdmin">
 
         {/* Login and Registration Screens */}
         <Stack.Screen name="login" component={LoginScreen} />
@@ -95,8 +106,15 @@ export default function App() {
         <Stack.Screen name="seguimientoSolicitudes" component={SeguimientoSolicitudes} options={{ title: "Seguimiento Solicitudes" }} />
 
 
-
-
+        {/* Module Admin*/}
+        <Stack.Screen name="HomePageAdmin" component={HomePageAdmin} options={{title: "Inicio"}} />
+        <Stack.Screen name="GestionRolesUsuarios" component={GestionRolesUsuarios} options={{title: "Gestion de usuarios y roles"}} />
+        <Stack.Screen name="CambioRol" component={CambioRol} options={{title: "Cambio de roles"}} />
+        <Stack.Screen name="CrearUsuario" component={CrearUsuario} options={{title: "Crear Usuario"}} />
+        <Stack.Screen name="EditarUsuario" component={EditarUsuario} options={{title: "Editar Usuario"}} />
+        <Stack.Screen name="MonitoreoActividades" component={MonitoreoActividades} options={{title: "Monitoreo de actividades"}} />
+        <Stack.Screen name="ValidacionOfertas" component={ValidacionOfertas} options={{title: "Validacion ofertas "}} />
+        <Stack.Screen name="EditarOferta" component={EditarOferta} options={{title: "Validacion ofertas "}} />
 
       </Stack.Navigator>
     </NavigationContainer>
