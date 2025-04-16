@@ -33,9 +33,6 @@ import EdicionOfertas from './src/Screens/Profesores/edicionOfertas';
 import GestionPostulaciones from './src/Screens/Profesores/gestionPostulaciones';
 import InfoEstudiante from './src/Screens/Profesores/infoEstudiante';
 
-
-
-
 //Modulo de Estudiantes
 import HomePageEstudiantes from './src/Screens/Estudiantes/homePageEstudiantes';
 import RegistroEdicionEstudiantes from './src/Screens/Estudiantes/registroEdicionEstudiantes';
@@ -52,7 +49,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-        <Stack.Navigator initialRouteName="HomePageEstudiantes">
+        <Stack.Navigator initialRouteName="login">
 
         {/* Login and Registration Screens */}
         <Stack.Screen name="login" component={LoginScreen} />
@@ -89,9 +86,6 @@ export default function App() {
         <Stack.Screen name="InfoEstudiante" component={InfoEstudiante} options={{title: "Información del Estudiante"}}/>
 
 
-
-
-
         {/* Module Estudiantes*/}
         <Stack.Screen name="HomePageEstudiantes" component={HomePageEstudiantes} options={{title: "Inicio"}} />
         <Stack.Screen name="RegistroEdicionEstudiantes" component={RegistroEdicionEstudiantes} options={{title: "Registro y edición"}}/>
@@ -99,9 +93,6 @@ export default function App() {
         <Stack.Screen name="formularioAplicacion" component={FormularioAplicacion} options={{ title: "Aplicar a oportunidad" }} />
         <Stack.Screen name="detallesOportunidad" component={DetalleOportunidad} options={{ title: "Detalles Oportunidad" }} />
         <Stack.Screen name="seguimientoSolicitudes" component={SeguimientoSolicitudes} options={{ title: "Seguimiento Solicitudes" }} />
-
-
-
 
 
 

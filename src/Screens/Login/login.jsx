@@ -3,54 +3,41 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Login/login';
 import axios from 'axios'; 
-import URL from '../../Services/url'
+import URL from '../../Services/url';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
-  
+
   const handleRegistro = () => {
     navigation.navigate("registroPage");
-  };	
+  };
 
   const handleInicioSeccion = async () => {
     try {
-      const storedUrl = URL;  // Esto obtiene la URL que has definido en url.js
-      
-      // Concatenar correctamente la URL con el puerto
-      const apiUrl = `${storedUrl}:3000`; // Asegúrate de usar las comillas correctas
-      
-      // Usando Axios en vez de fetch
-      const response = await axios.post(`${apiUrl}/login`, 
-        {
-          email: email,
-          password: password
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.post(`${apiUrl}/login`, { email, password });
+
+      if (response.status === 200) {
+        const { rol } = response.data;
+
+        if (rol === "estudiante") {
+          alert("Login exitoso como estudiante");
+          navigation.navigate("HomePageEstudiantes");
+        } else if (rol === "profesor") {
+          alert("Login exitoso como profesor");
+          navigation.navigate("HomePageProfesores");
+        } else if (rol === "admin") {
+          alert("Login exitoso como administrador");
+          navigation.navigate("homePageEscuela");
         }
-      );
-      
-      if (response.status === 200) { // Verifica si la respuesta es exitosa
-        alert("Login exitoso para modulo #1 estudiantes");
-        //navigation.navigate("homePage");
       }
-      else if (response.status === 201) {
-        alert("Login para modulo #1(escuelas),Modulo #2(profesores) de administradores");
-        navigation.navigate("homePageEscuela");
-      }
-      else if (response.status === 202) {
-        alert("Login para modulo #4 de admin");
-        //navigation.navigate("homePage");
-      }
-      else {
-        alert("Error: " + response.data.message);
-      }
-    } 
-    catch (error) {
+
+    } catch (error) {
       if (error.response?.status === 401) {
-        const mensaje = error.response.data.message;
-        alert(mensaje);
-      } 
-      else {
+        alert(error.response.data.message);
+      } else {
         console.error("Error al hacer la solicitud:", error);
         alert("Error de red o del servidor.");
       }
@@ -60,7 +47,7 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Inicio de Sesión</Text>
-      <Text style={styles.subtitle}>Gestión de Asistencias, Tutorías y Proyectos de Investigación</Text>
+      <Text style={styles.subtitle}>Gestín de Asistencias, Tutorías y Proyectos</Text>
 
       <Text style={styles.label}>Correo Electrónico</Text>
       <TextInput
@@ -71,7 +58,6 @@ const LoginScreen = () => {
         keyboardType="email-address"
       />
 
-
       <Text style={styles.label}>Contraseña</Text>
       <TextInput
         style={styles.input}
@@ -81,16 +67,12 @@ const LoginScreen = () => {
         secureTextEntry
       />
 
-      <TouchableOpacity onPress={() => handleRegistro()}>
-        <Text style={styles.forgotPassword}>Registrase</Text>
+      <TouchableOpacity onPress={handleRegistro}>
+        <Text style={styles.forgotPassword}>Registrarse</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => handleInicioSeccion()}>
+      <TouchableOpacity style={styles.button} onPress={handleInicioSeccion}>
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("HomePageProfesores")}>
-        <Text style={styles.buttonText}>Profesores</Text>
       </TouchableOpacity>
 
       <Image source={require('../../../assets/Login/ImagenLogin.png')} style={styles.image} />

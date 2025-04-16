@@ -34,7 +34,7 @@ const seguimientoData = [
     avances: true,
     retroalimentacion: true,
     certificados: true,
-    alertaHoras: false,
+    alertaHoras: true,
   },
   // Más registros si se desea...
 ];
