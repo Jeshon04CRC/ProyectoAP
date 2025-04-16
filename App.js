@@ -24,7 +24,7 @@ import historialPagosScreen from './src/Screens/Module1/historialPagos'; // Aseg
 import perfilPostulanteScreen from './src/Screens/Module1/perfilPostulante'; // Asegúrate de que la ruta sea correcta
 
 //Modulo de Profesores
-import HomePage from './src/Screens/Profesores/homePage';
+import HomePageProfesores from './src/Screens/Profesores/homePageProfesores';
 import RegistroEdicion from './src/Screens/Profesores/registroEdicion';
 import GestionAsignaturas from './src/Screens/Profesores/gestionAsignaturas';
 import EvaluacionRetroalimentacion from './src/Screens/Profesores/evaluacionRetroalimentacion'; 
@@ -60,7 +60,7 @@ export default function App() {
   return (
     <NavigationContainer>
 
-        <Stack.Navigator initialRouteName="HomePageAdmin">
+        <Stack.Navigator initialRouteName="login">
 
         {/* Login and Registration Screens */}
         <Stack.Screen name="login" component={LoginScreen} />
@@ -87,7 +87,7 @@ export default function App() {
 
 
         {/* Module Profesores*/}
-        <Stack.Screen name="HomePageProfesores" component={HomePage} options={{title: "Inicio"}} />
+        <Stack.Screen name="HomePageProfesores" component={HomePageProfesores} options={{title: "Inicio"}} />
         <Stack.Screen name="registroEdicion" component={RegistroEdicion} options={{title: "Registro y edición"}}/>
         <Stack.Screen name="gestionAsignaturas" component={GestionAsignaturas} options={{title: "Gestión de Asignaturas"}}/>
         <Stack.Screen name="evaluacionRetroalimentacion" component={EvaluacionRetroalimentacion} options={{title: "Evaluación"}}/>

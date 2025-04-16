@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import data from './mockData.json'; 
-import { styles } from '../../Style/Profesores/homePage'; 
+import { styles } from '../../Style/Profesores/homePageProfesores'; // Asegúrate de que la ruta sea correcta
 
 const HomePage = () => {
   const navigation = useNavigation(); // Usar useNavigation para la navegación

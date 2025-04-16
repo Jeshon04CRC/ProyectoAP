@@ -25,19 +25,29 @@ const LoginScreen = () => {
         if (rol === "estudiante") {
           alert("Login exitoso como estudiante");
           navigation.navigate("HomePageEstudiantes");
+
         } else if (rol === "profesor") {
           alert("Login exitoso como profesor");
           navigation.navigate("HomePageProfesores");
-        } else if (rol === "admin") {
-          alert("Login exitoso como administrador");
+        } 
+        else if (rol === "escuela") {
+          alert("Login exitoso como escuela");
           navigation.navigate("homePageEscuela");
+        }
+        else if (rol === "admin") {
+          alert("Login exitoso como administrador");
+          navigation.navigate("HomePageAdmin");
         }
       }
 
     } catch (error) {
       if (error.response?.status === 401) {
         alert(error.response.data.message);
-      } else {
+      }
+      else if (error.response?.status === 401) {
+        alert(error.response.data.message);
+      }
+      else {
         console.error("Error al hacer la solicitud:", error);
         alert("Error de red o del servidor.");
       }
