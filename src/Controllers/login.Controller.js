@@ -44,7 +44,7 @@ console.log("Tipo de usuario:", tipo);
       id: id
     });
   } 
-  else if(tipo === "Escuela"){
+  else if(tipo === "Escuela" || tipo === "Departamento"){
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",

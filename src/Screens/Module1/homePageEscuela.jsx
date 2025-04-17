@@ -1,11 +1,18 @@
 import { View, Text, ScrollView, Image, SafeAreaView, TouchableOpacity} from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { styles } from '../../Style/Module1/homePageEscuela';
+import { useRoute } from '@react-navigation/native';
 
 
 export default function HomePageScreen() {
   const navigation = useNavigation()
+  const route = useRoute();
+  const { userId } = route.params;
 
+
+  console.log("User ID:", userId); // Log the userId to verify it's being passed correctly
+
+  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -20,7 +27,7 @@ export default function HomePageScreen() {
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("adminPerfilEscuela")}>
             <Text style={styles.menuItemText}>Registro y Administración de Perfiles</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela")}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela", { userId: userId })}>
             <Text style={styles.menuItemText}>Información de escuela/departamento</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela")}>
