@@ -20,23 +20,23 @@ const LoginScreen = () => {
       const response = await axios.post(`${apiUrl}/login`, { email, password });
 
       if (response.status === 200) {
-        const { rol } = response.data;
+        const { rol, id } = response.data;
 
         if (rol === "estudiante") {
           alert("Login exitoso como estudiante");
-          navigation.navigate("HomePageEstudiantes");
+          navigation.navigate("HomePageEstudiantes", { userId: id });
 
         } else if (rol === "profesor") {
           alert("Login exitoso como profesor");
-          navigation.navigate("HomePageProfesores");
+          navigation.navigate("HomePageProfesores", { userId: id });
         } 
         else if (rol === "escuela") {
           alert("Login exitoso como escuela");
-          navigation.navigate("homePageEscuela");
+          navigation.navigate("homePageEscuela", { userId: id });
         }
         else if (rol === "admin") {
           alert("Login exitoso como administrador");
-          navigation.navigate("HomePageAdmin");
+          navigation.navigate("HomePageAdmin", { userId: id });
         }
       }
 

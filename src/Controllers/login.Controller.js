@@ -15,34 +15,41 @@ export const postLogin = async (req, res) => {
       html: `<h1>Has iniciado sesión en tu cuenta</h1><p>Hola, ${email}</p>`
     });
 */
-const tipo = await validarCredenciales(email.toLowerCase(), password);
+const credenciales = await validarCredenciales(email.toLowerCase(), password);
+let id = credenciales.id;
+let tipo = credenciales.tipoUsuario;
+
 console.log("Tipo de usuario:", tipo);
   if(tipo === "Estudiante"){
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
-      rol: "estudiante"
+      rol: "estudiante",
+      id: id
     });
   }
   else if(tipo === "Profesor"){
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
-      rol: "profesor"
+      rol: "profesor",
+      id: id
     });
   } 
   else if(tipo === "Administrador"){
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
-      rol: "admin"
+      rol: "admin",
+      id: id
     });
   } 
   else if(tipo === "Escuela"){
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
-      rol: "escuela"
+      rol: "escuela",
+      id: id
     });
   }
   else if(tipo === 400){
@@ -78,7 +85,10 @@ const validarCredenciales = async (emailIngresado, contrasenaIngresada) => {
         data.contrasena === contrasenaIngresada
       ) {
         console.log("Usuario autenticado:", data);
-        return data.tipoUsuario; // ahora sí retorna correctamente
+        return {
+          tipoUsuario: data.tipoUsuario,
+          id: doc.id
+        }; // ahora sí retorna correctamente
       }
     }
 
