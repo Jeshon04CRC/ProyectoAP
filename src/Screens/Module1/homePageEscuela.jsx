@@ -30,7 +30,7 @@ export default function HomePageScreen() {
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela", { userId: userId })}>
             <Text style={styles.menuItemText}>Información de escuela/departamento</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela")}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela", { userId: userId })}>
             <Text style={styles.menuItemText}>Áreas Académicas</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialAsistencia")}>

@@ -37,7 +37,7 @@ export default function ContactInfoScreen() {
   const handleInformacion = async () => {
     try {
       const apiUrl = `${URL}:3000`;
-      const response = await axios.post(`${apiUrl}/escuelas/infoEscuela`, { userId });
+      const response = await axios.get(`${apiUrl}/escuelas/infoEscuela`, { params : {userId }});
       return response.data.datos;
     } catch (error) {
       console.error("Error al hacer la solicitud:", error);
@@ -53,7 +53,7 @@ export default function ContactInfoScreen() {
   const handleSave = async () => {
     try {
       const apiUrl = `${URL}:3000`;
-      const response = await axios.post(`${apiUrl}/escuelas/actualizarInfoEscuela`, { userId, formData });
+      const response = await axios.put(`${apiUrl}/escuelas/actualizarInfoEscuela`, { userId, formData });
       console.log("Respuesta del servidor:", response.data);
       if (response.status === 200) {
         alert(response.data.message);
