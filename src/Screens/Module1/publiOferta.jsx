@@ -30,7 +30,7 @@ export default function OfertasScreen() {
         try {
             const apiUrl = `${URL}:3000`;
             const response = await axios.get(`${apiUrl}/escuelas/historialOfertas`, {
-                params: { userId },
+                params: { userId }
             });
 
             if (response.status === 200) {

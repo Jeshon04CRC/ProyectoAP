@@ -209,3 +209,54 @@ export const actualizarInfoOferta = async (req, res) => {
 }
 
 
+//PARA HISTORIAL DE POSTULANTES
+
+export const informacionPostulantes = async (req, res) => {
+  const { userId } = req.query;
+  const postulantes = [];
+  let carrera = "";
+  const estudiantes = [];
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for(const doc of asistenciasSnapshot.docs) {
+        const datos = doc.data();
+        if(datos.departamento === userId) {
+          postulantes.push(datos.postulaciones);
+      }
+    }
+
+    for(const doc of usuariosSnapshot.docs) {
+      if(doc.id === userId) {
+        carrera = doc.data().carrera;
+        }
+      }
+    
+    const postulantesUnicos = [...new Set(postulantes.flat())];
+    
+    for (const postulante of postulantesUnicos) {
+      for (const doc of usuariosSnapshot.docs) {
+        const datos = doc.data(); 
+        if (doc.id === postulante) {
+          const estudiante = {
+            id: doc.id,
+            nombre: datos.nombre,
+            carrera: carrera,
+            nivel: datos.nivelAcademico,
+            ponderado: datos.ponderado,
+            cursosAprobados: datos.cursosAprovados.length,
+            estado: datos.estado
+          };
+          estudiantes.push(estudiante);
+        }
+      }
+    }
+    return res.status(200).json({estudiantes});
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+  
+}

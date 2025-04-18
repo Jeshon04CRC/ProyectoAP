@@ -39,7 +39,7 @@ export default function HistorialAsistenciaScreen() {
     try {
       const apiUrl = `${URL}:3000`;
       const response = await axios.get(`${apiUrl}/escuelas/historialAsistencias`, {
-        params: { userId },
+        params: { userId }
       });
 
       const data = response.data;

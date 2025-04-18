@@ -5,7 +5,8 @@ import {informacionEscuela,
         historialAsistencias,
         informacionOfertas,
         publicarOfertas,
-        actualizarInfoOferta
+        actualizarInfoOferta,
+        informacionPostulantes
 } 
 from "../Controllers/modulo1.Controller.js"
 
@@ -22,4 +23,5 @@ router.get("/escuelas/historialOfertas", informacionOfertas)
 router.post("/escuelas/publiOferta", publicarOfertas)
 router.put("/escuelas/actualizarOferta", actualizarInfoOferta) // Cambia el controlador según lo que necesites hacer
 
+router.get("/escuelas/historialPostulantes", informacionPostulantes)
 export default router;
