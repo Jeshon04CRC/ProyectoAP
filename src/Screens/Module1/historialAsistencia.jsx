@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import {
   View,
   Text,
@@ -10,37 +10,12 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
+import { useEffect } from 'react';
 import { styles } from '../../Style/Module1/historialAsistencia';
+import { useRoute } from '@react-navigation/native';
+import URL from '../../Services/url';
+import axios from 'axios';
 
-const allData = [
-  {
-    fecha: 'Nov 15, 2024',
-    estudiante: 'Tomas',
-    tutor: 'Jaime',
-    curso: 'Reque',
-    semestre: 'I Semestre',
-    estado: 'Completado',
-    valoracion: 4.8,
-  },
-  {
-    fecha: 'Sep 10, 2024',
-    estudiante: 'Jeffer',
-    tutor: 'Bena',
-    curso: 'Arky',
-    semestre: 'I Semestre',
-    estado: 'Pendiente',
-    valoracion: 2.8,
-  },
-  {
-    fecha: 'Dic 01, 2024',
-    estudiante: 'Luis',
-    tutor: 'Ana',
-    curso: 'Progra',
-    semestre: 'II Semestre',
-    estado: 'Completado',
-    valoracion: 3.8,
-  },
-];
 
 export default function HistorialAsistenciaScreen() {
   const [search, setSearch] = useState('');
@@ -48,6 +23,40 @@ export default function HistorialAsistenciaScreen() {
   const [selectedEstado, setSelectedEstado] = useState('');
   const [showSemestreModal, setShowSemestreModal] = useState(false);
   const [showEstadoModal, setShowEstadoModal] = useState(false);
+  const [allData, setAllData] = useState([]); // Estado para almacenar los datos obtenidos de la API
+  const route = useRoute();
+  const { userId } = route.params; // Obtener el userId de los parámetros de la ruta
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await handleInformacion();
+      setAllData(data); // Actualizar el estado con los datos obtenidos
+    };
+    fetchData();
+  }, []); // Ejecutar la función al montar el componente
+
+  const handleInformacion = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.get(`${apiUrl}/escuelas/historialAsistencias`, {
+        params: { userId },
+      });
+
+      const data = response.data;
+
+      if (response.status === 200) {
+        return data.historialAsistencia || [];
+      } else {
+        console.error('Error al obtener los datos:', response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+      return [];
+    } 
+  }
+  
+
 
   // 🔁 Obtener valores únicos de semestre y estado
   const uniqueSemestres = [...new Set(allData.map(item => item.semestre))];
@@ -81,10 +90,6 @@ export default function HistorialAsistenciaScreen() {
       <View style={styles.cardRow}>
         <Text style={styles.label}>Estado:</Text>
         <Text style={styles.estado}>{item.estado}</Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Valoración:</Text>
-        <Text style={styles.valoracion}>{item.valoracion.toFixed(1)}/5</Text>
       </View>
     </View>
   );

@@ -50,7 +50,6 @@ export const actualizarInfoEscuela = async (req, res) => {
   
 
 //PARA EL CURSOSESCUELA
-
 export const informacionCursosEscuela = async (req, res) => {
   const { userId } = req.query;
 
@@ -84,7 +83,7 @@ export const informacionCursosEscuela = async (req, res) => {
         const curso = doc.data();
 
         const profesorInfo = usuariosMap.get(curso.profesor) || { id: curso.profesor, nombre: "Desconocido" };
-        const estudiantesInfo = (curso.Estudiantes || []).map(id => usuariosMap.get(id) || { id, nombre: "Desconocido" });
+        const estudiantesInfo = (curso.estudiantes || []).map(id => usuariosMap.get(id) || { id, nombre: "Desconocido" });
 
         return {
           id: doc.id,
@@ -113,3 +112,46 @@ export const informacionCursosEscuela = async (req, res) => {
     return res.status(500).json({ error: "Error al obtener la información de cursos y programas" });
   }
 };
+
+
+
+
+
+
+//PARA EL HISTORIAL DE ASISTENCIAS
+export const historialAsistencias = async (req, res) => {
+  const { userId } = req.query;
+  const historialAsistencia = [];
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+   for(const doc of asistenciasSnapshot.docs) {
+        const datos = doc.data();
+
+        if (datos.departamento === userId) {
+          for (const doc of usuariosSnapshot.docs) {
+            const datosUsuario = doc.data();
+            if (doc.id === datos.personaACargo) {
+              const profesor =  datosUsuario.nombre;
+
+              const entrada = {
+                fecha: datos.fechaInicio || '00/00/2025',
+                estudiante: datos.cantidadVacantes, // Aquí podrías ligarlo a una colección "Postulaciones" si hay
+                tutor: profesor,
+                curso: datos.tituloPrograma || 'Sin curso',
+                semestre: datos.semestre, // Podés usar lógica para calcularlo con base en fechaInicio si querés
+                estado: datos.estado ? 'Completado' : 'Pendiente'
+              };
+              historialAsistencia.push(entrada);
+              return res.status(200).json({historialAsistencia});
+            }
+          }
+        }
+      } 
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+} 
