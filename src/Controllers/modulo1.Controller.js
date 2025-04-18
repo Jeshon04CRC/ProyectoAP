@@ -126,7 +126,7 @@ export const historialAsistencias = async (req, res) => {
     const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
     const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
 
-   for(const doc of asistenciasSnapshot.docs) {
+    for(const doc of asistenciasSnapshot.docs) {
         const datos = doc.data();
 
         if (datos.departamento === userId) {
@@ -141,17 +141,71 @@ export const historialAsistencias = async (req, res) => {
                 tutor: profesor,
                 curso: datos.tituloPrograma || 'Sin curso',
                 semestre: datos.semestre, // Podés usar lógica para calcularlo con base en fechaInicio si querés
-                estado: datos.estado ? 'Completado' : 'Pendiente'
+                estado: datos.estado
               };
               historialAsistencia.push(entrada);
-              return res.status(200).json({historialAsistencia});
             }
           }
         }
       } 
+    return res.status(200).json({historialAsistencia});
   }
   catch (error) {
     console.error("Error al obtener informacion:", error);
     return res.status(401).json({ error: "Error al obtener informacion" });
   }
 } 
+
+
+//PARA LA PUBLICACION DE OFERTAS
+
+export const informacionOfertas = async (req, res) => {
+  const { userId } = req.query;
+  const ofertasActuales = [];
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for(const doc of asistenciasSnapshot.docs) {
+        const datos = doc.data();
+
+        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision" || datos.estado === "Cerrado")) {
+          for (const doc of usuariosSnapshot.docs) {
+            const datosUsuario = doc.data();
+            if (doc.id === datos.personaACargo) {
+              const profesor =  datosUsuario.nombre;
+
+              const ofertas = {
+                id: doc.id,
+                nombre: datos.tituloPrograma,
+                tipo: datos.tipo, // Aquí podrías ligarlo a una colección "Postulaciones" si hay
+                estado: datos.estado,
+                estudiantes: datos.cantidadVacantes,
+                horas: datos.totalHoras, // Podés usar lógica para calcularlo con base en fechaInicio si querés
+                fechaLimite: datos.fechaFin,
+                beneficio: datos.beneficio
+              };
+              ofertasActuales.push(ofertas);
+            }
+          }
+        }
+      } 
+    return res.status(200).json({ofertasActuales});
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+}
+
+
+export const publicarOfertas = async (req, res) => {
+
+}
+
+export const actualizarInfoOferta = async (req, res) => {
+
+
+}
+
+

@@ -2,7 +2,11 @@ import {Router} from "express"
 import {informacionEscuela, 
         actualizarInfoEscuela, 
         informacionCursosEscuela,
-        historialAsistencias} 
+        historialAsistencias,
+        informacionOfertas,
+        publicarOfertas,
+        actualizarInfoOferta
+} 
 from "../Controllers/modulo1.Controller.js"
 
 const router = Router()
@@ -13,5 +17,9 @@ router.put("/escuelas/actualizarInfoEscuela", actualizarInfoEscuela); // Cambia 
 router.get("/escuelas/cursosEscuela", informacionCursosEscuela);
 
 router.get("/escuelas/historialAsistencias", historialAsistencias)
+
+router.get("/escuelas/historialOfertas", informacionOfertas)
+router.post("/escuelas/publiOferta", publicarOfertas)
+router.put("/escuelas/actualizarOferta", actualizarInfoOferta) // Cambia el controlador según lo que necesites hacer
 
 export default router;

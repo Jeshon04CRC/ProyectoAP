@@ -10,6 +10,8 @@ import { styles } from '../../Style/Module1/crearOferta';
 import axios from 'axios';
 import URL from '../../Services/url';
 
+
+
 export default function EditarOfertaScreen() {
   const route = useRoute();
   const oferta = route.params?.oferta;
@@ -25,6 +27,10 @@ export default function EditarOfertaScreen() {
   const [requisitos, setRequisitos] = useState(oferta?.requisitos || '');
   const [fechaInicio, setFechaInicio] = useState(oferta?.fechaInicio ? new Date(oferta.fechaInicio) : new Date());
   const [fechaCierre, setFechaCierre] = useState(oferta?.fechaLimite ? new Date(oferta.fechaLimite) : new Date());
+  const router = useRoute();
+  const { userId } = router.params;
+
+
 
   const handleConfirmInicio = (event, selectedDate) => {
     if (selectedDate) setFechaInicio(selectedDate);
