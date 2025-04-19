@@ -6,21 +6,22 @@ import { styles } from '../../Style/Estudiantes/detallesOportunidad';
 const DetalleOportunidad = () => {
   const navigation = useNavigation();
   const route = useRoute();
+
   const {
     titulo,
     escuela,
     encargado,
     horas,
-    tipo = 'No especificado',
-    horario = 'No especificado',
-    vacantes = 'No especificado',
-    descripcion = 'No disponible.',
-    beneficios = 'No se detallaron beneficios.'
+    descripcion,
+    horario,
+    cantidadVacantes,
+    objetivos,
+    beneficio
   } = route.params;
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
+      {/* Encabezado */}
       <View style={styles.headerBar}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
@@ -36,15 +37,15 @@ const DetalleOportunidad = () => {
         <Text style={styles.cardTitle}>{titulo}</Text>
         <Text style={styles.cardText}>Escuela: {escuela}</Text>
         <Text style={styles.cardText}>Encargado: {encargado}</Text>
-        <Text style={styles.cardText}>Tipo de asistencia: {tipo}</Text>
+        <Text style={styles.cardText}>Tipo de asistencia: {descripcion}</Text>
         <Text style={styles.cardText}>Horario: {horario}</Text>
-        <Text style={styles.cardText}>Vacantes: {vacantes}</Text>
+        <Text style={styles.cardText}>Vacantes: {cantidadVacantes}</Text>
         <Text style={styles.cardText}>Horas a la semana: {horas}</Text>
-        <Text style={styles.cardText}>Descripción: {descripcion}</Text>
-        <Text style={styles.cardText}>Beneficios: {beneficios}</Text>
+        <Text style={styles.cardText}>Objetivos: {objetivos}</Text>
+        <Text style={styles.cardText}>Beneficio: {beneficio}</Text>
       </View>
 
-      {/* Botón para aplicar */}
+      {/* Botón de aplicar */}
       <TouchableOpacity
         style={[styles.button, styles.applyButton]}
         onPress={() => navigation.navigate('formularioAplicacion', { titulo })}
