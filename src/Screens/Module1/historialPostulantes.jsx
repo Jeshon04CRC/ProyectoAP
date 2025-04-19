@@ -9,39 +9,6 @@ import URL from '../../Services/url';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-const estudiantesData = [
-  {
-    id: '1',
-    nombre: 'Tomás Abarca',
-    idEstudiante: 'ISTA',
-    carrera: 'Computación',
-    nivel: 'Principiante',
-    ponderado: '89.5',
-    cursosAprobados: '20',
-    estado: 'Aprobado'
-  },
-  {
-    id: '2',
-    nombre: 'Ana Pérez',
-    idEstudiante: 'TPS',
-    carrera: 'Ingeniería Civil',
-    nivel: 'Avanzado',
-    ponderado: '90.1',
-    cursosAprobados: '30',
-    estado: 'Inactivo'
-  },
-  {
-    id: '3',
-    nombre: 'Carlos Martínez',
-    idEstudiante: 'CML',
-    carrera: 'Computación',
-    nivel: 'Intermedio',
-    ponderado: '85.0',
-    cursosAprobados: '15',
-    estado: 'Activo'
-  },
-  // Puedes agregar más estudiantes aquí
-];
 
 export default function EstudiantesPostuladosScreen() {
   const [filtro, setFiltro] = useState('Todos');
@@ -171,7 +138,7 @@ export default function EstudiantesPostuladosScreen() {
             <Text style={styles.cell}>{item.ponderado}</Text>
             <Text style={styles.cell}>{item.cursosAprobados}</Text>
             <Text style={[styles.estado, { backgroundColor: '#D6F5E3', color: '#2B8C58' }]}>{item.estado}</Text>
-            <TouchableOpacity style={styles.detailsButton} onPress={() => navigator.navigate("perfilEstudiante")}>
+            <TouchableOpacity style={styles.detailsButton} onPress={() => navigator.navigate("perfilEstudiante", { userId: item.id })}>
               <Text style={styles.detailsButtonText}>Detalles</Text>
             </TouchableOpacity>
           </View>

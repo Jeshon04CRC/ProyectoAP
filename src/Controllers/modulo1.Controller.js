@@ -258,5 +258,50 @@ export const informacionPostulantes = async (req, res) => {
     console.error("Error al obtener informacion:", error);
     return res.status(401).json({ error: "Error al obtener informacion" });
   }
+};
+
+export const informacionEstudiante = async (req, res) => {
+  const { userId } = req.query;
+  const estudiante = {};
   
-}
+  const historialAsistencia = [];
+  try {
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+
+    for (const doc of usuariosSnapshot.docs) {
+      const datos = doc.data();
+      if (doc.id === userId) {
+        for(const doc of usuariosSnapshot.docs) {
+          if (doc.id === datos.carrera) {
+            const carrera = doc.data().nombre;
+            estudiante.carrera = carrera;
+          }
+        }
+        estudiante.correo = datos.correo;
+        estudiante.nombre = datos.nombre;
+        estudiante.nivelAcademico = datos.nivelAcademico;
+        estudiante.ponderado = datos.ponderado;
+        estudiante.cursosAprobados = datos.cursosAprovados.length;
+      }
+    }
+    for(const doc of asistenciasSnapshot.docs) {
+      const datos = doc.data();
+      if(datos.postulaciones.includes(userId)) {
+        const asistencia = {
+          fecha: datos.fechaInicio || '00/00/2025', 
+          titulo: datos.tituloPrograma || 'Sin curso',
+          horas: datos.totalHoras
+        };
+        historialAsistencia.push(asistencia);
+      }
+    }
+
+    console.log("estudiante:", estudiante);
+    return res.status(200).json({estudiante, historialAsistencia});
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+};
