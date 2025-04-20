@@ -66,7 +66,7 @@ const HomePageEstudiantes = () => {
           telefono: datos.telefono,
           nombreResponsable: datos.nombre,
           apellidosResponsable: datos.apellidos || '',
-          escuelaDepartamento: datos.escuela || datos.departamento || 'No asignado',
+          escuelaDepartamento: datos.carrera || 'No asignado',
           sede: datos.sede || 'Sin sede',
         };
 

@@ -12,7 +12,9 @@ import { collection, getDocs, updateDoc, doc, getDoc, addDoc, query, where, arra
 export const informacionEstudiante = async (req, res) => {
   const { userId } = req.query;
   try {
+    let carrera = '';
     const userDoc = await getDoc(doc(db, "Usuarios", userId));
+    const escuelaDoc = await getDocs(collection(db, "Usuarios"));
     if (!userDoc.exists()) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
@@ -24,6 +26,7 @@ export const informacionEstudiante = async (req, res) => {
     if (Array.isArray(datos.cursosAprovados)) {
       for (const idCurso of datos.cursosAprovados) {
         const cursoDoc = await getDoc(doc(db, "Cursos", idCurso));
+
         if (cursoDoc.exists()) {
           cursosNombres.push(cursoDoc.data().nombre || idCurso);
         } else {
@@ -32,8 +35,16 @@ export const informacionEstudiante = async (req, res) => {
       }
     }
 
+    for(const docs of escuelaDoc.docs){
+      const datos1 = docs.data();
+      if(docs.id === datos.carrera){
+        carrera = datos1.carrera;
+      }
+    }
+
     const respuesta = {
       ...datos,
+      carrera: carrera,
       cursosAprovados: cursosNombres
     };
 
@@ -117,7 +128,9 @@ export const obtenerOportunidades = async (req, res) => {
       usuariosMap[doc.id] = data.nombre;
     });
 
-    const oportunidades = snapshot.docs.map((doc) => {
+    const oportunidades = snapshot.docs
+      .filter(doc => doc.data().estado !== "Cerrado")
+      .map((doc) => {
       const data = doc.data();
 
       return {
