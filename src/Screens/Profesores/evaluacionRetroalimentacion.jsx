@@ -33,7 +33,7 @@ const EvaluacionRetroalimentacion = () => {
   const [newDesempeño, setNewDesempeño] = useState("");
   const uniqueCarnets = Array.from(new Set(historial.map(item => item.carnet)));
 
-  // useEffect para filtrar el historial según el carnet seleccionado o el escrito
+
   useEffect(() => {
     let carnetFilter = selectedCarnet;
     if (selectedCarnet === "custom" && customCarnet.trim() !== "") {
