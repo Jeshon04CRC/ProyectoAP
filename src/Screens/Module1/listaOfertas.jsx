@@ -8,6 +8,7 @@ import URL from '../../Services/url';
 export default function OfertasScreen() {
   const [search, setSearch] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState("Todo");
+  const [ofertasOriginales, setOfertasOriginales] = useState([]);
   const [ofertas, setOfertas] = useState();
   const router = useRoute();
   const { userId } = router.params;
@@ -55,15 +56,18 @@ export default function OfertasScreen() {
   };
 
   const actualizarFiltro = (texto, estado) => {
-    let filtradas = ofertasIniciales;
+    let filtradas = [...ofertasOriginales]; // <-- Parte desde las originales
+  
     if (estado !== "Todo") {
       filtradas = filtradas.filter((oferta) => oferta.estado === estado);
     }
+  
     if (texto !== "") {
       filtradas = filtradas.filter((oferta) =>
         oferta.nombre.toLowerCase().includes(texto.toLowerCase())
       );
     }
+  
     setOfertas(filtradas);
   };
 

@@ -1,45 +1,19 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
 import { Button, Avatar, Menu, Provider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Module1/asistenciaTotalHist';
+import { useRoute } from '@react-navigation/native';
+import URL from '../../Services/url';
+import axios from 'axios';
 
-const estudiantes = [
-  {
-    nombre: 'Tomas Abarca',
-    id: 'ISTA',
-    carrera: 'Computación',
-    nivel: 'Principiante',
-    ponderado: 89.5,
-    cursosAprobados: 20,
-    estado: 'Aprobado',
-  },
-  {
-    nombre: 'Isaac',
-    id: 'IS12',
-    carrera: 'Administración',
-    nivel: 'Principiante',
-    ponderado: 75.5,
-    cursosAprobados: 25,
-    estado: 'Inactivo',
-  },
-  {
-    nombre: 'Gabriel',
-    id: 'GA32',
-    carrera: 'Computación',
-    nivel: 'Principiante',
-    ponderado: 70.5,
-    cursosAprobados: 15,
-    estado: 'Aprobado',
-  },
-];
 
 export default function ListaEstudiantes() {
   const [estadoFiltro, setEstadoFiltro] = useState('');
@@ -48,7 +22,41 @@ export default function ListaEstudiantes() {
   const [menuNivelVisible, setMenuNivelVisible] = useState(false);
   const [carreraSeleccionada, setCarreraSeleccionada] = useState('');
   const [nivelSeleccionado, setNivelSeleccionado] = useState('');
-  const navigation = useNavigation();
+  const [estudiantes, setEstudiantesData] = useState([]);
+  const navigator = useNavigation();
+  const route = useRoute();
+  const { userId } = route.params;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await handleInformacion();
+      setEstudiantesData(data); // Actualizar el estado con los datos obtenidos
+    };
+    fetchData();
+  }, []); // Ejecutar la función al montar el componente
+
+  const handleInformacion = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.get(`${apiUrl}/escuelas/historialPostulantes`, {
+        params: { userId }
+      });
+
+      const data = response.data;
+      console.log('Datos obtenidos:', data); // Verifica los datos obtenidos
+
+      if (response.status === 200) {
+        return data.estudiantes || [];
+      } else {
+        console.error('Error al obtener los datos:', response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+      return [];
+    }
+  
+  };
 
   const carreras = useMemo(() => [...new Set(estudiantes.map(e => e.carrera))], []);
   const niveles = useMemo(() => [...new Set(estudiantes.map(e => e.nivel))], []);
@@ -136,7 +144,6 @@ export default function ListaEstudiantes() {
         <View style={styles.tabla}>
           <View style={styles.filaEncabezado}>
             <Text style={styles.encabezado}>Nombre</Text>
-            <Text style={styles.encabezado}>ID</Text>
             <Text style={styles.encabezado}>Carrera</Text>
             <Text style={styles.encabezado}>Nivel</Text>
             <Text style={styles.encabezado}>Ponderado</Text>
@@ -148,13 +155,12 @@ export default function ListaEstudiantes() {
           {estudiantesFiltrados.map((est, index) => (
             <View key={index} style={styles.fila}>
               <Text style={styles.celda}>{est.nombre}</Text>
-              <Text style={styles.celda}>{est.id}</Text>
               <Text style={styles.celda}>{est.carrera}</Text>
               <Text style={styles.celda}>{est.nivel}</Text>
               <Text style={styles.celda}>{est.ponderado}</Text>
               <Text style={styles.celda}>{est.cursosAprobados}</Text>
               <Text style={[styles.estado, est.estado === 'Aprobado' ? styles.estadoAprobado : styles.estadoInactivo]}>{est.estado}</Text>
-              <TouchableOpacity style={styles.botonDetalles} onPress={() => navigation.navigate("perfilEstudiante")}>
+              <TouchableOpacity style={styles.botonDetalles} onPress={() => navigator.navigate("perfilEstudiante", { userId: est.id })}>
                 <Text style={styles.textoDetalles}>Detalles</Text>
               </TouchableOpacity>
             </View>

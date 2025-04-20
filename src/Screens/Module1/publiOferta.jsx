@@ -29,7 +29,7 @@ export default function OfertasScreen() {
     const handleInformacion = async () => {
         try {
             const apiUrl = `${URL}:3000`;
-            const response = await axios.get(`${apiUrl}/escuelas/historialOfertas`, {
+            const response = await axios.get(`${apiUrl}/escuelas/historialOfertasActivas`, {
                 params: { userId }
             });
 
@@ -73,7 +73,7 @@ export default function OfertasScreen() {
         <View style={styles.container}>
             <Text style={styles.title}>Estados de las ofertas</Text>
             <View style={styles.filters}>
-                {['Todo', 'Abierto', 'Revision', 'Cerrado'].map((estado) => (
+                {['Todo', 'Abierto', 'Revision'].map((estado) => (
                     <TouchableOpacity
                         key={estado}
                         style={[styles.filterButton, estadoFiltro === estado && styles.activeFilter]}

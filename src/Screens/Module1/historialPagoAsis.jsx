@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Module1/historialPagoAsis';
+import { useRoute } from '@react-navigation/native';
+import URL from '../../Services/url';
+import axios from 'axios';
 
 const datosIniciales = [
   { id: '1', estudiante: 'Tomas', carrera: 'Computación', tipo: 'Exoneración', monto: 14500, semestre: 'II Semestre', estado: 'Aprobada' },
@@ -14,16 +17,44 @@ export default function ListaEstudiantes() {
   const [nivel, setNivel] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('Todos');
   const [datos, setDatos] = useState(datosIniciales);
+  const route = useRoute();
+  const { userId } = route.params; // Obtener el userId de los parámetros de la ruta
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await handleInformacion();
+      setDatos(data);
+    };
+    fetchData();
+  }, []);
+
+  const handleInformacion = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.get(`${apiUrl}/escuelas/historialPagoAsisActivos`, {
+        params: { userId }
+      });
+      const data = response.data;
+      if (response.status === 200) {
+        console.log('Datos obtenidos:', data);
+        return data || [];
+      } else {
+        console.error('Error al obtener los datos:', response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+      return [];
+    }
+  };
 
   const beneficioExoneracion = datos
     .filter(d => d.tipo === 'Exoneración')
-    .reduce((sum, d) => sum + d.monto, 0);
+    .reduce((sum, d) => sum + parseInt(d.monto), 0);
 
   const beneficioPago = datos
-    .filter(d => d.tipo === 'Pago')
-    .reduce((sum, d) => sum + d.monto, 0);
-
-  const beneficioTotal = beneficioExoneracion + beneficioPago;
+    .filter(d => d.tipo === 'Pago' || d.tipo === 'Tutoria')
+    .reduce((sum, d) => sum + parseInt(d.monto), 0);
 
   const datosFiltrados = datos.filter(d => {
     return (carrera === '' || d.carrera === carrera) &&
@@ -34,7 +65,6 @@ export default function ListaEstudiantes() {
   return (
     <View style={styles.container}>
       <View style={styles.cardsContainer}>
-        <Card title="Beneficio total" value={beneficioTotal} />
         <Card title="Exoneración de Matrícula" value={beneficioExoneracion} />
         <Card title="Pagos por Hora" value={beneficioPago} />
       </View>
@@ -88,7 +118,6 @@ export default function ListaEstudiantes() {
             <Text style={styles.headerCell}>Tipo</Text>
             <Text style={styles.headerCell}>Monto</Text>
             <Text style={styles.headerCell}>Semestre</Text>
-            <Text style={styles.headerCell}>Estado</Text>
         </View>
 
         <FlatList
@@ -106,9 +135,6 @@ export default function ListaEstudiantes() {
                 <Text style={styles.rowCell}>{item.tipo}</Text>
                 <Text style={styles.rowCell}>${item.monto}</Text>
                 <Text style={styles.rowCell}>{item.semestre}</Text>
-                <Text style={[styles.rowCell, { color: item.estado === 'Aprobada' ? 'green' : 'gray' }]}>
-                {item.estado}
-                </Text>
             </View>
             )}
         />

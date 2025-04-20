@@ -1,6 +1,6 @@
 import { transporter } from "../Services/emails.js";
 import { db, app } from "../Services/fireBaseConnect.js";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, addDoc } from "firebase/firestore";
 
 
 //PARA EL INFOESCUELA 
@@ -116,8 +116,6 @@ export const informacionCursosEscuela = async (req, res) => {
 
 
 
-
-
 //PARA EL HISTORIAL DE ASISTENCIAS
 export const historialAsistencias = async (req, res) => {
   const { userId } = req.query;
@@ -169,7 +167,7 @@ export const informacionOfertas = async (req, res) => {
     for(const doc of asistenciasSnapshot.docs) {
         const datos = doc.data();
 
-        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision" || datos.estado === "Cerrado")) {
+        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision")) {
           for (const doc of usuariosSnapshot.docs) {
             const datosUsuario = doc.data();
             if (doc.id === datos.personaACargo) {
@@ -206,6 +204,47 @@ export const publicarOfertas = async (req, res) => {
 export const actualizarInfoOferta = async (req, res) => {
 
 
+}
+
+
+//PARA LISTA DE TODAS LAS OFERTAS
+export const historialOfertas = async (req, res) => {
+  const { userId } = req.query;
+  const ofertasActuales = [];
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for(const doc of asistenciasSnapshot.docs) {
+        const datos = doc.data();
+
+        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision" || datos.estado === "Cerrado" || datos.estado === "Cancelada")) {
+          for (const doc of usuariosSnapshot.docs) {
+            const datosUsuario = doc.data();
+            if (doc.id === datos.personaACargo) {
+              const profesor =  datosUsuario.nombre;
+
+              const ofertas = {
+                id: doc.id,
+                nombre: datos.tituloPrograma,
+                tipo: datos.tipo, // Aquí podrías ligarlo a una colección "Postulaciones" si hay
+                estado: datos.estado,
+                estudiantes: datos.cantidadVacantes,
+                horas: datos.totalHoras, // Podés usar lógica para calcularlo con base en fechaInicio si querés
+                fechaLimite: datos.fechaFin,
+                beneficio: datos.beneficio
+              };
+              ofertasActuales.push(ofertas);
+            }
+          }
+        }
+      } 
+    return res.status(200).json({ofertasActuales});
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
 }
 
 
@@ -305,3 +344,195 @@ export const informacionEstudiante = async (req, res) => {
     return res.status(401).json({ error: "Error al obtener informacion" });
   }
 };
+
+///PARA EL HISTORIAL DE PAGOS Y ASISTENCIAS ACTIVOS
+
+export const informacionPagoAsisActivos = async (req, res) => {
+  const { userId } = req.query;
+  const asistenciasActivas = [];
+  try{
+    const asistenciasAsignadasSnapshot = await getDocs(collection(db, "AsistenciasAsignadas"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+    const asistenciaSnapshot = await getDocs(collection(db, "Asistencias"));
+
+    for(const doc of asistenciasAsignadasSnapshot.docs) {
+        const datos = doc.data();
+        if(datos.idEscuela === userId && datos.activo === true) {
+          let estudiante = '';
+          let escuela = '';
+          let semestre = '';
+          let tipo = '';
+
+          for (const doc1 of usuariosSnapshot.docs) {
+            if(doc1.id === datos.userId) {
+              estudiante = doc1.data().nombre;
+              }
+            else if(doc1.id === userId) {
+              escuela = doc1.data().nombre;
+              };
+            }
+          
+          for (const doc2 of asistenciaSnapshot.docs) {
+            if(doc2.id === datos.asistenciaId) {
+              semestre = doc2.data().semestre;
+              tipo = doc2.data().tipo;
+              };
+            }
+          const asistencia = {
+            id: doc.id, 
+            estudiante: estudiante,
+            carrera: escuela,
+            tipo: tipo,
+            monto: datos.pago,
+            semestre: semestre,
+            estado: datos.activo
+          };
+          console.log("asistencia:", asistencia);
+          asistenciasActivas.push(asistencia);
+        }
+      }
+
+    return res.status(200).json(asistenciasActivas);
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+}
+
+
+//PARA CREAR UN PAGO DE OFERTA
+
+export const obtenerDatosCrearOferta = async (req, res) => {
+  const { userId } = req.query;
+  const ofertas = [];
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    for (const doc of asistenciasSnapshot.docs) {
+      const datos = doc.data();
+      if (datos.departamento === userId) {
+        ofertas.push({titulo : datos.tituloPrograma, id: doc.id});
+      }
+    }
+    return res.status(200).json({ ofertas });
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    return res.status(500).json({ error: "Error al obtener los datos" });
+  }
+}
+
+
+export const crearPagoOferta = async (req, res) => {
+  const { estudiante, oferta, tipo, monto, semestre, userId } = req.body;
+
+  try {
+    const nuevoPago = {
+      activo: true,
+      asistenciaId : oferta,
+      userId : estudiante,
+      idEscuela : userId,
+      pago : monto, // si lo querés como número, usá parseFloat(pago)
+      fechaAsignacion: new Date(),
+    };
+
+    await addDoc(collection(db, "AsistenciasAsignadas"), nuevoPago);
+
+    return res.status(200).json({
+      message: "Pago creado exitosamente",
+      nuevoPago,
+    });
+  } catch (error) {
+    console.error("Error al crear el pago:", error);
+    return res.status(500).json({ error: "Error al crear el pago" });
+  }
+};
+
+export const estudiantesPostulados = async (req, res) => {
+  const { ofertaId } = req.query;
+  const estudiantes = [];
+
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for (const doc of asistenciasSnapshot.docs) {
+      const datos = doc.data();
+      if (doc.id === ofertaId) {
+        for (const estudianteId of datos.postulaciones) {
+          for (const usuarioDoc of usuariosSnapshot.docs) {
+            if (usuarioDoc.id === estudianteId) {
+              estudiantes.push({ id: usuarioDoc.id, nombre: usuarioDoc.data().nombre });
+            }
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({ estudiantes });
+  } catch (error) {
+    console.error("Error al obtener los estudiantes postulados:", error);
+    return res.status(500).json({ error: "Error al obtener los estudiantes postulados" });
+  }
+}
+
+
+//PARA EL HISTORIAL DE BENEFICIOS
+
+export const historialBeneficiarios = async (req, res) => {
+  const { userId } = req.query;
+  const asistenciasActivas = [];
+  try{
+    const asistenciasAsignadasSnapshot = await getDocs(collection(db, "AsistenciasAsignadas"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+    const asistenciaSnapshot = await getDocs(collection(db, "Asistencias"));
+
+    for(const doc of asistenciasAsignadasSnapshot.docs) {
+        const datos = doc.data();
+        if(datos.idEscuela === userId && datos.activo === true) {
+          let estudiante = '';
+          let escuela = '';
+          let semestre = '';
+          let tipo = '';
+          let oferta = '';
+          let idEstudiante = '';
+
+          for (const doc1 of usuariosSnapshot.docs) {
+            if(doc1.id === datos.userId) {
+              estudiante = doc1.data().nombre;
+              idEstudiante = doc1.id;
+              }
+            else if(doc1.id === userId) {
+              escuela = doc1.data().nombre;
+              };
+            }
+          
+          for (const doc2 of asistenciaSnapshot.docs) {
+            if(doc2.id === datos.asistenciaId) {
+              semestre = doc2.data().semestre;
+              tipo = doc2.data().tipo;
+              oferta = doc2.data().tituloPrograma;
+              };
+            }
+          const asistencia = {
+            id: doc.id, 
+            idEstudiante: datos.userId,
+            estudiante: estudiante,
+            oferta : oferta,
+            carrera: escuela,
+            tipo: tipo,
+            monto: datos.pago,
+            semestre: semestre,
+            estado: datos.activo
+          };
+          console.log("asistencia:", asistencia);
+          asistenciasActivas.push(asistencia);
+        }
+      }
+
+    return res.status(200).json(asistenciasActivas);
+  }
+  catch (error) {
+    console.error("Error al obtener informacion:", error);
+    return res.status(401).json({ error: "Error al obtener informacion" });
+  }
+}
