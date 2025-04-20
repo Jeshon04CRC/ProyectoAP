@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+//---------------------------------------------------------------------------------------------------------------
+
+// Seguimiento de actividades - Visualización de historial, monitoreo de horas, evaluaciones recibidas 
+// y descarga de certificados.
+
+//----------------------------------------------------------------------------------------------------------------
+
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,42 +14,65 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { styles } from '../../Style/Estudiantes/seguimientoSolicitudes';
+import URL from '../../Services/url';
 
-const seguimientoData = [
-  {
-    tipoBeca: 'Tutoría',
-    periodo: 'IS2025',
-    responsable: 'Lupita Perez',
-    estado: 'Aprobada',
-    estadoDias: 14,
-    horasTrabajadas: 50,
-    avances: true,
-    retroalimentacion: true,
-    certificados: true,
-    alertaHoras: true,
-  },
-  {
-    tipoBeca: 'Tutoría',
-    periodo: 'IS2025',
-    responsable: 'Lupita Perez',
-    estado: 'Aprobada',
-    estadoDias: 14,
-    horasTrabajadas: 50,
-    avances: true,
-    retroalimentacion: true,
-    certificados: true,
-    alertaHoras: true,
-  },
-  // Más registros si se desea...
-];
+//--------------------------------------
+//  Componente principal
+//--------------------------------------
 
 const SeguimientoSolicitudes = () => {
-  const navigation = useNavigation();
-  const [busqueda, setBusqueda] = useState('');
-  const [filtradas, setFiltradas] = useState(seguimientoData);
+  const navigation = useNavigation(); // Hook para navegar entre pantallas
+  const [busqueda, setBusqueda] = useState(''); // Estado para texto del buscador
+  const [seguimientoData, setSeguimientoData] = useState([]); // Datos originales
+  const [filtradas, setFiltradas] = useState([]); // Datos filtrados por búsqueda
+
+  // Hook que se ejecuta cada vez que la pantalla gana el foco
+  useFocusEffect(
+    useCallback(() => {
+      const fetchSolicitudes = async () => {
+        try {
+          // Obtiene el userId guardado localmente
+          const userId = await AsyncStorage.getItem('userId');
+
+          // Solicita al backend las solicitudes de ese usuario
+          const response = await axios.get(`${URL}:3000/solicitudes/seguimiento`, {
+            params: { userId }
+          });
+
+          // Elimina duplicados basándose en el título
+          const unicos = [];
+          const titulosVistos = new Set();
+
+          for (const solicitud of response.data.solicitudes) {
+            if (!titulosVistos.has(solicitud.titulo)) {
+              titulosVistos.add(solicitud.titulo);
+              unicos.push(solicitud);
+            }
+          }
+
+          // Actualiza los estados con los datos únicos
+          setSeguimientoData(unicos);
+          setFiltradas(unicos);
+        } catch (error) {
+          console.error("❌ Error al obtener seguimiento:", error.message);
+          Alert.alert("Error", "No se pudo cargar el seguimiento de tus solicitudes.");
+        }
+      };
+
+      fetchSolicitudes(); // Llama la función cuando la pantalla se enfoca
+    }, [])
+  );
+
+//--------------------------------------
+// Filtra los datos según lo ingresado 
+// en el buscador
+//--------------------------------------
 
   const realizarBusqueda = () => {
     const texto = busqueda.toLowerCase();
@@ -54,6 +84,10 @@ const SeguimientoSolicitudes = () => {
     setFiltradas(resultado);
   };
 
+//--------------------------------------
+// Renderización del componente
+//--------------------------------------
+  
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardRow}>
@@ -78,60 +112,51 @@ const SeguimientoSolicitudes = () => {
           {item.horasTrabajadas}
         </Text>
       </View>
-        <View style={styles.cardRow}>
+      <View style={styles.cardRow}>
         <Text style={styles.label}>Avances:</Text>
         {item.avances ? (
-            <TouchableOpacity onPress={() => alert('Descargando archivo de avances...')}>
+          <TouchableOpacity onPress={() => Alert.alert('Avance', 'Descargando archivo de avances...')}>
             <Text style={styles.downloadLink}>Descargar</Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         ) : (
-            <Text style={styles.value}>No disponible</Text>
+          <Text style={styles.value}>No disponible</Text>
         )}
-        </View>
-
-        <View style={styles.cardRow}>
+      </View>
+      <View style={styles.cardRow}>
         <Text style={styles.label}>Retroalimentación:</Text>
         {item.retroalimentacion ? (
-            <TouchableOpacity onPress={() => alert('Descargando retroalimentación...')}>
+          <TouchableOpacity onPress={() => Alert.alert('Retroalimentación', 'Descargando archivo...')}>
             <Text style={styles.downloadLink}>Descargar</Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         ) : (
-            <Text style={styles.value}>No disponible</Text>
+          <Text style={styles.value}>No disponible</Text>
         )}
-        </View>
-
-        <View style={styles.cardRow}>
+      </View>
+      <View style={styles.cardRow}>
         <Text style={styles.label}>Certificados:</Text>
         {item.certificados ? (
-            <TouchableOpacity onPress={() => alert('Descargando certificado...')}>
+          <TouchableOpacity onPress={() => Alert.alert('Certificado', 'Descargando archivo...')}>
             <Text style={styles.downloadLink}>Descargar</Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         ) : (
-            <Text style={styles.value}>No disponible</Text>
+          <Text style={styles.value}>No disponible</Text>
         )}
-        </View>
-
+      </View>
     </View>
   );
 
+  // Render principal del componente
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header con logo y perfil */}
+      {/* Encabezado con logo y avatar */}
       <View style={styles.headerBar}>
-        <Image
-          source={require('../../../assets/LogoTec.png')}
-          style={styles.headerLogo}
-          resizeMode="contain"
-        />
+        <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
         <TouchableOpacity onPress={() => navigation.navigate('perfilEstudiante')}>
-          <Image
-            source={require('../../../assets/avataricon.png')}
-            style={styles.headerAvatar}
-          />
+          <Image source={require('../../../assets/avataricon.png')} style={styles.headerAvatar} />
         </TouchableOpacity>
       </View>
 
-      {/* Título */}
+      {/* Título de pantalla */}
       <Text style={styles.header}>Seguimiento de actividades</Text>
 
       {/* Buscador */}
@@ -147,7 +172,7 @@ const SeguimientoSolicitudes = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Lista */}
+      {/* Lista de solicitudes */}
       <FlatList
         data={filtradas}
         renderItem={renderItem}
