@@ -60,7 +60,7 @@ const SeguimientoSolicitudes = () => {
           setSeguimientoData(unicos);
           setFiltradas(unicos);
         } catch (error) {
-          console.error("❌ Error al obtener seguimiento:", error.message);
+          console.error("Error al obtener seguimiento:", error.message);
           Alert.alert("Error", "No se pudo cargar el seguimiento de tus solicitudes.");
         }
       };

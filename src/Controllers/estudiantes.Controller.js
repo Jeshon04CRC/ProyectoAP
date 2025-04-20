@@ -196,28 +196,15 @@ export const registrarSolicitud = async (req, res) => {
 
     return res.status(200).json({ mensaje: 'Solicitud registrada correctamente' });
   } catch (error) {
-    console.error('❌ Error al registrar la solicitud:', error);
+    console.error('Error al registrar la solicitud:', error);
     return res.status(500).json({ error: 'Error al registrar la solicitud' });
   }
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que registra el seguimiento de las solicitudes 
+//----------------------------------------------------------------------------------------------------------------
 
 export const seguimientoSolicitudes = async (req, res) => {
   const { userId } = req.query;
