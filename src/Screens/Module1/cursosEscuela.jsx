@@ -153,9 +153,6 @@ export default function App() {
           <Text>Estudiantes: {item.estudiantes}</Text>
           <Text>Profesor: {item.profesor}</Text>
           <Text>{item.semestre}</Text>
-          <TouchableOpacity onPress={() => navigator.navigate('actualizarPoliticas')}>
-            <Text style={styles.updateLink}>Actualizar políticas</Text>
-          </TouchableOpacity>
         </View>
       )}
     />

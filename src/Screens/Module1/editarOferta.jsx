@@ -27,6 +27,10 @@ export default function EditarOfertaScreen() {
   const [requisitos, setRequisitos] = useState(oferta?.requisitos || '');
   const [fechaInicio, setFechaInicio] = useState(oferta?.fechaInicio ? new Date(oferta.fechaInicio) : new Date());
   const [fechaCierre, setFechaCierre] = useState(oferta?.fechaLimite ? new Date(oferta.fechaLimite) : new Date());
+  const [promedioMinimo, setPromedioMinimo] = useState("");
+  const [cursosPrevios, setCursosPrevios] = useState("");
+  const [horasMaximas, setHorasMaximas] = useState("");
+  const [requisitosAdicionales, setRequisitosAdicionales] = useState("");
   const router = useRoute();
   const { userId } = router.params;
 
@@ -66,100 +70,97 @@ export default function EditarOfertaScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{oferta ? 'Editar Oferta' : 'Crear nueva oferta'}</Text>
-
-      <Text>Nombre de la oferta</Text>
-      <TextInput style={styles.input} value={nombreCurso} onChangeText={setNombreCurso} />
-
-      <Text>Nombre del profesor</Text>
-      <TextInput style={styles.input} value={profesor} onChangeText={setProfesor} />
-
-      <View style={styles.row}>
-        <View style={styles.pickerContainer}>
-          <Text>Tipo</Text>
-          <Picker selectedValue={tipo} onValueChange={setTipo} style={styles.picker}>
-            <Picker.Item label="Seleccione el tipo" value="" />
-            <Picker.Item label="Tutoria" value="Tutotía" />
-            <Picker.Item label="Laboratorio" value="Laboratorio" />
-          </Picker>
+        <Text style={styles.title}>Crear nueva oferta</Text>
+        <Text>Nombre de la oferta</Text>
+        <TextInput style={styles.input} value={nombreCurso} onChangeText={setNombreCurso} />
+        <Text>Nombre del profesor</Text>
+        <TextInput style={styles.input} value={profesor} onChangeText={setProfesor} />
+        <View style={styles.row}>
+            <View style={styles.pickerContainer}>
+                <Text>Tipo</Text>
+                <Picker selectedValue={tipo} onValueChange={setTipo} style={styles.picker}>
+                    <Picker.Item label="Seleccione el tipo" value="" />
+                    <Picker.Item label="Tutoria" value="tutoria" />
+                    <Picker.Item label="Laboratorio" value="laboratorio" />
+                </Picker>
+            </View>
+            <View style={styles.pickerContainer}>
+                <Text>Estado</Text>
+                <Picker selectedValue={estado} onValueChange={setEstado} style={styles.picker}>
+                    <Picker.Item label="Seleccione el estado" value="" />
+                    <Picker.Item label="Abierto" value="abierto" />
+                    <Picker.Item label="Cerrado" value="cerrado" />
+                </Picker>
+            </View>
         </View>
-
-        <View style={styles.pickerContainer}>
-          <Text>Estado</Text>
-          <Picker selectedValue={estado} onValueChange={setEstado} style={styles.picker}>
-            <Picker.Item label="Seleccione el estado" value="" />
-            <Picker.Item label="Abierto" value="Abierto" />
-            <Picker.Item label="Cerrado" value="Cerrado" />
-          </Picker>
+        <View style={styles.row}>
+            <View style={styles.halfInput}>
+                <Text>Número de estudiantes</Text>
+                <TextInput style={styles.input} keyboardType="numeric" value={estudiantes} onChangeText={setEstudiantes} />
+            </View>
         </View>
-      </View>
+        <View style={styles.row}>
+            <View style={styles.halfInput}>
+                <Text>Fecha de inicio</Text>
+                <DateTimePicker
+                    value={fechaInicio}
+                    mode="date"
+                    display="default"
+                    onChange={handleConfirmInicio}
+                />
+            </View>
+            <View style={styles.halfInput}>
+                <Text>Fecha de cierre</Text>
+                <DateTimePicker
+                    value={fechaCierre}
+                    mode="date"
+                    display="default"
+                    onChange={handleConfirmCierre}
+                />
+            </View>
+            
+        </View>
+        <Text>Beneficio financiero</Text>
+        <TextInput style={styles.input} value={beneficio} onChangeText={setBeneficio} />
+        <Text style={styles.title}>Políticas internas</Text>
 
-      <View style={styles.row}>
-        <View style={styles.halfInput}>
-          <Text>Número de estudiantes</Text>
-          <TextInput
+        <Text>Promedio mínimo requerido</Text>
+        <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={estudiantes}
-            onChangeText={setEstudiantes}
-          />
-        </View>
+            value={promedioMinimo}
+            onChangeText={setPromedioMinimo}
+        />
 
-        <View style={styles.halfInput}>
-          <Text>Horas por semana</Text>
-          <TextInput
+        <Text>Cursos previos aprobados y notas</Text>
+        <TextInput
+            style={[styles.input, { height: 80 }]}
+            multiline
+            placeholder="Ej: Cálculo I: 85, Programación I: 90"
+            value={cursosPrevios}
+            onChangeText={setCursosPrevios}
+        />
+
+        <Text>Horas máximas por semestre</Text>
+        <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={horas}
-            onChangeText={setHoras}
-          />
-        </View>
-      </View>
+            value={horasMaximas}
+            onChangeText={setHorasMaximas}
+        />
 
-      <View style={styles.row}>
-        <View style={styles.halfInput}>
-          <Text>Fecha de inicio</Text>
-          <DateTimePicker
-            value={fechaInicio}
-            mode="date"
-            display="default"
-            onChange={handleConfirmInicio}
-          />
-        </View>
+        <Text>Requisitos adicionales</Text>
+        <TextInput
+            style={[styles.input, { height: 80 }]}
+            multiline
+            placeholder="Ej: Entrevista, Prueba técnica, etc."
+            value={requisitosAdicionales}
+            onChangeText={setRequisitosAdicionales}
+        />
 
-        <View style={styles.halfInput}>
-          <Text>Fecha de cierre</Text>
-          <DateTimePicker
-            value={fechaCierre}
-            mode="date"
-            display="default"
-            onChange={handleConfirmCierre}
-          />
-        </View>
-      </View>
-
-      <Text>Beneficio financiero</Text>
-      <TextInput style={styles.input} value={beneficio} onChangeText={setBeneficio} />
-
-      <Text>Descripción</Text>
-      <TextInput
-        style={[styles.input, { height: 80 }]}
-        multiline
-        value={descripcion}
-        onChangeText={setDescripcion}
-      />
-
-      <Text>Requisitos académicos</Text>
-      <TextInput
-        style={[styles.input, { height: 80 }]}
-        multiline
-        value={requisitos}
-        onChangeText={setRequisitos}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleCrearOferta}>
-        <Text style={styles.buttonText}>{oferta ? 'Actualizar oferta' : 'Crear oferta'}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleCrearOferta()}>
+            <Text style={styles.buttonText}>Crear oferta</Text>
+        </TouchableOpacity>
     </ScrollView>
-  );
-}
+);
+};

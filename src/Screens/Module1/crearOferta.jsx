@@ -18,6 +18,11 @@ export default function CrearOfertaScreen () {
     const [requisitos, setRequisitos] = useState('');
     const [fechaInicio, setFechaInicio] = useState(new Date());
     const [fechaCierre, setFechaCierre] = useState(new Date());
+    const [promedioMinimo, setPromedioMinimo] = useState("");
+    const [cursosPrevios, setCursosPrevios] = useState("");
+    const [horasMaximas, setHorasMaximas] = useState("");
+    const [requisitosAdicionales, setRequisitosAdicionales] = useState("");
+
 
     const handleConfirmInicio = (event, selectedDate) => {
         if (selectedDate) setFechaInicio(selectedDate);
@@ -87,10 +92,6 @@ export default function CrearOfertaScreen () {
                     <Text>Número de estudiantes</Text>
                     <TextInput style={styles.input} keyboardType="numeric" value={estudiantes} onChangeText={setEstudiantes} />
                 </View>
-                <View style={styles.halfInput}>
-                    <Text>Horas por semana</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={horas} onChangeText={setHoras} />
-                </View>
             </View>
             <View style={styles.row}>
                 <View style={styles.halfInput}>
@@ -111,13 +112,46 @@ export default function CrearOfertaScreen () {
                         onChange={handleConfirmCierre}
                     />
                 </View>
+                
             </View>
             <Text>Beneficio financiero</Text>
             <TextInput style={styles.input} value={beneficio} onChangeText={setBeneficio} />
-            <Text>Descripción</Text>
-            <TextInput style={[styles.input, { height: 80 }]} multiline value={descripcion} onChangeText={setDescripcion} />
-            <Text>Requisitos académicos</Text>
-            <TextInput style={[styles.input, { height: 80 }]} multiline value={requisitos} onChangeText={setRequisitos} />
+            <Text style={styles.title}>Políticas internas</Text>
+
+            <Text>Promedio mínimo requerido</Text>
+            <TextInput
+                style={styles.input}
+                keyboardType="numeric"
+                value={promedioMinimo}
+                onChangeText={setPromedioMinimo}
+            />
+
+            <Text>Cursos previos aprobados y notas</Text>
+            <TextInput
+                style={[styles.input, { height: 80 }]}
+                multiline
+                placeholder="Ej: Cálculo I: 85, Programación I: 90"
+                value={cursosPrevios}
+                onChangeText={setCursosPrevios}
+            />
+
+            <Text>Horas máximas por semestre</Text>
+            <TextInput
+                style={styles.input}
+                keyboardType="numeric"
+                value={horasMaximas}
+                onChangeText={setHorasMaximas}
+            />
+
+            <Text>Requisitos adicionales</Text>
+            <TextInput
+                style={[styles.input, { height: 80 }]}
+                multiline
+                placeholder="Ej: Entrevista, Prueba técnica, etc."
+                value={requisitosAdicionales}
+                onChangeText={setRequisitosAdicionales}
+            />
+
             <TouchableOpacity style={styles.button} onPress={() => handleCrearOferta()}>
                 <Text style={styles.buttonText}>Crear oferta</Text>
             </TouchableOpacity>

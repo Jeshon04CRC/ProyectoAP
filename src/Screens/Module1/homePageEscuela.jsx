@@ -25,53 +25,53 @@ export default function HomePageScreen() {
 
         <View style={styles.menuContainer}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("adminPerfilEscuela", { userId: userId })}>
-            <Text style={styles.menuItemText}>Registro y Administración de Perfiles</Text>
+            <Text style={styles.menuItemText}>Registro y edición de perfil institucional</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("infoEscuela", { userId: userId })}>
-            <Text style={styles.menuItemText}>Información de escuela/departamento</Text>
+            <Text style={styles.menuItemText}>Gestión de información de contacto</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("cursosEscuela", { userId: userId })}>
             <Text style={styles.menuItemText}>Áreas Académicas</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialAsistencia", { userId: userId })}>
-            <Text style={styles.menuItemText}>Asignar Estudiantes y Grupos profesores</Text>
+            <Text style={styles.menuItemText}>Historial de asistencias/tutorías </Text>
           </TouchableOpacity>
         </View>
 
 
-        <Text style={styles.sectionTitle}>Publicaciones de Ofertas de Asistencias, Tutorías y Proyectos</Text>
+        <Text style={styles.sectionTitle}>Publicación de Ofertas de Asistencias, Tutorías y Proyectos</Text>
 
         <View style={styles.menuContainer}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("publiOferta", { userId: userId })}>
-            <Text style={styles.menuItemText}>Publicación de ofertas</Text>
+            <Text style={styles.menuItemText}>Sistema de publicación de ofertas</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("listaOfertas", { userId: userId })}>
-            <Text style={styles.menuItemText}>Control de Resultados</Text>
+            <Text style={styles.menuItemText}>Historial de cambios en la oferta</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPostulantes", { userId: userId })}>
             <Text style={styles.menuItemText}>Asignación de Estudiantes a Tutorías</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Publicaciones de Evaluaciones</Text>
+        <Text style={styles.sectionTitle}>Gestión de Postulaciones de Estudiantes</Text>
 
         <View style={styles.menuContainer}>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("asistenciaTotalHist", { userId: userId })}>
-            <Text style={styles.menuItemText}>Publicación de evaluaciones</Text>
+            <Text style={styles.menuItemText}>Visualización de postulantes</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPagoAsis", { userId: userId })}>
-            <Text style={styles.menuItemText}>Análisis de evaluaciones</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("crearPagoEstudiante", { userId: userId })}>
+            <Text style={styles.menuItemText}>Gestion de postulaciones</Text>
           </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionTitle}>Gestión de Proyectos</Text>
 
         <View style={styles.menuContainer}>
-          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("crearPagoEstudiante", { userId: userId })}>
-            <Text style={styles.menuItemText}>Control de proyectos</Text>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPagoAsis", { userId: userId })}>
+            <Text style={styles.menuItemText}>Pagos actuales</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("historialPagos", { userId: userId })}>
-            <Text style={styles.menuItemText}>Gestión de pagos y presupuestos</Text>
+            <Text style={styles.menuItemText}>Historial y reportes</Text>
           </TouchableOpacity>
         </View>
 
