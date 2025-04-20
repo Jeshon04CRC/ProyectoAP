@@ -3,8 +3,54 @@ import { db, app } from "../Services/fireBaseConnect.js";
 import { collection, getDocs, updateDoc, doc, addDoc } from "firebase/firestore";
 
 
-//PARA EL INFOESCUELA 
+//PARA ADIMINSTRACION DE PERFIL
 
+export const informacionAdmin = async (req, res) => {
+    const { userId } = req.query;
+    try {
+      const querySnapshot = await getDocs(collection(db, "Usuarios"));
+
+      for (const doc of querySnapshot.docs) {
+        const datos = doc.data();
+        if (doc.id === userId) {
+          console.log("InformacionDepatamento:", datos);
+          return res.status(200).json({datos});
+        }
+      }
+  
+      console.log("Correo o contraseña incorrectos.");
+      return res.status(400).json({ error: "Correo o contraseña incorrectos." });
+  
+    } catch (error) {
+      console.error("Error al validar credenciales:", error);
+      return res.status(401).json({ error: "Error al validar credenciales" });
+    }
+  }
+
+export const actualizarInfoAdmin = async (req, res) => {
+    const { userId, nombre, facultad } = req.body;
+    try {
+      console.log("userId:", userId);
+      const docRef = doc(db, 'Usuarios', userId); // 'Usuarios' es la colección, y userId es el ID del documento
+  
+      // Actualiza solo los campos que deseas modificar
+      await updateDoc(docRef, {
+        carrera: nombre,
+        facultad: facultad
+      });    
+  
+      console.log("Documento actualizado correctamente");
+      return res.status(200).json({ message: "Documento actualizado correctamente" });
+
+    }
+    catch (error) {
+      console.error("Error al validar credenciales:", error);
+      return res.status(401).json({ error: "Error al validar credenciales" });
+    }
+  }
+
+
+//PARA EL INFOESCUELA 
 export const informacionEscuela = async (req, res) => {
     const { userId } = req.query;
     try {
@@ -156,7 +202,6 @@ export const historialAsistencias = async (req, res) => {
 
 
 //PARA LA PUBLICACION DE OFERTAS
-
 export const informacionOfertas = async (req, res) => {
   const { userId } = req.query;
   const ofertasActuales = [];
@@ -166,15 +211,16 @@ export const informacionOfertas = async (req, res) => {
 
     for(const doc of asistenciasSnapshot.docs) {
         const datos = doc.data();
-
         if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision")) {
-          for (const doc of usuariosSnapshot.docs) {
-            const datosUsuario = doc.data();
-            if (doc.id === datos.personaACargo) {
+
+          for (const doc1 of usuariosSnapshot.docs) {
+            const datosUsuario = doc1.data();
+            if (doc1.id === datos.personaACargo) {
               const profesor =  datosUsuario.nombre;
 
               const ofertas = {
-                id: doc.id,
+                idAsistencia: doc.id,
+                id: doc1.id,
                 nombre: datos.tituloPrograma,
                 tipo: datos.tipo, // Aquí podrías ligarlo a una colección "Postulaciones" si hay
                 estado: datos.estado,
@@ -196,16 +242,120 @@ export const informacionOfertas = async (req, res) => {
   }
 }
 
+export const informacionProfesoresCarrera = async (req, res) => {
+  const { userId } = req.query;
+  const profesor = [];
+  try {
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+    for (const doc of usuariosSnapshot.docs) {
+      const datos = doc.data();
+      if (datos.carrera === userId && datos.tipoUsuario === "Profesor") {
+        profesor.push({titulo : datos.nombre, id: doc.id});
+      }
+    }
+    return res.status(200).json({ profesor });
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    return res.status(500).json({ error: "Error al obtener los datos" });
+  }
+}
+
 
 export const publicarOfertas = async (req, res) => {
+  const { data } = req.body;
+  try {
+    const nuevaOferta = {
+      beneficio: data.beneficio,
+      cantidadSolicitudes: "0",
+      cantidadVacantes: data.estudiantes,
+      departamento: data.id,
+      descripcion: data.descripcion,
+      estado: "Revision",
+      fechaFin: data.fechaCierre,
+      fechaInicio: data.fechaInicio,
+      historialCambios: [
+      ],
+      horaXSemana: "",
+      horario: "",
+      objetivos: "",
+      personaACargo: data.profesor,
+      postulaciones: [
+
+      ],
+      promedioRequerido: data.promedio,
+      requisitos: [
+        data.cursosPrevios
+      ],
+      semestre: "|| Semestre",
+      tipo: data.tipo,
+      tituloPrograma: data.nombreCurso,
+      totalHoras: data.horas,
+      requisitosAdicionales: data.requisitos
+    }
+    const docRef = await addDoc(collection(db, "Asistencias"), nuevaOferta);
+    console.log("Documento creado con ID:", docRef.id);
+    return res.status(200).json({ message: "Oferta creada exitosamente"});
+
+  } catch (e) {
+    console.error("Error al crear la oferta:", e);
+  }
 
 }
 
 export const actualizarInfoOferta = async (req, res) => {
+  const { data, id } = req.body;
+  console.log("data:", data);
+  console.log("id:", id);
+  try {
+    const docRef = doc(db, 'Asistencias', id); // 'Asistencias' es la colección, y ofertaId es el ID del documento
+    
 
+    // Actualiza solo los campos que deseas modificar
+    await updateDoc(docRef, data);
+  
+    console.log("Documento actualizado correctamente");
+    return res.status(200).json({ message: "Documento actualizado correctamente" });
 
+  } 
+  catch (error) {
+    console.error("Error al actualizar el documento:", error);
+    return res.status(400).json({ error: "Error al actualizar el documento" });
+  }
 }
 
+
+export const InformacionOferta = async (req, res) => {
+
+  const { oferta } = req.query;
+
+  const ofertaInfo = {};
+  try {
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for (const doc of asistenciasSnapshot.docs) {
+      const datos = doc.data();
+      if (doc.id === oferta) {
+        ofertaInfo.tituloPrograma = datos.tituloPrograma;
+        ofertaInfo.tipo = datos.tipo;
+        ofertaInfo.estado = datos.estado;
+        ofertaInfo.horas = datos.totalHoras;
+        ofertaInfo.fechaLimite = datos.fechaFin;
+        ofertaInfo.beneficio = datos.beneficio;
+        ofertaInfo.descripcion = datos.descripcion;
+        ofertaInfo.cursosPrevios = datos.requisitos[0];
+        ofertaInfo.promedioRequerido = datos.promedioRequerido;
+        ofertaInfo.cantidadVacantes = datos.cantidadVacantes;
+        ofertaInfo.requisitosAdicionales = datos.requisitosAdicionales;
+      }
+    }
+
+    return res.status(200).json({ofertaInfo});
+  } catch (error) {
+    console.error("Error al obtener la oferta:", error);
+    return res.status(500).json({ error: "Error al obtener la oferta" });
+  }
+}
 
 //PARA LISTA DE TODAS LAS OFERTAS
 export const historialOfertas = async (req, res) => {
@@ -410,7 +560,7 @@ export const obtenerDatosCrearOferta = async (req, res) => {
     const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
     for (const doc of asistenciasSnapshot.docs) {
       const datos = doc.data();
-      if (datos.departamento === userId) {
+      if (datos.departamento === userId && datos.estado !== "Cerrado") {
         ofertas.push({titulo : datos.tituloPrograma, id: doc.id});
       }
     }
@@ -426,6 +576,13 @@ export const crearPagoOferta = async (req, res) => {
   const { estudiante, oferta, tipo, monto, semestre, userId } = req.body;
 
   try {
+
+    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const solicitudesSnapshot = await getDocs(collection(db, "Solicitudes"));
+    let idAsistencia = '';
+    let nombreAsistencia = '';
+    let idSolicitud = '';
+
     const nuevoPago = {
       activo: true,
       asistenciaId : oferta,
@@ -434,6 +591,34 @@ export const crearPagoOferta = async (req, res) => {
       pago : monto, // si lo querés como número, usá parseFloat(pago)
       fechaAsignacion: new Date(),
     };
+
+    for(const doc of asistenciasSnapshot.docs) {
+      const datos = doc.data();
+      if (doc.id === oferta) {
+        idAsistencia = doc.id;
+        nombreAsistencia = datos.tituloPrograma;
+      }
+    }
+
+    for(const doc of solicitudesSnapshot.docs) {
+      const datos = doc.data();
+      if (datos.tituloOportunidad === nombreAsistencia) {
+        idSolicitud = doc.id;
+      }
+    }
+
+    const docSolicitudes = doc(db, 'Solicitudes', idSolicitud); 
+  
+    await updateDoc(docSolicitudes, {
+      estado: "Aceptado"
+    });    
+
+    const docAsistencias = doc(db, 'Asistencias', idAsistencia); 
+  
+    await updateDoc(docAsistencias, {
+      estado: "Cerrado"
+    });    
+
 
     await addDoc(collection(db, "AsistenciasAsignadas"), nuevoPago);
 

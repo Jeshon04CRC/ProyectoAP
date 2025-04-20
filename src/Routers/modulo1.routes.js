@@ -1,11 +1,15 @@
 import {Router} from "express"
-import {informacionEscuela, 
+import {informacionAdmin,
+        actualizarInfoAdmin,
+        informacionEscuela, 
         actualizarInfoEscuela, 
         informacionCursosEscuela,
         historialAsistencias,
         informacionOfertas,
+        informacionProfesoresCarrera,
         publicarOfertas,
         actualizarInfoOferta,
+        InformacionOferta,
         historialOfertas,
         informacionPostulantes,
         informacionEstudiante,
@@ -19,6 +23,9 @@ from "../Controllers/modulo1.Controller.js"
 
 const router = Router()
 
+router.get("/escuelas/infoEscuelaAdmin", informacionAdmin);
+router.put("/escuelas/actualizarInfoAdmin", actualizarInfoAdmin);
+
 router.get("/escuelas/infoEscuela", informacionEscuela);
 router.put("/escuelas/actualizarInfoEscuela", actualizarInfoEscuela); // Cambia el controlador según lo que necesites hacer
 
@@ -27,8 +34,10 @@ router.get("/escuelas/cursosEscuela", informacionCursosEscuela);
 router.get("/escuelas/historialAsistencias", historialAsistencias)
 
 router.get("/escuelas/historialOfertasActivas", informacionOfertas)
+router.get("/escuelas/profesoresEscuela", informacionProfesoresCarrera) // Cambia el controlador según lo que necesites hacer
 router.post("/escuelas/publiOferta", publicarOfertas)
 router.put("/escuelas/actualizarOferta", actualizarInfoOferta) // Cambia el controlador según lo que necesites hacer
+router.get("/escuelas/informacionOferta", InformacionOferta) // Cambia el controlador según lo que necesites hacer
 
 router.get("/escuelas/historialOfertas", historialOfertas)
 

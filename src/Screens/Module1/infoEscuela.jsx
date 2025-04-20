@@ -46,7 +46,7 @@ export default function ContactInfoScreen() {
     }
   };
 
-  const handleChange = (key: string, value: string) => {
+  const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
 

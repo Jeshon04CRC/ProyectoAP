@@ -33,6 +33,7 @@ export default function OfertasScreen() {
 
           if (response.status === 200) {
               const data = response.data.ofertasActuales;
+              console.log("Datos obtenidos:", data);
               return data;
           } else {
               console.error("Error al obtener los datos:", response.statusText);
@@ -93,7 +94,7 @@ export default function OfertasScreen() {
       />
       <FlatList
         data={ofertas}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.nombre}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.offerName}>{item.nombre}</Text>

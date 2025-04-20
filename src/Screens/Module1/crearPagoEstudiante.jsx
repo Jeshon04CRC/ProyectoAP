@@ -139,16 +139,6 @@ export default function CrearBeneficio() {
           ))}
       </Picker>
 
-      <Text style={styles.label}>Tipo de beneficio</Text>
-      <Picker
-        selectedValue={tipo}
-        onValueChange={(value) => setTipo(value)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Seleccione el tipo" value="" />
-        <Picker.Item label="Exoneración" value="Exoneración" />
-        <Picker.Item label="Pago" value="Pago" />
-      </Picker>
 
       <Text style={styles.label}>Monto</Text>
       <TextInput

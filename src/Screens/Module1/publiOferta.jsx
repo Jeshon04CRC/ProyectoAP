@@ -86,7 +86,7 @@ export default function OfertasScreen() {
 
             <TouchableOpacity
                 style={styles.newOfferButton}
-                onPress={() => navigation.navigate("crearOferta")}
+                onPress={() => navigation.navigate("crearOferta", { userId: userId })}
             >
                 <Text style={styles.newOfferText}>+ Nueva oferta</Text>
             </TouchableOpacity>
@@ -100,7 +100,7 @@ export default function OfertasScreen() {
 
             <FlatList
                 data={ofertas}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.nombre}
                 renderItem={({ item }) => (
                     <View style={styles.card}>
                         <Text style={styles.offerName}>{item.nombre}</Text>
@@ -112,7 +112,7 @@ export default function OfertasScreen() {
                         <Text>Beneficio: {item.beneficio}</Text>
                         <TouchableOpacity
                             style={styles.editButton}
-                            onPress={() => navigation.navigate("editarOferta", { oferta: item, userId : userId })}
+                            onPress={() => navigation.navigate("editarOferta", { oferta: item.idAsistencia, userId : userId })}
                         >
                             <Text style={styles.editText}>Editar</Text>
                         </TouchableOpacity>
