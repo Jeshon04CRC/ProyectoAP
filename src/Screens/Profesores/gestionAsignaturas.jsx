@@ -23,7 +23,7 @@ const HistorialCard = ({ item }) => (
 );
 
 const GestionAsignaturas = () => {
-  // Extraemos las secciones de datos del JSON
+
   const { courses = [], proyectos = [], historial = [] } =
     data.gestionAsignaturas || {};
 

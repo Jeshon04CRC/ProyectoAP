@@ -32,6 +32,9 @@ import creacionOfertas from './src/Screens/Profesores/creacionOfertas';
 import EdicionOfertas from './src/Screens/Profesores/edicionOfertas';
 import GestionPostulaciones from './src/Screens/Profesores/gestionPostulaciones';
 import InfoEstudiante from './src/Screens/Profesores/infoEstudiante';
+import SeguimientoEstudiantes from './src/Screens/Profesores/seguimientoEstudiantes'; 
+import EvaluacionDesempeno from './src/Screens/Profesores/evaluacionDesempeno';
+import EditarSeguimiento from './src/Screens/Profesores/editarSeguimiento'; 
 
 //Modulo de Estudiantes
 import HomePageEstudiantes from './src/Screens/Estudiantes/homePageEstudiantes';
@@ -95,6 +98,9 @@ export default function App() {
         <Stack.Screen name="edicionOfertas" component={EdicionOfertas} options={{title: "Edición de Ofertas"}}/>
         <Stack.Screen name="gestionPostulaciones" component={GestionPostulaciones} options={{title: "Gestión de Postulaciones"}}/>
         <Stack.Screen name="InfoEstudiante" component={InfoEstudiante} options={{title: "Información del Estudiante"}}/>
+        <Stack.Screen name="seguimientoEstudiantes" component={SeguimientoEstudiantes} options={{title: "Seguimiento de Estudiantes"}}/>
+        <Stack.Screen name="evaluacionDesempeno" component={EvaluacionDesempeno} options={{title: "Evaluación de Desempeño"}}/>
+        <Stack.Screen name="editarSeguimiento" component={EditarSeguimiento} options={{title: "Edición de Seguimiento"}}/>
 
 
         {/* Module Estudiantes*/}

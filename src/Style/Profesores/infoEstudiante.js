@@ -8,6 +8,8 @@ export const styles = StyleSheet.create({
     },
     sectionContainer: {
       marginBottom: 20,
+      backgroundColor: '#405F9021',
+      padding: 15,
     },
     sectionTitle: {
       fontSize: 22,

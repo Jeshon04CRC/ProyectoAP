@@ -4,47 +4,42 @@ import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import { styles } from "../../Style/Profesores/gestionPostulaciones";
 
-// Importa el JSON actualizado (asegúrate de que la ruta sea correcta)
+
 const mockData = require("./mockData.json");
-// Extrae la data de postulaciones del JSON
+
 const { postulacionesData } = mockData;
 
 const GestionPostulaciones = () => {
   const navigation = useNavigation();
 
-  // Estados para el filtrado y resultados
+
   const [searchText, setSearchText] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("Todos"); // Filtro único para los 6 botones
   const [filteredPostulaciones, setFilteredPostulaciones] = useState(postulacionesData);
   const [entriesNumber, setEntriesNumber] = useState("All");
 
-  // Función que aplica los filtros
+
   const handleFilter = () => {
     let filtered = [...postulacionesData];
 
-    // Filtro por estado o extra (de los 6 botones)
+    // Filtro por estado o extra 
     if (selectedFilter === "Aprobados") {
       filtered = filtered.filter((p) => p.estado === "Aprobado");
     } else if (selectedFilter === "En Espera") {
       filtered = filtered.filter((p) => p.estado === "En espera");
     } else if (selectedFilter === "Requisitos") {
-      // Ejemplo: filtra postulaciones con 25 o más cursos aprobados
       filtered = filtered.filter((p) => p.cursosAprobados >= 25);
     } else if (selectedFilter === "Promedio") {
       filtered.sort((a, b) => b.ponderado - a.ponderado);
     } else if (selectedFilter === "Experiencia") {
       filtered.sort((a, b) => a.experiencia.localeCompare(b.experiencia));
     }
-    // "Todos" no filtra nada
 
-    // Filtra por búsqueda en el nombre
     if (searchText.trim() !== "") {
       filtered = filtered.filter((p) =>
         p.nombre.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-
-    // Aquí podrías limitar la cantidad según entriesNumber si lo deseas
 
     setFilteredPostulaciones(filtered);
   };
@@ -124,19 +119,7 @@ const GestionPostulaciones = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Picker para seleccionar número de entradas (opcional) */}
-      <View style={styles.pickerContainer}>
-        <Text style={styles.label}>Mostrar: </Text>
-        <Picker
-          selectedValue={entriesNumber}
-          style={styles.picker}
-          onValueChange={(itemValue) => setEntriesNumber(itemValue)}
-        >
-          <Picker.Item label="Todos" value="All" />
-          <Picker.Item label="5" value="5" />
-          <Picker.Item label="10" value="10" />
-        </Picker>
-      </View>
+
 
       {/* Carrusel de cards de postulaciones */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carouselContainer}>
