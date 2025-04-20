@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------------------------------------------------
+
+// Home Page de estudiantes aqui se le permite a los estudiantes hacer 
+// Registro de perfil academico, Busqueda de oportunidades, Postulacion de ofertas, seguimiento de actividades
+
+//----------------------------------------------------------------------------------------------------------------
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -7,43 +14,53 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { styles } from '../../Style/Estudiantes/homePageEstudiantes';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import URL from '../../Services/url';
+import { useNavigation } from '@react-navigation/native'; // Para navegación entre pantallas
+import { styles } from '../../Style/Estudiantes/homePageEstudiantes'; // Archivo de estilos
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Almacenamiento local del ID del usuario
+import axios from 'axios'; // Cliente HTTP para peticiones al backend
+import URL from '../../Services/url'; // URL base del backend
+
+//--------------------------------------
+// Componente principal de la pantalla 
+//--------------------------------------
 
 const HomePageEstudiantes = () => {
   const navigation = useNavigation();
+
+  // Estado para guardar los datos de contacto del estudiante
   const [contactInfo, setContactInfo] = useState(null);
 
+  // Opciones del menú
   const options = [
     "Registro y edición del perfil",
     "Busqueda y aplicacion de oportunidades",
     "Seguimiento de actividades"
   ];
 
+  // Mapeo de nombre de opción a la ruta correspondiente
   const screenMapping = {
     "Registro y edición del perfil": "RegistroEdicionEstudiantes",
     "Busqueda y aplicacion de oportunidades": "busquedaApliOportunidades",
     "Seguimiento de actividades": "seguimientoSolicitudes",
   };
 
+  // useEffect se ejecuta al montar el componente
   useEffect(() => {
     const fetchContactInfo = async () => {
-      const userId = await AsyncStorage.getItem('userId');
+      const userId = await AsyncStorage.getItem('userId'); // Se obtiene el userId almacenado localmente
       console.log("Consultando datos del estudiante con userId:", userId);
-
       if (!userId) return;
 
       try {
         const apiUrl = `${URL}:3000`;
+        // Se hace una petición al backend para obtener los datos del estudiante
         const response = await axios.get(`${apiUrl}/estudiantes/infoEstudiantes`, {
           params: { userId }
         });
 
         const datos = response.data.datos;
 
+        // Se estructura la información de contacto que se mostrará
         const contactData = {
           correo: datos.correo,
           telefono: datos.telefono,
@@ -53,15 +70,16 @@ const HomePageEstudiantes = () => {
           sede: datos.sede || 'Sin sede',
         };
 
-        setContactInfo(contactData);
+        setContactInfo(contactData); // Se guarda en el estado
       } catch (error) {
         console.error("Error al cargar datos del estudiante:", error);
       }
     };
 
-    fetchContactInfo();
+    fetchContactInfo(); // Se ejecuta la función al cargar
   }, []);
 
+  // Mientras se cargan los datos se muestra un spinner
   if (!contactInfo) {
     return (
       <View style={styles.container}>
@@ -70,9 +88,13 @@ const HomePageEstudiantes = () => {
       </View>
     );
   }
+//--------------------------------------
+// Renderización de la pantalla principal
+//--------------------------------------
 
   return (
     <ScrollView style={styles.container}>
+      {/* Encabezado con logo y avatar */}
       <View style={styles.headerBar}>
         <Image
           source={require('../../../assets/LogoTec.png')}
@@ -87,6 +109,7 @@ const HomePageEstudiantes = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Sección de información del estudiante */}
       <Text style={styles.title}>Información de Contacto</Text>
       <View style={styles.contactContainer}>
         <Text style={styles.headerText}>Mis Datos</Text>
@@ -107,6 +130,7 @@ const HomePageEstudiantes = () => {
         </Text>
       </View>
 
+      {/* Sección de menú de navegación */}
       <Text style={{
         color: 'black',
         fontSize: 16,
@@ -123,11 +147,11 @@ const HomePageEstudiantes = () => {
             key={index}
             style={styles.button}
             onPress={() => {
-              const route = screenMapping[label];
+              const route = screenMapping[label]; // Se busca la ruta asociada
               if (route) {
-                navigation.navigate(route);
+                navigation.navigate(route); // Navega a la pantalla correspondiente
               } else {
-                alert(`Ruta no definida para: ${label}`);
+                alert(`Ruta no definida para: ${label}`); // Mensaje si no existe ruta
               }
             }}
           >
@@ -136,6 +160,7 @@ const HomePageEstudiantes = () => {
         ))}
       </View>
 
+      {/* Imagen ilustrativa inferior */}
       <View style={styles.imageContainer}>
         <Image
           source={require('../../../assets/Login/ImagenLogin.png')}

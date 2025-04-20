@@ -1,3 +1,9 @@
+//---------------------------------------------------------------------------------------------------------------
+
+// Formulario de aplicacion - Aplicación directa, subida de archivos, notificaciones sobre estado de postulación.
+
+//----------------------------------------------------------------------------------------------------------------
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -15,12 +21,14 @@ import axios from 'axios';
 import URL from '../../Services/url';
 import { styles } from '../../Style/Estudiantes/formularioAplicacion';
 
+// Componente principal del formulario de aplicación
 const FormularioAplicacion = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { titulo } = route.params || {};
-  const [documento, setDocumento] = useState(null);
+  const navigation = useNavigation(); // Hook de navegación
+  const route = useRoute(); // Hook para obtener parámetros de la ruta
+  const { titulo } = route.params || {}; // Obtiene el título de la oportunidad desde la ruta
+  const [documento, setDocumento] = useState(null); // Estado para almacenar archivo adicional
 
+  // Estado para los campos del formulario
   const [formulario, setFormulario] = useState({
     nombre: '',
     correo: '',
@@ -31,6 +39,7 @@ const FormularioAplicacion = () => {
     comentarios: ''
   });
 
+  // Obtiene los datos personales automáticamente al cargar el componente
   useEffect(() => {
     const fetchDatosPersonales = async () => {
       const userId = await AsyncStorage.getItem('userId');
@@ -43,6 +52,7 @@ const FormularioAplicacion = () => {
 
         const datos = response.data.datos;
 
+        // Rellena automáticamente los campos del formulario con los datos obtenidos
         setFormulario(prev => ({
           ...prev,
           nombre: datos.nombre || '',
@@ -50,46 +60,60 @@ const FormularioAplicacion = () => {
           telefono: datos.telefono || ''
         }));
       } catch (error) {
-        console.error("❌ Error al cargar datos del usuario:", error.message);
+        console.error("Error al cargar datos del usuario:", error.message);
       }
     };
 
     fetchDatosPersonales();
   }, []);
 
+  // Actualiza el estado del formulario cuando cambia un campo
   const handleChange = (key, value) => {
     setFormulario({ ...formulario, [key]: value });
   };
 
+  // Abre el selector de archivos y guarda el archivo elegido
   const seleccionarDocumento = async () => {
     const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
     if (result.type === 'success') setDocumento(result);
   };
 
+  // Envía la solicitud al backend
   const aplicar = async () => {
+    // Valida que todos los campos obligatorios estén llenos
+    const camposObligatorios = ['nombre', 'correo', 'telefono', 'promedio', 'horas', 'nota', 'comentarios'];
+
+    for (let campo of camposObligatorios) {
+      if (!formulario[campo] || formulario[campo].trim() === '') {
+        Alert.alert("Campos incompletos", "Por favor complete todos los campos requeridos antes de enviar.");
+        return;
+      }
+    }
+
     try {
       const userId = await AsyncStorage.getItem('userId');
-  
+
       const payload = {
         ...formulario,
-        documento: documento?.name || null,
+        documento: documento?.name || null, // El nombre del archivo seleccionado
         tituloOportunidad: titulo,
         userId
       };
-  
+
       await axios.post(`${URL}:3000/solicitudes/registrar`, payload);
-  
+
       Alert.alert("Éxito", "Tu solicitud fue enviada correctamente");
-      navigation.goBack();
+      navigation.goBack(); // Regresa a la pantalla anterior
     } catch (error) {
-      console.error("❌ Error al registrar solicitud:", error);
+      console.error("Error al registrar solicitud:", error);
       Alert.alert("Error", "No se pudo registrar la solicitud.");
     }
   };
-   
 
+  // Renderizado del formulario
   return (
     <ScrollView style={styles.container}>
+      {/* Barra de encabezado con logo y botón de regreso */}
       <View style={styles.headerBar}>
         <TouchableOpacity onPress={() => navigation.navigate('HomePageEstudiantes')}>
           <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
@@ -99,18 +123,22 @@ const FormularioAplicacion = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Título del formulario */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>
           {titulo ? `Formulario - ${titulo}` : 'Formulario para aplicar a asistencias estudiantiles'}
         </Text>
       </View>
 
+      {/* Sección de datos personales */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Información Personal</Text>
       </View>
 
+      {/* Formulario dividido en dos columnas */}
       <View style={{ flexDirection: 'row', gap: 20 }}>
         <View style={{ flex: 1 }}>
+          {/* Campos de nombre, correo, teléfono, promedio, horas */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>1. Nombre</Text>
             <TextInput style={styles.input} value={formulario.nombre} onChangeText={t => handleChange('nombre', t)} />
@@ -134,6 +162,7 @@ const FormularioAplicacion = () => {
         </View>
 
         <View style={{ flex: 1 }}>
+          {/* Campos de nota, comentarios y carga de documento */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>6. Nota con la cual aprobó el curso</Text>
             <TextInput style={styles.input} onChangeText={t => handleChange('nota', t)} keyboardType="decimal-pad" />
@@ -160,6 +189,7 @@ const FormularioAplicacion = () => {
         </View>
       </View>
 
+      {/* Botón para enviar la solicitud */}
       <View style={{ alignItems: 'center', marginTop: 20 }}>
         <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={aplicar}>
           <Text style={styles.buttonText}>Aplicar</Text>
