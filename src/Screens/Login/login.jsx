@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Login/login';
 import axios from 'axios'; 
-import URL from '../../Services/url';
+import URL from '../../Services/url.js'; // 👈 IMPORTANTE
 import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 IMPORTANTE
 
 const LoginScreen = () => {
