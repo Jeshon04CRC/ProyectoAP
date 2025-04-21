@@ -131,6 +131,7 @@ export default function EditarOfertaScreen() {
             const response = await axios.put(`${apiUrl}/escuelas/actualizarOferta`, { data: data, id: oferta });
             console.log("Respuesta del servidor:", response.data); // Verifica la respuesta del servidor
             alert("Oferta creada exitosamente.");
+            navigation.goBack();
             
         }
         catch (error) {
@@ -167,7 +168,7 @@ export default function EditarOfertaScreen() {
                 <Picker selectedValue={tipo} onValueChange={setTipo} style={styles.picker}>
                     <Picker.Item label="Seleccione el tipo" value="" />
                     <Picker.Item label="Tutoria" value="tutoria" />
-                    <Picker.Item label="Laboratorio" value="laboratorio" />
+                    <Picker.Item label="Asistencia" value="asistencia" />
                 </Picker>
             </View>
         </View>

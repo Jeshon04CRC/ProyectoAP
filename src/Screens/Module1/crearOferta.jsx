@@ -99,7 +99,7 @@ export default function CrearOfertaScreen () {
             const response = await axios.post(`${apiUrl}/escuelas/publiOferta`, { data: data });
             console.log("Respuesta del servidor:", response.data); // Verifica la respuesta del servidor
             alert("Oferta creada exitosamente.");
-            
+            navigation.goBack();
         }
         catch (error) {
             console.error("Error al hacer la solicitud:", error);
@@ -135,7 +135,7 @@ export default function CrearOfertaScreen () {
                     <Picker selectedValue={tipo} onValueChange={setTipo} style={styles.picker}>
                         <Picker.Item label="Seleccione el tipo" value="" />
                         <Picker.Item label="Tutoria" value="tutoria" />
-                        <Picker.Item label="Laboratorio" value="laboratorio" />
+                        <Picker.Item label="Asistencia" value="asistencia" />
                     </Picker>
                 </View>
             </View>

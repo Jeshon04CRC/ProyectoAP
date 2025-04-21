@@ -59,6 +59,8 @@ export default function CrearBeneficio() {
   
       if (response.status === 200) {
         console.log("Beneficio enviado correctamente:", response.data);
+        alert("Beneficio creado", "El beneficio ha sido creado correctamente.");
+        navigation.goBack();
         // Aquí podrías navegar a otro screen o mostrar una alerta
       } else {
         console.error("Error en la respuesta del servidor:", response.statusText);

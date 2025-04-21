@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  Image,
+  Image
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/cambioRolStyle';
+import axios from 'axios';
+import URL from '../../Services/url';
 
 const CambioRol = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { nombre = 'Nombre del usuario', rol = '' } = route.params || {};
+  const { nombre = 'Nombre del usuario', rol = '' , id } = route.params || {};
 
   const [rolSeleccionado, setRolSeleccionado] = useState(rol);
 
-  const guardarCambios = () => {
-    console.log(`Rol actualizado: ${nombre} ahora es ${rolSeleccionado}`);
-    navigation.goBack();
+  const handleActualizarRol = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.put(`${apiUrl}/admin/ActualizarRol`, {
+        idUsuario: id,
+        nuevoRol: rolSeleccionado,
+      });
+
+      if (response.status === 200) {
+        alert("Rol actualizado", "El rol del usuario ha sido actualizado correctamente.");
+        navigation.goBack();
+      } else {
+        alert("Error", "No se pudo actualizar el rol del usuario.");
+      }
+    } catch (error) {
+      console.error("Error al actualizar el rol:", error);
+      alert("Error", "Error de red o del servidor.");
+    }
   };
 
   return (
@@ -72,12 +89,13 @@ const CambioRol = () => {
           <Picker.Item label="Profesor" value="Profesor" />
           <Picker.Item label="Estudiante" value="Estudiante" />
           <Picker.Item label="Administrador" value="Administrador" />
+          <Picker.Item label="Departamento" value="Departamento" />
         </Picker>
       </View>
 
       {/* Botones */}
       <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={guardarCambios}>
+        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleActualizarRol}>
           <Text style={styles.buttonText}>Guardar cambios</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.returnButton, { marginTop: 10 }]} onPress={() => navigation.goBack()}>
