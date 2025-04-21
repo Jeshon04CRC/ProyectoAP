@@ -6,6 +6,7 @@ import { styles } from '../../Style/Module1/crearOferta';  // Importamos los est
 import { useRoute } from '@react-navigation/native';
 import axios from "axios";
 import URL from '../../Services/url';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CrearOfertaScreen () {
     const [nombreCurso, setNombreCurso] = useState('');
@@ -27,6 +28,7 @@ export default function CrearOfertaScreen () {
     const [horasMaximas, setHorasMaximas] = useState("");
     const [requisitosAdicionales, setRequisitosAdicionales] = useState("");
     const [listaProfesores, setListaProfesores] = useState([]);
+    const navigation = useNavigation();
 
     const router = useRoute();
     const { userId } = router.params;

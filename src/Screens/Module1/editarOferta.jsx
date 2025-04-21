@@ -9,7 +9,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { styles } from '../../Style/Module1/crearOferta';
 import axios from 'axios';
 import URL from '../../Services/url';
-
+import { useNavigation } from '@react-navigation/native';
 
 
 export default function EditarOfertaScreen() {
@@ -34,6 +34,7 @@ export default function EditarOfertaScreen() {
     const [listaProfesores, setListaProfesores] = useState([]);
     const route = useRoute();
     const {oferta , userId} = route.params;
+    const navigation = useNavigation();
 
 
     useEffect(() => {

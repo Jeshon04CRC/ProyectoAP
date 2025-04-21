@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,36 +7,81 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/gestionRolesUsuarios';
-
-const ofertasData = [
-  {
-    nombre: 'Tuto mate',
-    tipo: 'Tutoría',
-    estado: 'Aprobado',
-    estudiantes: 25,
-    horas: 40,
-  },
-  {
-    nombre: 'Tutoría Prog',
-    tipo: 'Tutoría',
-    estado: 'Pendiente',
-    estudiantes: 20,
-    horas: 35,
-  },
-];
+import axios from 'axios';
+import URL from '../../Services/url';
+import { useRoute } from '@react-navigation/native';
 
 const ValidacionOfertas = () => {
   const navigation = useNavigation();
   const [busqueda, setBusqueda] = useState('');
-  const [filtradas, setFiltradas] = useState(ofertasData);
+  const [ofertas, setOfertas] = useState([]);
+  const [filtradas, setFiltradas] = useState([]);
+  const route = useRoute();
+
+  useEffect(() => {
+    handlerDatos();
+  }, []);
+
+  const handlerDatos = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.get(`${apiUrl}/admin/Ofertas`);
+
+      if (response.status === 200) {
+        console.log('Datos obtenidos:', response.data.ofertas);
+        setOfertas(response.data.ofertas);
+        setFiltradas(response.data.ofertas); // Mostramos todas por defecto
+      } else {
+        console.error('Error al obtener los datos:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error de red o del servidor:', error);
+    }
+  };
+
+  const handleAceptarAsistencia = async (idAsistencia) => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.put(`${apiUrl}/admin/aceptarOferta`, {
+        id: idAsistencia // Asegúrate de enviar el id dentro del cuerpo
+      });
+      if(response.status === 200){
+        alert("Asistencia aceptada", "La asistencia ha sido aceptada correctamente.");
+        handlerDatos();
+      }
+      
+    } catch (error) {
+      console.error("Error al hacer la solicitud:", error);
+      alert("Error de red o del servidor.");
+      return null;
+    }
+  }
+
+  const handleEliminarAsistencia = async (idAsistencia) => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.delete(`${apiUrl}/admin/eliminarOferta`, {
+        params: { id : idAsistencia}
+      });
+      if(response.status === 200){
+        alert("Asistencia cerrada", "La asistencia ha sido cerrada correctamente.");
+        handlerDatos();
+      }
+      
+    } catch (error) {
+      console.error("Error al hacer la solicitud:", error);
+      alert("Error de red o del servidor.");
+      return null;
+    }
+  }
 
   const realizarBusqueda = () => {
     const texto = busqueda.toLowerCase();
-    const resultado = ofertasData.filter(oferta =>
+    const resultado = ofertas.filter(oferta =>
       oferta.nombre.toLowerCase().includes(texto) ||
       oferta.tipo.toLowerCase().includes(texto) ||
       oferta.estado.toLowerCase().includes(texto)
@@ -63,7 +108,9 @@ const ValidacionOfertas = () => {
             styles.value,
             {
               backgroundColor:
-                item.estado === 'Aprobado' ? '#D4F4D1' : '#FFCC80',
+                item.estado === 'Aprobado' ? '#D4F4D1' :
+                item.estado === 'Revision' ? '#FFF59D' :
+                '#FFCC80',
               paddingHorizontal: 8,
               paddingVertical: 2,
               borderRadius: 6,
@@ -88,27 +135,32 @@ const ValidacionOfertas = () => {
 
       {/* Botones de acción */}
       <View style={styles.cardRow}>
+        {item.estado === 'Revision' && (
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => {
+              alert(`Cambiar estado: ${item.nombre}`);
+              handleAceptarAsistencia(item.id);
+            }}
+          >
+            <Text style={styles.actionButtonText}>Aprobar</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => alert(`Cambiar estado: ${item.nombre}`)}
+          onPress={() =>
+            navigation.navigate('EditarOferta', {
+              nombre: item.nombre,
+              tipo: item.tipo,
+              estado: item.estado,
+              horasSemana: item.horas,
+              fechaInicio: '2024-05-01',
+              fechaCierre: '2024-07-15',
+            })
+          }
         >
-          <Text style={styles.actionButtonText}>Aprobar/No aprobar</Text>
-        </TouchableOpacity>
-
-       <TouchableOpacity
-                 style={styles.actionButton}
-                 onPress={() =>
-                   navigation.navigate('EditarOferta', {
-                    nombre: item.nombre,
-                    tipo: item.tipo,
-                    estado: item.estado,
-                    horasSemana: item.horas,
-                    fechaInicio: '2024-05-01',     // podés dejar vacío si no los usás
-                    fechaCierre: '2024-07-15',
-                   })
-                 }
-               >
-                 <Text style={styles.actionButtonText}>Editar</Text>
+          <Text style={styles.actionButtonText}>Editar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -119,7 +171,7 @@ const ValidacionOfertas = () => {
               `¿Deseas eliminar la oferta "${item.nombre}"?`,
               [
                 { text: 'Cancelar', style: 'cancel' },
-                { text: 'Eliminar', onPress: () => console.log('Eliminado') },
+                { text: 'Eliminar', onPress: () => handleEliminarAsistencia(item.id) },
               ]
             )
           }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,41 +8,39 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/monitoreoActividades';
+import URL from '../../Services/url';
+import axios from 'axios';
 
-const seguimientoData = [
-  {
-    tipoBeca: 'Tutoría',
-    periodo: 'IS2025',
-    responsable: 'Lupita Perez',
-    estado: 'Aprobada',
-  },
-  {
-    tipoBeca: 'Oferta',
-    periodo: 'IS2025',
-    responsable: 'Lupita Perez',
-    estado: 'Aprobada',
-   
-  },
-  {
-    tipoBeca: 'Cambio de rol',
-    periodo: 'IS2025',
-    responsable: 'Lupita Perez',
-    estado: 'Aprobada',
-  
-  },
-];
+
+
 
 const MonitoreoActividades = () => {
   const navigation = useNavigation();
   const [busqueda, setBusqueda] = useState('');
-  const [filtradas, setFiltradas] = useState(seguimientoData);
+  const [filtradas, setFiltradas] = useState();
+  const route = useRoute();
+
+
+  useEffect(() => {
+    const obtenerAsistencias= async () => {
+      try {
+        const response = await axios.get(`${URL}:3000/admin/monitoreoAsistencia`);
+        console.log('Asistencias obtenidas:', response.data);
+        setFiltradas(response.data.asistencias);
+      } catch (error) {
+        console.error('Error al obtener las asistencias:', error);
+      }
+    };
+    obtenerAsistencias();
+  }, []);
+    
 
   const realizarBusqueda = () => {
     const texto = busqueda.toLowerCase();
     const resultado = seguimientoData.filter(item =>
-      item.tipoBeca.toLowerCase().includes(texto) ||
+      item.asistencia.toLowerCase().includes(texto) ||
       item.responsable.toLowerCase().includes(texto) ||
       item.estado.toLowerCase().includes(texto)
     );
@@ -52,8 +50,8 @@ const MonitoreoActividades = () => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardRow}>
-        <Text style={styles.label}>Actividad:</Text>
-        <Text style={styles.value}>{item.tipoBeca}</Text>
+        <Text style={styles.label}>Asistencia:</Text>
+        <Text style={styles.value}>{item.asistencia}</Text>
       </View>
 
       <View style={styles.cardRow}>
