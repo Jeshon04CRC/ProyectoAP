@@ -104,34 +104,45 @@ const EvaluacionRetroalimentacion = ({ route }) => {
 
   const handleGuardar = async () => {
     if (!registro) {
-      return Alert.alert('Error', 'Seleccione un registro antes de guardar');
+      return Alert.alert("Error", "Seleccione un registro antes de guardar");
     }
-  
-    const id = registro.type === 'asignada'
+
+    const id = registro.type === "asignada"
       ? registro.asignacionId
       : registro.asistenciaId;
     const type = registro.type;
-  
+
     const body = {
       retroalimentacion: newComentario,
       desempeno: newDesempeno
     };
-  
+
     try {
       const endpoint = `${apiUrl}/moduloProfesores/updateAsistenciaFeedback/${type}/${id}`;
+      //console.log("[handleGuardar] PATCH", endpoint);
+      //console.log("[handleGuardar] body:", body);
+
       const response = await axios.patch(endpoint, body);
-  
+
+      //console.log("[handleGuardar] response:", response.status, response.data);
       if (response.status === 200) {
-        Alert.alert('Éxito', 'Feedback guardado correctamente.');
-        setRegistro(r => r ? { ...r, retroalimentacion: newComentario, desempeno: newDesempeno } : r);
-        setNewComentario('');
-        setNewDesempeno('');
+        Alert.alert("Éxito", "Feedback guardado correctamente.");
+        setRegistro(r => r
+          ? { ...r, retroalimentacion: newComentario, desempeno: body.desempeno }
+          : r
+        );
+        setNewComentario("");
+        setNewDesempeno("");
       } else {
-        Alert.alert('Error', 'No se pudo guardar el feedback.');
+        Alert.alert("Error", "No se pudo guardar el feedback.");
       }
     } catch (error) {
-      console.error('Error updating feedback:', error.response?.data || error.message);
-      Alert.alert('Error', 'Error de conexión o servidor.');
+      console.error(
+        "[handleGuardar] Error updating feedback:",
+        error.response?.status,
+        error.response?.data || error.message
+      );
+      Alert.alert("Error", "Error de conexión o servidor.");
     }
   };
 

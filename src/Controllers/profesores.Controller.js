@@ -399,6 +399,9 @@ export const updateAsistenciaFeedback = async (req, res) => {
   const { type, id } = req.params;
   const { retroalimentacion, desempeno } = req.body;
 
+  //console.log("[updateAsistenciaFeedback] params:", { type, id });
+  //console.log("[updateAsistenciaFeedback] body:", { retroalimentacion, desempeno });
+
   try {
     let docRef;
     if (type === "asignada") {
@@ -406,16 +409,24 @@ export const updateAsistenciaFeedback = async (req, res) => {
     } else if (type === "cerrada") {
       docRef = doc(db, "Asistencias", id);
     } else {
+      console.log("[updateAsistenciaFeedback] Tipo inválido:", type);
       return res.status(400).json({ message: "Tipo inválido" });
     }
-    const snap = await getDoc(docRef);
-    if (!snap.exists()) {
+    const beforeSnap = await getDoc(docRef);
+    if (!beforeSnap.exists()) {
+      //console.log("[updateAsistenciaFeedback] Documento no existe:", id);
       return res.status(404).json({ message: "Documento no encontrado" });
     }
+    //console.log("[updateAsistenciaFeedback] Antes:", beforeSnap.data());
+
     await updateDoc(docRef, {
       retroalimentacion,
       desempeno
     });
+    //console.log("[updateAsistenciaFeedback] updateDoc() completado");
+
+    const afterSnap = await getDoc(docRef);
+    //console.log("[updateAsistenciaFeedback] Después:", afterSnap.data());
 
     return res.status(200).json({ message: "Feedback guardado correctamente." });
   } catch (error) {
@@ -424,6 +435,7 @@ export const updateAsistenciaFeedback = async (req, res) => {
   }
 };
 
+
 export const assignAndRemoveSolicitud = async (req, res) => {
   const student = req.body;
   console.log("[assignAndRemoveSolicitud] body:", student);
@@ -431,7 +443,7 @@ export const assignAndRemoveSolicitud = async (req, res) => {
   const {
     userId,
     tituloOportunidad,
-    pago = null,
+    pago = 2000,
     retroalimentacion = "",
     desempeno = "",
     fechaAsignacion = Timestamp.now(),
