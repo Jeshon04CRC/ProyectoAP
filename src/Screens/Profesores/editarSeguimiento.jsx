@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { styles } from '../../Style/Profesores/editarSeguimiento'; // Asegúrate de que la ruta sea correcta
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { styles } from '../../Style/Profesores/editarSeguimiento'; 
+import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
+import URL from '../../Services/url';
 
 const EditarSeguimiento = () => {
   const [tutoriasCumplidas, setTutoriasCumplidas] = useState('');
@@ -10,26 +13,47 @@ const EditarSeguimiento = () => {
   const [asistenciasPorCumplir, setAsistenciasPorCumplir] = useState('');
   const [tareasPorCumplir, setTareasPorCumplir] = useState('');
 
-  const handleEditarRegistro = () => {
-    // Aquí podrías enviar los datos a una API o registrar los cambios
-    console.log("Editar Registro:", {
-      tutoriasCumplidas,
-      asistenciasCumplidas,
-      cumplimientoTareas,
-      tutoriasPorCumplir,
-      asistenciasPorCumplir,
-      tareasPorCumplir
-    });
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { asistenciaId } = route.params;
+
+  const handleEditarRegistro = async () => {
+    try {
+      const data = {
+        tutoriasCumplidas,
+        asistenciasCumplidas,
+        cumplimientoTareas,
+        tutoriasPorCumplir,
+        asistenciasPorCumplir,
+        tareasPorCumplir
+      };
+
+      const response = await axios.patch(
+        `${URL}:3000/moduloProfesores/updateSeguimiento/${asistenciaId}`,
+        data
+      );
+
+      if (response.status === 200) {
+        console.log("Registro actualizado:", response.data.message);
+        alert("Registro actualizado correctamente");
+        navigation.goBack();
+      } else {
+        alert("Error al actualizar el registro");
+      }
+    } catch (error) {
+      console.error("Error al editar registro:", error);
+      alert("Ocurrió un error al actualizar.");
+    }
   };
 
   const handleRegresar = () => {
-    // Lógica para regresar (por ejemplo, usar navegación)
     console.log("Regresar");
+    navigation.goBack();
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.header}>Editar Seguimiento</Text>
+      <Text style={styles.header}>Editar Seguimiento</Text>
 
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Cantidad de Tutorías cumplidas</Text>

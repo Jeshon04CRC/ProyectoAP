@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { modalStyles } from '../../Style/Profesores/ofertaModal';	
 
-const OfertaModal = ({ visible, oferta, onClose }) => {
+const OfertaModal = ({ visible, oferta, contactInfo, onClose }) => {
   if (!oferta) return null;
   return (
     <Modal animationType="slide" transparent={true} visible={visible}>
@@ -11,7 +11,7 @@ const OfertaModal = ({ visible, oferta, onClose }) => {
           <ScrollView style={modalStyles.modalContent}>
             <Text style={modalStyles.modalTitle}>{oferta.nombre}</Text>
             <Text style={modalStyles.modalText}>Estudiantes: {oferta.estudiantes}</Text>
-            <Text style={modalStyles.modalText}>Profesor: {oferta.profesor}</Text>
+            <Text style={modalStyles.modalText}>Profesor: {contactInfo.nombre}</Text>
             <Text style={modalStyles.modalText}>Semestre: {oferta.semestre}</Text>
             <Text style={modalStyles.modalText}>Beneficio: {oferta.beneficio}</Text>
             <Text style={modalStyles.modalText}>Descripción: {oferta.descripcion}</Text>

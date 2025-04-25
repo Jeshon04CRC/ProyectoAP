@@ -1,33 +1,111 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { styles } from '../../Style/Profesores/infoEstudiante'; 
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import axios from 'axios';
+import { styles } from '../../Style/Profesores/infoEstudiante';
+import URL from '../../Services/url';
+import { Timestamp } from 'firebase/firestore';
 
 const InfoEstudiante = ({ route, navigation }) => {
-  // Se espera que los datos del estudiante se envíen en route.params.student
-  const { student } = route.params; 
+  const { student } = route.params;
+  const [carreraName, setCarreraName] = useState(student.carrera || "");
+
+  useEffect(() => {
+    const fetchCarrera = async () => {
+      try {
+        const response = await axios.get(
+          `${URL}:3000/moduloProfesores/searchCarreraByuserId/${student.userId}`
+        );
+        if (response.status === 200 && response.data?.carrera) {
+          setCarreraName(response.data.carrera);
+        }
+      } catch (error) {
+        console.error("Error fetching carrera:", error.message);
+      }
+    };
+    fetchCarrera();
+  }, [student.userId]);
+
+
+  const asignarEstudiante = async () => {
+    try {
+      const datosAsign = {
+        pago: student.pago || 0,
+        retroalimentacion: student.comentarios || "",
+        desempeno: student.nota || 0,
+        fechaAsignacion: Timestamp.now()
+      };
+      const endpoint =
+        `${URL}:3000/moduloProfesores/assignAndRemoveSolicitud/${student.userId}/${encodeURIComponent(student.tituloOportunidad.trim())}`;
+      const resp = await axios.patch(endpoint, datosAsign);
+      if (resp.status === 200) {
+        Alert.alert("Éxito", "Estudiante asignado y solicitud eliminada.");
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", "No se pudo asignar el estudiante.");
+      }
+    } catch (err) {
+      console.error("Error asignarEstudiante:", err);
+      Alert.alert("Error", "Ocurrió un problema al asignar.");
+    }
+  };
+
+  const rechazarPostulacion = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.patch(
+        `${apiUrl}/moduloProfesores/rechazarPostulacion/${student.id}`,
+      );
+  
+      if (response.status === 200) {
+        Alert.alert("Postulación rechazada");
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", "No se pudo rechazar la postulación.");
+      }
+    } catch (error) {
+      console.error("Error en rechazarPostulacion:", error);
+      Alert.alert("Error", "Ocurrió un problema al rechazar.");
+    }
+  };
+  
+
+  const solicitarReunion = async () => {
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.patch(
+        `${apiUrl}/moduloProfesores/setSolicitudReunion/${student.id}`,
+        { reunion: true }
+      );
+      if (response.status === 200) {
+        Alert.alert('Reunión solicitada');
+      } else {
+        Alert.alert('Error', 'No se pudo solicitar la reunión');
+      }
+    } catch (error) {
+      console.error("Error al solicitar reunión:", error);
+      Alert.alert('Error', 'Hubo un problema solicitando la reunión');
+    }
+  };
+  
 
   return (
     <ScrollView style={styles.container}>
-      {/* Sección: Mis Datos */}
+      {/* Datos del estudiante */}
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Mis Datos</Text>
         <View style={styles.dataContainer}>
-          <Image 
-            source={require('../../../assets/avataricon.png')}
-            style={styles.avatar}
-          />
+          <Image source={require('../../../assets/avataricon.png')} style={styles.avatar} />
           <View style={styles.textContainer}>
-            <Text style={styles.infoText}>Correo: {student.correo || "Tomas13@estudiantec.cr"}</Text>
-            <Text style={styles.infoText}>Cédula: {student.cedula || "11000500"}</Text>
-            <Text style={styles.infoText}>Nombre: {student.nombre || "Tomas Abarca"}</Text>
-            <Text style={styles.infoText}>Carrera: {student.carrera || "Ingeniería en Computación"}</Text>
-            <Text style={styles.infoText}>Ponderado: {student.ponderado || "75.8"}</Text>
-            <Text style={styles.infoText}>Cursos aprobados: {student.cursosAprobados || "20"}</Text>
+            <Text style={styles.infoText}>Correo: {student.correo}</Text>
+            <Text style={styles.infoText}>Nombre: {student.nombre}</Text>
+            <Text style={styles.infoText}>Carrera: {carreraName}</Text>
+            <Text style={styles.infoText}>Ponderado: {student.promedio}</Text>
+            <Text style={styles.infoText}>Cursos aprobados: {student.cursosAprobados}</Text>
           </View>
         </View>
       </View>
-      
-      {/* Sección: Documentos adjuntos */}
+
+      {/* Documentos adjuntos */}
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Documentos adjuntos</Text>
         <View style={styles.documentosContainer}>
@@ -42,21 +120,21 @@ const InfoEstudiante = ({ route, navigation }) => {
           </View>
         </View>
       </View>
-      
-      {/* Sección: Acciones */}
+
+      {/* Botones de acción */}
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity style={[styles.actionButton, styles.approveButton]}>
+        <TouchableOpacity style={[styles.actionButton, styles.approveButton]} onPress={asignarEstudiante}>
           <Text style={styles.actionButtonText}>Aprobar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.rejectButton]}>
+        <TouchableOpacity style={[styles.actionButton, styles.rejectButton]} onPress={rechazarPostulacion}>
           <Text style={styles.actionButtonText}>Rechazar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, styles.meetingButton]}>
+        <TouchableOpacity style={[styles.actionButton, styles.meetingButton]} onPress={solicitarReunion}>
           <Text style={styles.actionButtonText}>Solicitar reunión</Text>
         </TouchableOpacity>
       </View>
-      
-      {/* Botón Regresar */}
+
+      {/* Regresar */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Regresar</Text>
       </TouchableOpacity>

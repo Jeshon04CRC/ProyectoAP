@@ -5,53 +5,68 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Profesores/registroEdicion';
+import axios from 'axios';
+import URL from '../../Services/url';
 
 const RegistroEdicion = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { contactInfo, carrera} = route.params;
+  const { contactInfo, carrera, userId } = route.params;
 
   const [nombre, setNombre] = useState('');
-  const [apellidos, setApellidos] = useState('');
   const [correo, setCorreo] = useState('');
   const [telefono, setTelefono] = useState('');
-  const [departamento, setDepartamento] = useState('');
+  const [sede, setSede] = useState('');
 
-  // Cuando el componente se monte, inicializa los estados con contactInfo recibido
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   useEffect(() => {
     if (contactInfo) {
       setNombre(contactInfo.nombre || '');
       setCorreo(contactInfo.correo || '');
       setTelefono(contactInfo.telefono || '');
-      setDepartamento(carrera);
+      setSede(contactInfo.sede || '');
     }
   }, [contactInfo]);
 
-  // Función para manejar el guardado de cambios (POST/PUT al endpoint)
   const guardarCambios = async () => {
-    console.log('Guardando cambios...');
-    const updatedData = { nombre, apellidos, correo, telefono, departamento };
-    console.log(updatedData);
-    // Ejemplo de llamada al endpoint (debes ajustar la URL y método según tu API):
-    // try {
-    //   const response = await axios.post('https://tuservidor/api/actualizarContacto', updatedData);
-    //   if (response.status === 200) {
-    //     console.log('Datos actualizados correctamente');
-    //     // Podrías navegar de regreso o mostrar un mensaje de éxito
-    //   }
-    // } catch (error) {
-    //   console.error('Error al actualizar datos', error);
-    // }
+    if (showPasswordSection) {
+      if (!password || !confirmPassword) {
+        return Alert.alert('Error', 'Por favor ingrese y confirme la nueva contraseña.');
+      }
+      if (password !== confirmPassword) {
+        return Alert.alert('Error', 'Las contraseñas no coinciden.');
+      }
+    }
+
+    const body = { nombre, correo, telefono, sede };
+    if (showPasswordSection) body.password = password;
+
+    const apiUrl = `${URL}:3000`;
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/moduloProfesores/updateInfoProfesores/${userId}`,
+        body
+      );
+      if (response.status === 200) {
+        Alert.alert('Éxito', 'Cambios guardados correctamente.');
+        navigation.navigate('HomePageProfesores', { userId });
+      } else {
+        Alert.alert('Error', 'No se pudieron guardar los cambios.');
+      }
+    } catch (error) {
+      console.error('Error al guardar cambios:', error);
+      Alert.alert('Error', 'Error de conexión. Intente más tarde.');
+    }
   };
 
-  // Función para regresar a la ruta anterior
-  const regresar = () => {
-    navigation.goBack();
-  };
+  const regresar = () => navigation.goBack();
 
   return (
     <ScrollView style={styles.container}>
@@ -61,7 +76,7 @@ const RegistroEdicion = () => {
       </View>
 
       <View style={styles.formContainer}>
-        {/* Campo: Nombre */}
+        {/* Nombre */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>1. Nombre Completo</Text>
           <TextInput
@@ -72,7 +87,7 @@ const RegistroEdicion = () => {
           />
         </View>
 
-        {/* Campo: Correo Institucional */}
+        {/* Correo */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>2. Correo Institucional</Text>
           <TextInput
@@ -85,7 +100,7 @@ const RegistroEdicion = () => {
           />
         </View>
 
-        {/* Campo: Teléfono */}
+        {/* Teléfono */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>3. Teléfono</Text>
           <TextInput
@@ -97,30 +112,61 @@ const RegistroEdicion = () => {
           />
         </View>
 
-        {/* Campo: Departamento/Escuela (Picker) */}
+        {/* Sede */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>4. Escuela o departamento</Text>
+          <Text style={styles.label}>4. Sede</Text>
           <TextInput
             style={styles.input}
             placeholder="Ingrese su escuela o departamento"
-            value={departamento}
-            onChangeText={setDepartamento}
-            keyboardType="phone-pad"
+            value={sede}
+            onChangeText={setSede}
           />
         </View>
 
-        {/* Botones */}
+        {/* Toggle password fields */}
+        <TouchableOpacity
+          style={[styles.saveButton]}
+          onPress={() => setShowPasswordSection(v => !v)}
+        >
+          <Text style={styles.buttonText}>
+            {showPasswordSection ? 'Ocultar cambio de contraseña' : 'Cambiar contraseña'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Password Section */}
+        {showPasswordSection && (
+  <View style={{ backgroundColor: 'rgba(255,0,0,0.1)' }}>
+    
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Nueva Contraseña</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ingrese nueva contraseña"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Confirmar Contraseña</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Repita la contraseña"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+            </View>
+          
+  </View>
+)}
+
+        {/* Action Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.saveButton]}
-            onPress={guardarCambios}
-          >
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={guardarCambios}>
             <Text style={styles.buttonText}>Guardar cambios</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.returnButton]}
-            onPress={regresar}
-          >
+          <TouchableOpacity style={[styles.button, styles.returnButton]} onPress={regresar}>
             <Text style={styles.buttonText}>Regresar</Text>
           </TouchableOpacity>
         </View>

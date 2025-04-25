@@ -25,7 +25,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Definición de funciones antes del useEffect
   const handleInformacion = async () => {
     try {
       const apiUrl = `${URL}:3000`;
@@ -68,7 +67,6 @@ const HomePage = () => {
     }
   };
 
-  // Fetch user info and then career info
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -94,14 +92,13 @@ const HomePage = () => {
     fetchData();
   }, []);
 
-  // Log when carrera state changes
   useEffect(() => {
     if (carrera !== null) {
       console.log('Carrera actualizada en estado:', carrera);
     }
   }, [carrera]);
 
-  // Show loading UI
+  
   if (loading) {
     return (
       <View style={styles.container}>
@@ -167,7 +164,7 @@ const HomePage = () => {
             onPress={() => {
               const routeName = screenMapping[buttonLabel];
               if (routeName) {
-                navigation.navigate(routeName, { contactInfo: contactInfo, carrera: carrera } );
+                navigation.navigate(routeName, { contactInfo: contactInfo, carrera: carrera, userId: userId} );
               } else {
                 alert('Ruta no definida para este botón: ' + buttonLabel);
               }

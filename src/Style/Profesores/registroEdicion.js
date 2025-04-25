@@ -19,7 +19,8 @@ export const styles = StyleSheet.create({
     },
     formContainer: {
 
-      marginVertical: 20,
+      flexGrow: 1,
+      paddingBottom: 20,
 
     },
     header: {
@@ -50,7 +51,6 @@ export const styles = StyleSheet.create({
       borderWidth: 1,
       borderColor: '#ccc',
       borderRadius: 5,
-      overflow: 'hidden'
     },
     buttonContainer: {
       flexDirection: 'row',

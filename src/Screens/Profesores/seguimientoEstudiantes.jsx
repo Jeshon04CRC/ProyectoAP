@@ -1,84 +1,145 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Profesores/seguimientoEstudiantes';
-import { useNavigation } from "@react-navigation/native";
-
-
-const mockData = require('./mockData.json');
-const { postulacionesData } = mockData;
-
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from 'axios';
+import URL from '../../Services/url';
 
 const SeguimientoEstudiantes = () => {
   const navigation = useNavigation();
-  const acceptedAssistants = postulacionesData.filter(
-    (a) => a.estado === "Aprobado"
-  );
+  const route = useRoute();
+  const { userId } = route.params;
   
-  const [selectedAssistant, setSelectedAssistant] = useState(
-    acceptedAssistants.length > 0 ? acceptedAssistants[0] : null
-  );
+  const [mergedData, setMergedData] = useState([]);
+  const [selectedAsistencia, setSelectedAsistencia] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const apiUrl = `${URL}:3000`;
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/moduloProfesores/getUserInfoByAsistencias/${userId}`
+        );
+
+        const asistenciasData = response.data.asignadas;
+
+        const userIds = [
+          ...new Set(asistenciasData.map(item => item.datosAsignacion.userId))
+        ];
+
+        const usersInfo = await Promise.all(
+          userIds.map(userId =>
+            axios.get(`${apiUrl}/moduloProfesores/infoProfesores/${userId}`)
+          )
+        );
+
+        const usersMap = usersInfo.reduce((acc, response) => {
+          if (response.data && response.data.id) {
+            acc[response.data.id] = response.data;
+          }
+          return acc;
+        }, {});
+
+        const combined = asistenciasData.map(asistencia => ({
+          ...asistencia,
+          userInfo: usersMap[asistencia.datosAsignacion.userId] || {
+            nombre: 'Desconocido',
+            id: asistencia.datosAsignacion.userId
+          }
+        }));
+
+        setMergedData(combined);
+        setSelectedAsistencia(combined[0]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+        <Text>Cargando...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Seguimiento de estudiantes</Text>
       
-      {/* Picker para seleccionar entre los asistentes aceptados */}
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={selectedAssistant ? selectedAssistant.id.toString() : ''}
-          style={styles.picker}
-          onValueChange={(itemValue) => {
-            const assistant = acceptedAssistants.find(
-              (a) => a.id.toString() === itemValue
+          selectedValue={selectedAsistencia?.asignacionId}
+          onValueChange={(value) => {
+            const selected = mergedData.find(item =>
+              item.asignacionId === value
             );
-            setSelectedAssistant(assistant);
+            setSelectedAsistencia(selected);
           }}
         >
-          {acceptedAssistants.map((assistant) => (
+          {mergedData.map((item) => (
             <Picker.Item
-              key={assistant.id}
-              label={assistant.nombre}
-              value={assistant.id.toString()}
+              key={item.asignacionId}
+              label={`${item.userInfo.nombre} - ${item.datosAsistencia.tituloPrograma}`}
+              value={item.asignacionId}
             />
           ))}
         </Picker>
       </View>
 
-      {/* Card con la información del asistente seleccionado */}
-      {selectedAssistant && (
+      {selectedAsistencia && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{selectedAssistant.nombre}</Text>
+          <Text style={styles.cardTitle}>{selectedAsistencia.userInfo.nombre}</Text>
+
           <Text style={styles.cardDetail}>
-            Experiencia: {selectedAssistant.experiencia}
+            Programa: {selectedAsistencia.datosAsistencia.tituloPrograma}
           </Text>
           <Text style={styles.cardDetail}>
-            Carrera: {selectedAssistant.carrera}
+            Carrera: {selectedAsistencia.userInfo.carrera}
           </Text>
           <Text style={styles.cardDetail}>
-            Nivel: {selectedAssistant.nivel}
+            Teléfono: {selectedAsistencia.userInfo.telefono}
           </Text>
           <Text style={styles.cardDetail}>
-            Ponderado: {selectedAssistant.ponderado}
+            Ponderado: {selectedAsistencia.userInfo.ponderado}
           </Text>
           <Text style={styles.cardDetail}>
-            Cursos Aprobados: {selectedAssistant.cursosAprobados}
+            Estado: {selectedAsistencia.datosAsistencia.estado}
           </Text>
           <Text style={styles.cardDetail}>
-            Estado: {selectedAssistant.estado}
+            Desempeño: {selectedAsistencia.datosAsignacion.desempeno}
           </Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("evaluacionDesempeno", { student: selectedAssistant })}>
+          <Text style={styles.cardDetail}>
+            Retroalimentación: {selectedAsistencia.datosAsignacion.retroalimentacion}
+          </Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => navigation.navigate("evaluacionDesempeno", { asistenciaId: selectedAsistencia.asignacionId, student: selectedAsistencia.userInfo })}
+          >
             <Text style={styles.buttonText}>Evaluar</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Botón Regresar */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("editarSeguimiento")}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigation.navigate('editarSeguimiento', { asistenciaId: selectedAsistencia.asignacionId, student: selectedAsistencia.userInfo })}
+        >
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => console.log("Regresar")}>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.buttonText}>Regresar</Text>
         </TouchableOpacity>
       </View>

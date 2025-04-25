@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { styles } from '../../Style/Profesores/creacionOfertas'; 
-import { Alert } from 'react-native';
-
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { styles } from '../../Style/Profesores/creacionOfertas';
+import axios from 'axios';
+import URL from '../../Services/url';
 
 const CreacionOfertas = () => {
-  // Estados para cada campo del formulario
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { userId } = route.params;
+
   const [nombrePrograma, setNombrePrograma] = useState('');
   const [objetivos, setObjetivos] = useState('');
   const [tipo, setTipo] = useState('');
@@ -17,143 +21,144 @@ const CreacionOfertas = () => {
   const [beneficios, setBeneficios] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [requisitos, setRequisitos] = useState('');
+  const [semestre, setSemestre] = useState('');
 
-  const handleCrearOferta = () => {
-    // Aquí se podría enviar los datos a un API, agregar validaciones, etc.
-    console.log('Creando oferta con datos:', {
+  const handleCrearOferta = async () => {
+    if (
+      !nombrePrograma.trim() ||
+      !objetivos.trim() ||
+      !tipo.trim() ||
+      !horario.trim() ||
+      !vacantes.trim() ||
+      !horasSemanal.trim() ||
+      !fechaInicio.trim() ||
+      !fechaCierre.trim() ||
+      !beneficios.trim() ||
+      !descripcion.trim() ||
+      !requisitos.trim() ||
+      !semestre.trim()
+    ) {
+      Alert.alert('Error', 'Por favor complete todos los campos.');
+      return;
+    }
+
+    const horasSemanalNum = parseInt(horasSemanal, 10);
+    if (isNaN(horasSemanalNum) || horasSemanalNum <= 0) {
+      Alert.alert('Error', 'Las horas por semana deben ser un número positivo.');
+      return;
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(fechaInicio) || !dateRegex.test(fechaCierre)) {
+      Alert.alert('Error', 'Las fechas deben estar en el formato AAAA-MM-DD.');
+      return;
+    }
+
+    if (new Date(fechaInicio) > new Date(fechaCierre)) {
+      Alert.alert('Error', 'La fecha de inicio no puede ser posterior a la fecha de cierre.');
+      return;
+    }
+
+    const body = {
       nombrePrograma,
       objetivos,
       tipo,
       horario,
       vacantes,
-      horasSemanal,
+      horasSemanal: horasSemanalNum,
       fechaInicio,
       fechaCierre,
       beneficios,
       descripcion,
       requisitos,
-    });
-    Alert.alert(
-        "Oferta creada",
-        "La oferta ha sido creada exitosamente.",
-        [{ text: "OK" }],
-        { cancelable: false }
-    );
-    
+      semestre,
+      estado: 'Abierto',
+      cantidadSolicitudes: 0,
+    };
+
+    try {
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.post(
+        `${apiUrl}/moduloProfesores/insertNewOferta/${userId}`,
+        body
+      );
+      if (response.status === 200) {
+        Alert.alert('Éxito', 'Oferta creada exitosamente.');
+        navigation.goBack();
+      } else {
+        Alert.alert('Error', 'Hubo un problema al crear la oferta. Intente de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error al crear la oferta:', error);
+      Alert.alert('Error', 'Hubo un problema al crear la oferta. Intente de nuevo.');
+    }
   };
 
-  const handleRegresar = () => {
-    console.log('Regresar');
-  };
+  const handleRegresar = () => navigation.goBack();
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Crear Nueva Oferta</Text>
       <View style={styles.formContainer}>
+        {/** Nombre del programa */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Nombre del programa</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese el nombre del programa"
-            value={nombrePrograma}
-            onChangeText={setNombrePrograma}
-          />
+          <TextInput style={styles.input} placeholder="Ingrese el nombre del programa" value={nombrePrograma} onChangeText={setNombrePrograma} />
         </View>
+        {/** Objetivos */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Objetivos del programa</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Ingrese los objetivos"
-            multiline
-            value={objetivos}
-            onChangeText={setObjetivos}
-          />
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Ingrese los objetivos" multiline value={objetivos} onChangeText={setObjetivos} />
         </View>
+        {/** Tipo */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Tipo</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese el tipo"
-            value={tipo}
-            onChangeText={setTipo}
-          />
-          {/* Alternativamente, se podría usar un Picker para elegir el tipo */}
+          <TextInput style={styles.input} placeholder="Ingrese el tipo" value={tipo} onChangeText={setTipo} />
         </View>
+        {/** Horario */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Horario</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese el horario"
-            value={horario}
-            onChangeText={setHorario}
-          />
+          <TextInput style={styles.input} placeholder="Ingrese el horario" value={horario} onChangeText={setHorario} />
         </View>
+        {/** Vacantes */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Vacantes</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese el número de vacantes"
-            keyboardType="numeric"
-            value={vacantes}
-            onChangeText={setVacantes}
-          />
+          <TextInput style={styles.input} placeholder="Ingrese el número de vacantes" keyboardType="numeric" value={vacantes} onChangeText={setVacantes} />
         </View>
+        {/** Horas por semana */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Horas por semana</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese las horas por semana"
-            keyboardType="numeric"
-            value={horasSemanal}
-            onChangeText={setHorasSemanal}
-          />
+          <TextInput style={styles.input} placeholder="Ingrese las horas por semana" keyboardType="numeric" value={horasSemanal} onChangeText={setHorasSemanal} />
         </View>
+        {/** Fecha de inicio */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Fecha de inicio</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="AAAA-MM-DD"
-            value={fechaInicio}
-            onChangeText={setFechaInicio}
-          />
+          <TextInput style={styles.input} placeholder="AAAA-MM-DD" value={fechaInicio} onChangeText={setFechaInicio} />
         </View>
+        {/** Fecha de cierre */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Fecha de cierre</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="AAAA-MM-DD"
-            value={fechaCierre}
-            onChangeText={setFechaCierre}
-          />
+          <TextInput style={styles.input} placeholder="AAAA-MM-DD" value={fechaCierre} onChangeText={setFechaCierre} />
         </View>
+        {/** Beneficios */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Beneficios</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese beneficios"
-            value={beneficios}
-            onChangeText={setBeneficios}
-          />
+          <TextInput style={styles.input} placeholder="Ingrese beneficios" value={beneficios} onChangeText={setBeneficios} />
         </View>
+        {/** Descripción */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Descripción</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Ingrese descripción"
-            multiline
-            value={descripcion}
-            onChangeText={setDescripcion}
-          />
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Ingrese descripción" multiline value={descripcion} onChangeText={setDescripcion} />
         </View>
+        {/** Requisitos */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Requisitos</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Ingrese requisitos"
-            multiline
-            value={requisitos}
-            onChangeText={setRequisitos}
-          />
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Ingrese requisitos" multiline value={requisitos} onChangeText={setRequisitos} />
+        </View>
+        {/** Semestre */}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Semestre</Text>
+          <TextInput style={styles.input} placeholder="Ingrese semestre" value={semestre} onChangeText={setSemestre} />
         </View>
       </View>
       <View style={styles.buttonContainer}>

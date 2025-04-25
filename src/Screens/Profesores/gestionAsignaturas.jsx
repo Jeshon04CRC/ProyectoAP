@@ -1,69 +1,130 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  TouchableOpacity
+import React, { useState, useEffect } from "react";
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  TextInput, 
+  TouchableOpacity 
 } from "react-native";
-import data from "./mockData.json"; 
 import { styles } from "../../Style/Profesores/gestionAsignaturas";
+import axios from "axios";
+import URL from "../../Services/url"; 
+import { useNavigation, useRoute } from '@react-navigation/native';
 
+const HistorialCard = ({ item }) => {
+  const safeFormatDate = (timestamp) => {
+    try {
+      if (!timestamp) return "";
+      if (typeof timestamp === "object" && timestamp.seconds) {
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+      }
+      return typeof timestamp === "string" ? timestamp : "";
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Fecha inválida";
+    }
+  };
 
-const HistorialCard = ({ item }) => (
-  <View style={styles.historialCard}>
-    <Text style={styles.historialCardText}>Nombre: {item.nombre}</Text>
-    <Text style={styles.historialCardText}>Carnet: {item.carnet}</Text>
-    <Text style={styles.historialCardText}>Tipo: {item.tipo}</Text>
-    <Text style={styles.historialCardText}>Curso: {item.curso}</Text>
-    <Text style={styles.historialCardText}>Semestre: {item.semestre}</Text>
-    <Text style={styles.historialCardText}>Estado: {item.estado}</Text>
-    <Text style={styles.historialCardText}>Año: {item.año}</Text>
-  </View>
-);
+  const formattedFechaInicio = safeFormatDate(item.fechaInicio);
+  const formattedFechaCierre = safeFormatDate(item.fechaFin);
+
+  return (
+    <View style={styles.historialCard}>
+      <Text style={styles.historialCardText}>Nombre: {item.tituloPrograma}</Text>
+      <Text style={styles.historialCardText}>Beneficio: {item.beneficio}</Text>
+      <Text style={styles.historialCardText}>Tipo: {item.tipo}</Text>
+      <Text style={styles.historialCardText}>Descripción: {item.descripcion}</Text>
+      <Text style={styles.historialCardText}>Semestre: {item.semestre}</Text>
+      <Text style={styles.historialCardText}>Estado: {item.estado}</Text>
+      <Text style={styles.historialCardText}>Fecha Inicio: {formattedFechaInicio}</Text>
+      <Text style={styles.historialCardText}>Fecha Cierre: {formattedFechaCierre}</Text>
+      <Text style={styles.historialCardText}>Horas: {item.totalHoras}</Text>
+    </View>
+  );
+};
 
 const GestionAsignaturas = () => {
-
-  const { courses = [], proyectos = [], historial = [] } =
-    data.gestionAsignaturas || {};
-
+  const [courses, setCourses] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
+  const [historial, setHistorial] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   const [carouselSearchText, setCarouselSearchText] = useState("");
-  const [filteredCourses, setFilteredCourses] = useState(courses);
-  const [filteredProyectos, setFilteredProyectos] = useState(proyectos);
-
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [filteredProyectos, setFilteredProyectos] = useState([]);
+  
   const [historialSearchText, setHistorialSearchText] = useState("");
-  const [filteredHistorial, setFilteredHistorial] = useState(historial);
+  const [filteredHistorial, setFilteredHistorial] = useState([]);
+  
+  const route = useRoute();
+  const { userId, contactInfo } = route.params;
+  const navigation = useNavigation();
+  
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const apiUrl = `${URL}:3000`;
+        const response = await axios.get(`${apiUrl}/moduloProfesores/getCursos/${userId}`);
+        if (response.status === 200) {
+          setCourses(response.data);
+          setFilteredCourses(response.data);
+        } else {
+          console.error("Error al obtener los cursos:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener los cursos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, [userId]);
+  
 
+  useEffect(() => {
+    const fetchHistorial = async () => {
+      try {
+        const apiUrl = `${URL}:3000`;
+        const response = await axios.get(`${apiUrl}/moduloProfesores/getHistorial/${userId}`);
+        if (response.status === 200) {
+          setHistorial(response.data);
+          setFilteredHistorial(response.data);
+        } else {
+          console.error("Error al obtener el historial:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error al obtener el historial:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistorial();
+  }, [userId]);
   
   const handleCarouselSearch = () => {
     const filteredC = courses.filter((item) =>
       item.nombre.toLowerCase().includes(carouselSearchText.toLowerCase())
     );
-    const filteredP = proyectos.filter((item) =>
-      item.nombre.toLowerCase().includes(carouselSearchText.toLowerCase())
-    );
     setFilteredCourses(filteredC);
-    setFilteredProyectos(filteredP);
   };
-
+  
   const resetCarousel = () => {
     setCarouselSearchText("");
     setFilteredCourses(courses);
-    setFilteredProyectos(proyectos);
   };
-
+  
   const handleRegresar = () => {
-    console.log("Botón de regresar presionado en el carrusel");
+    navigation.goBack();
   };
-
+  
   const filterHistorialByYear = () => {
     const filtered = historial.filter(
-      (item) => item.año === historialSearchText
+      (item) => item.fechaInicio === historialSearchText
     );
     setFilteredHistorial(filtered);
   };
-
+  
   const filterHistorialByState = () => {
     const filtered = historial.filter(
       (item) =>
@@ -71,22 +132,31 @@ const GestionAsignaturas = () => {
     );
     setFilteredHistorial(filtered);
   };
-
+  
   const resetHistorial = () => {
     setHistorialSearchText("");
     setFilteredHistorial(historial);
   };
-
+  
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          Cargando Asistencias...
+        </Text>
+      </View>
+    );
+  }
+  
   return (
     <ScrollView style={styles.container}>
       {/* Título Principal */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Gestión de Asignaturas</Text>
       </View>
-
+      
       {/* Carrusel de Cursos y Proyectos */}
       <Text style={styles.sectionTitle}>Carrusel de Cursos y Proyectos</Text>
-      {/* Barra de búsqueda del carrusel */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -95,7 +165,6 @@ const GestionAsignaturas = () => {
           onChangeText={setCarouselSearchText}
         />
       </View>
-      {/* Fila de botones del carrusel */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.searchButton}
@@ -110,8 +179,7 @@ const GestionAsignaturas = () => {
           <Text style={styles.buttonText}>Regresar</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Mostrando cursos y proyectos filtrados */}
+      
       <Text style={styles.subSectionTitle}>Cursos</Text>
       <ScrollView
         horizontal
@@ -125,11 +193,11 @@ const GestionAsignaturas = () => {
             <Text style={styles.cardDetail}>Créditos: {course.creditos}</Text>
             <Text style={styles.cardDetail}>Semestre: {course.semestre}</Text>
             <Text style={styles.cardDetail}>Aula: {course.aula}</Text>
-            <Text style={styles.cardDetail}>Profesor: {course.profesor}</Text>
+            <Text style={styles.cardDetail}>Profesor: {contactInfo.nombre}</Text>
             <TouchableOpacity
               style={styles.cardButton}
               onPress={() =>
-                console.log(`Solicitar asistente para ${course.nombre}`)
+                navigation.navigate("creacionOfertasProfesores", { course })
               }
             >
               <Text style={styles.cardButtonText}>Solicitar Asistente</Text>
@@ -137,7 +205,7 @@ const GestionAsignaturas = () => {
           </View>
         ))}
       </ScrollView>
-
+      
       <Text style={styles.subSectionTitle}>Proyectos</Text>
       <ScrollView
         horizontal
@@ -151,11 +219,11 @@ const GestionAsignaturas = () => {
             <Text style={styles.cardDetail}>Créditos: {proyecto.creditos}</Text>
             <Text style={styles.cardDetail}>Semestre: {proyecto.semestre}</Text>
             <Text style={styles.cardDetail}>Aula: {proyecto.aula}</Text>
-            <Text style={styles.cardDetail}>Profesor: {proyecto.profesor}</Text>
+            <Text style={styles.cardDetail}>Profesor: {contactInfo.nombre}</Text>
             <TouchableOpacity
               style={styles.cardButton}
               onPress={() =>
-                console.log(`Solicitar asistencia para ${proyecto.nombre}`)
+                navigation.navigate("creacionOfertasProfesores", { proyecto })
               }
             >
               <Text style={styles.cardButtonText}>Solicitar Asistente</Text>
@@ -163,10 +231,8 @@ const GestionAsignaturas = () => {
           </View>
         ))}
       </ScrollView>
-
-      {/*  Historial como carrusel */}
-      <Text style={styles.sectionTitle}>Historial</Text>
-      {/* Barra de búsqueda del historial */}
+      
+      <Text style={styles.subSectionTitle}>Historial</Text>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -175,7 +241,6 @@ const GestionAsignaturas = () => {
           onChangeText={setHistorialSearchText}
         />
       </View>
-      {/* Fila de botones para el historial */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.searchButton}
@@ -193,10 +258,9 @@ const GestionAsignaturas = () => {
           <Text style={styles.buttonText}>Restablecer</Text>
         </TouchableOpacity>
       </View>
-      {/* Carrusel de Historial */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.historialContainer}>
         {filteredHistorial.map((item, index) => (
-          <HistorialCard key={item.id || index} item={item} />
+          <HistorialCard key={`${item.id}-${index}`} item={item} />
         ))}
       </ScrollView>
     </ScrollView>

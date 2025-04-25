@@ -1,103 +1,204 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  TextInput, 
+  TouchableOpacity, 
+  Alert 
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
+import URL from '../../Services/url';
 import { styles } from '../../Style/Profesores/evaluacionRetroalimentacion';
 
-// Componente para mostrar cada registro en una tarjeta
-const HistorialCard = ({ registro }) => (
-  <View style={styles.card}>
-    <Text style={styles.cardTitle}>{registro.nombre}</Text>
-    <Text style={styles.cardDetail}>Carnet: {registro.carnet}</Text>
-    <Text style={styles.cardDetail}>Tipo: {registro.tipo}</Text>
-    <Text style={styles.cardDetail}>Curso: {registro.curso}</Text>
-    <Text style={styles.cardDetail}>Semestre: {registro.semestre}</Text>
-    <Text style={styles.cardDetail}>Estado: {registro.estado}</Text>
-    <Text style={styles.cardDetail}>Año: {registro.año}</Text>
-    <Text style={styles.cardDetail}>
-      Comentario: {registro.comentario !== "" ? registro.comentario : "Sin comentario"}
-    </Text>
-    <Text style={styles.cardDetail}>
-      Desempeño: {registro.desempeño !== "" ? registro.desempeño : "Sin desempeño"}
-    </Text>
-  </View>
-);
+const EvaluacionRetroalimentacion = ({ route }) => {
+  const { userId } = route.params;
+  const apiUrl = `${URL}:3000`;
 
-const EvaluacionRetroalimentacion = () => {
-  const { gestionAsignaturas: { historial = [] } = {} } = require('./mockData.json');
-  const [filteredHistorial, setFilteredHistorial] = useState(historial);
-  const [selectedCarnet, setSelectedCarnet] = useState("");
-  const [customCarnet, setCustomCarnet] = useState("");
-  const registroInicial = filteredHistorial[0] || {};
-  const [registro, setRegistro] = useState(registroInicial);
-  const [newComentario, setNewComentario] = useState("");
-  const [newDesempeño, setNewDesempeño] = useState("");
-  const uniqueCarnets = Array.from(new Set(historial.map(item => item.carnet)));
+  const [asignadas, setAsignadas] = useState([]);
+  const [cerradas, setCerradas] = useState([]);
+  const [allRecords, setAllRecords] = useState([]);
 
+  const [selectedKey, setSelectedKey] = useState('');
+  const [customKey, setCustomKey] = useState('');
+  const [registro, setRegistro] = useState(null);
+  const [newComentario, setNewComentario] = useState('');
+  const [newDesempeno, setNewDesempeno] = useState('');
 
   useEffect(() => {
-    let carnetFilter = selectedCarnet;
-    if (selectedCarnet === "custom" && customCarnet.trim() !== "") {
-      carnetFilter = customCarnet;
-    }
-    const newFiltered = carnetFilter !== ""
-      ? historial.filter(item => item.carnet === carnetFilter)
-      : historial;
-    
-    setFilteredHistorial(newFiltered);
-    setRegistro(newFiltered[0] || {});
-  }, [selectedCarnet, customCarnet, historial]);
+    const fetchData = async () => {
+      try {
+        const resp = await axios.get(
+          `${apiUrl}/moduloProfesores/getUserInfoByAsistencias/${userId}`
+        );
+        if (resp.status === 200) {
+          const { asignadas, cerradas } = resp.data;
+          const formatAsign = asignadas.map(item => ({
+            key: `${item.datosAsignacion.userId}-${item.datosAsistencia.tituloPrograma}`.trim().toLowerCase(),
+            type: 'asignada',
+            asignacionId: item.asignacionId,
+            userId: item.datosAsignacion.userId,
+            pago: item.datosAsignacion.pago,
+            fechaAsignacion: item.datosAsignacion.fechaAsignacion,
+            activo: item.datosAsignacion.activo,
+            curso: item.datosAsistencia.tituloPrograma,
+            semestre: item.datosAsistencia.semestre,
+            estado: item.datosAsistencia.estado,
+            beneficio: item.datosAsistencia.beneficio,
+            horario: item.datosAsistencia.horario,
+            requisitosAdicionales: item.datosAsistencia.requisitosAdicionales,
+            tituloPrograma: item.datosAsistencia.tituloPrograma,
+            descripcion: item.datosAsistencia.descripcion,
+            retroalimentacion: item.datosAsignacion.retroalimentacion,
+            desempeno: item.datosAsignacion.desempeno
+          }));
+          const formatCerr = cerradas.map(item => ({
+            key: item.asistenciaId.trim().toLowerCase(),
+            type: 'cerrada',
+            asistenciaId: item.asistenciaId,
+            curso: item.datosAsistencia.tituloPrograma,
+            tituloPrograma: item.datosAsistencia.tituloPrograma, 
+            semestre: item.datosAsistencia.semestre,
+            estado: item.datosAsistencia.estado,
+            beneficio: item.datosAsistencia.beneficio,
+            horario: item.datosAsistencia.horario,
+            requisitosAdicionales: item.datosAsistencia.requisitosAdicionales,
+            descripcion: item.datosAsistencia.descripcion,
+            cantidadVacantes: item.datosAsistencia.cantidadVacantes,
+            horaXSemana: item.datosAsistencia.horaXSemana,
+            retroalimentacion: item.datosAsistencia.retroalimentacion,
+            desempeno: item.datosAsistencia.desempeno
+          }));
+          const combined = [...formatAsign, ...formatCerr];
+          setAsignadas(formatAsign);
+          setCerradas(formatCerr);
+          setAllRecords(combined);
+          setRegistro(combined[0] || null);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        Alert.alert('Error', 'No se pudo cargar la información');
+      }
+    };
+    fetchData();
+  }, [userId]);
 
-  const handleGuardar = () => {
-    if (filteredHistorial.length > 0) {
-      const updatedRegistro = {
-        ...filteredHistorial[0],
-        comentario: newComentario,
-        desempeño: newDesempeño
-      };
-      setRegistro(updatedRegistro);
-      setNewComentario("");
-      setNewDesempeño("");
+  useEffect(() => {
+    let key = selectedKey;
+    if (key === "custom" && customKey.trim()) key = customKey.trim().toLowerCase();
+
+    const filtered = key
+      ? allRecords.filter(r => r.tituloPrograma === key)
+      : allRecords;
+
+    setRegistro(filtered[0] || null);
+  }, [selectedKey, customKey, allRecords]);
+
+  const uniqueTitles = Array.from(
+    new Set(allRecords.map(r => r.tituloPrograma).filter(titulo => titulo))
+  );
+
+  console.log("Todos los títulos en allRecords:", allRecords.map(r => r.tituloPrograma));
+  console.log("Títulos únicos para el Picker:", uniqueTitles);
+
+  const handleGuardar = async () => {
+    if (!registro) {
+      return Alert.alert('Error', 'Seleccione un registro antes de guardar');
+    }
+  
+    const id = registro.type === 'asignada'
+      ? registro.asignacionId
+      : registro.asistenciaId;
+    const type = registro.type;
+  
+    const body = {
+      retroalimentacion: newComentario,
+      desempeno: newDesempeno
+    };
+  
+    try {
+      const endpoint = `${apiUrl}/moduloProfesores/updateAsistenciaFeedback/${type}/${id}`;
+      const response = await axios.patch(endpoint, body);
+  
+      if (response.status === 200) {
+        Alert.alert('Éxito', 'Feedback guardado correctamente.');
+        setRegistro(r => r ? { ...r, retroalimentacion: newComentario, desempeno: newDesempeno } : r);
+        setNewComentario('');
+        setNewDesempeno('');
+      } else {
+        Alert.alert('Error', 'No se pudo guardar el feedback.');
+      }
+    } catch (error) {
+      console.error('Error updating feedback:', error.response?.data || error.message);
+      Alert.alert('Error', 'Error de conexión o servidor.');
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Historial en modo carrusel */}
       <Text style={styles.sectionTitle}>Historial de Evaluación</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carouselContainer}>
-        {filteredHistorial.map((reg, index) => (
-          <HistorialCard key={reg.id || index} registro={reg} />
+      <ScrollView horizontal style={styles.carouselContainer}>
+        {allRecords.map(r => (
+          <View key={r.key} style={styles.card}>
+            <Text style={styles.cardTitle}>{r.curso}</Text>
+            <Text style={styles.cardDetail}>Tipo: {r.type}</Text>
+            <Text style={styles.cardDetail}>Semestre: {r.semestre}</Text>
+            <Text style={styles.cardDetail}>Estado: {r.estado}</Text>
+            {r.type === 'asignada' && (
+              <>
+                <Text style={styles.cardDetail}>Pago: {r.pago}</Text>
+                <Text style={styles.cardDetail}>
+                  Fecha Asignación: {new Date(r.fechaAsignacion.seconds * 1000).toISOString().split('T')[0]}
+                </Text>
+                <Text style={styles.cardDetail}>Activo: {r.activo ? 'Sí' : 'No'}</Text>
+                <Text style={styles.cardDetail}>Beneficio: {r.beneficio}</Text>
+                <Text style={styles.cardDetail}>Horario: {r.horario}</Text>
+                <Text style={styles.cardDetail}>Descripción: {r.descripcion}</Text>
+              </>
+            )}
+            {r.type === 'cerrada' && (
+              <>
+                <Text style={styles.cardDetail}>Beneficio: {r.beneficio}</Text>
+                <Text style={styles.cardDetail}>Horario: {r.horario}</Text>
+                <Text style={styles.cardDetail}>Vacantes: {r.cantidadVacantes}</Text>
+                <Text style={styles.cardDetail}>Horas/Semana: {r.horaXSemana}</Text>
+                <Text style={styles.cardDetail}>Descripción: {r.descripcion}</Text>
+              </>
+            )}
+            <Text style={styles.cardDetail}>Desempeño: {r.desempeno || 'N/A'}</Text>
+            <Text style={styles.cardDetail}>Retroalimentación: {r.retroalimentacion || 'Sin comentarios'}</Text>
+          </View>
         ))}
       </ScrollView>
 
-      {/* Formulario de Evaluación y Retroalimentación */}
       <Text style={styles.sectionTitle}>Evaluación y Retroalimentación</Text>
-      {/* Sección para elegir el carnet */}
-      <Text style={styles.label}>Seleccione un número de carnet:</Text>
+      <Text style={styles.label}>Seleccione registro:</Text>
       <Picker
-        selectedValue={selectedCarnet}
-        style={[styles.picker, { padding: 10, backgroundColor: '#405F9021', borderRadius: 5 }]}
-        onValueChange={(itemValue) => setSelectedCarnet(itemValue)}
+        selectedValue={selectedKey}
+        style={styles.picker}
+        onValueChange={setSelectedKey}
       >
         <Picker.Item label="Todos" value="" />
-        {uniqueCarnets.map(carnet => (
-          <Picker.Item key={carnet} label={carnet} value={carnet} />
+        {uniqueTitles.map((titulo, index) => (
+          <Picker.Item key={`${titulo}-${index}`} label={titulo} value={titulo} />
         ))}
         <Picker.Item label="Personalizado" value="custom" />
       </Picker>
-      {selectedCarnet === "custom" && (
+
+      {selectedKey === 'custom' && (
         <TextInput
           style={styles.input}
-          placeholder="Escribe el carnet..."
-          value={customCarnet}
-          onChangeText={setCustomCarnet}
+          placeholder="Escribe key..."
+          value={customKey}
+          onChangeText={setCustomKey}
         />
       )}
+
       <View style={styles.formGroup}>
         <Text style={styles.label}>Comentario:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ingresa tu comentario..."
           value={newComentario}
           onChangeText={setNewComentario}
         />
@@ -106,9 +207,8 @@ const EvaluacionRetroalimentacion = () => {
         <Text style={styles.label}>Desempeño:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ingresa el desempeño..."
-          value={newDesempeño}
-          onChangeText={setNewDesempeño}
+          value={newDesempeno}
+          onChangeText={setNewDesempeno}
         />
       </View>
       <TouchableOpacity style={styles.saveButton} onPress={handleGuardar}>
