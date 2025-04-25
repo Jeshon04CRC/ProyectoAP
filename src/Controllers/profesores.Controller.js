@@ -425,40 +425,69 @@ export const updateAsistenciaFeedback = async (req, res) => {
 };
 
 export const assignAndRemoveSolicitud = async (req, res) => {
-  const { userId, titulo } = req.params;
-  const datosAsignBody = req.body;
+  const student = req.body;
+  console.log("[assignAndRemoveSolicitud] body:", student);
+
+  const {
+    userId,
+    tituloOportunidad,
+    pago = null,
+    retroalimentacion = "",
+    desempeno = "",
+    fechaAsignacion = Timestamp.now(),
+    activo = true
+  } = student;
 
   try {
-    const asistRef = collection(db, "Asistencias");
-    const qAsist = query(
-      asistRef,
-      where("tituloPrograma", "==", titulo.trim())
-    );
-    const snapAsist = await getDocs(qAsist);
-    if (snapAsist.empty) return res.status(404).json({ message: "Asistencia no encontrada" });
-    const asistDoc = snapAsist.docs[0];
-    const asistenciaId = asistDoc.id;
-    const asignRef = collection(db, "AsistenciasAsignadas");
-    await addDoc(asignRef, {
-      asistenciaId,
-      userId,
-      ...datosAsignBody
+    const buscado = tituloOportunidad.trim().toLowerCase();
+    //console.log("Buscando (normalizado):", buscado);
+    const asistSnap = await getDocs(collection(db, "Asistencias"));
+    //console.log("Total asistencias en BD:", asistSnap.size);
+
+    const candidatos = asistSnap.docs.filter(d => {
+      const data = d.data();
+      const tituloBD = String(data.tituloPrograma || "").trim().toLowerCase();
+      const estadoBD = String(data.estado || "").trim().toLowerCase();
+      return tituloBD === buscado && estadoBD === "abierto";
     });
-    const solRef = collection(db, "Solicitudes");
-    const qSol = query(
-      solRef,
-      where("userId", "==", userId),
-      where("tituloOportunidad", "==", titulo.trim())
-    );
-    const snapSol = await getDocs(qSol);
-    for (const docSol of snapSol.docs) {
-      await deleteDoc(doc(db, "Solicitudes", docSol.id));
+    //console.log("Asistencias que cumplen título+estado:", candidatos.length);
+
+    if (candidatos.length === 0) {
+      return res.status(404).json({ message: "No existe Asistencia abierta con ese título." });
     }
 
-    return res.status(200).json({ message: "Estudiante asignado y solicitud eliminada" });
-  } catch (error) {
-    console.error("Error in assignAndRemoveSolicitud:", error);
-    return res.status(500).json({ message: "Error interno" });
+    const asistDoc = candidatos[0];
+    const asistenciaId = asistDoc.id;
+    //console.log("Usando asistenciaId:", asistenciaId);
+
+    const newAsign = {
+      asistenciaId,
+      userId,
+      pago,
+      retroalimentacion,
+      desempeno,
+      fechaAsignacion,
+      activo
+    };
+    //console.log("Insertando en AsistenciasAsignadas:", newAsign);
+    await addDoc(collection(db, "AsistenciasAsignadas"), newAsign);
+
+    const solSnap = await getDocs(collection(db, "Solicitudes"));
+    const solABorrar = solSnap.docs.filter(d => {
+      const s = d.data();
+      return String(s.userId) === userId
+          && String(s.tituloOportunidad).trim().toLowerCase() === buscado;
+    });
+    //console.log("Solicitudes a borrar:", solABorrar.length);
+    for (const d of solABorrar) {
+      //console.log("– borrando solicitud", d.id);
+      await deleteDoc(doc(db, "Solicitudes", d.id));
+    }
+
+    return res.status(200).json({ message: "Estudiante asignado y solicitud eliminada." });
+  } catch (err) {
+    console.error("Error en assignAndRemoveSolicitud:", err);
+    return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 

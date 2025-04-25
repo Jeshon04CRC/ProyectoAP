@@ -8,6 +8,7 @@ import { Timestamp } from 'firebase/firestore';
 const InfoEstudiante = ({ route, navigation }) => {
   const { student } = route.params;
   const [carreraName, setCarreraName] = useState(student.carrera || "");
+  console.log("studente: ",student)
 
   useEffect(() => {
     const fetchCarrera = async () => {
@@ -17,6 +18,7 @@ const InfoEstudiante = ({ route, navigation }) => {
         );
         if (response.status === 200 && response.data?.carrera) {
           setCarreraName(response.data.carrera);
+          console.log("Carrera: ", carreraName);
         }
       } catch (error) {
         console.error("Error fetching carrera:", error.message);
@@ -28,15 +30,19 @@ const InfoEstudiante = ({ route, navigation }) => {
 
   const asignarEstudiante = async () => {
     try {
-      const datosAsign = {
+      const datosStudent = {
+        ...student,
         pago: student.pago || 0,
         retroalimentacion: student.comentarios || "",
         desempeno: student.nota || 0,
-        fechaAsignacion: Timestamp.now()
+        fechaAsignacion: Timestamp.now(),
       };
-      const endpoint =
-        `${URL}:3000/moduloProfesores/assignAndRemoveSolicitud/${student.userId}/${encodeURIComponent(student.tituloOportunidad.trim())}`;
-      const resp = await axios.patch(endpoint, datosAsign);
+      console.log("[asignarEstudiante] datosStudent enviados:", datosStudent);
+  
+      const endpoint = `${URL}:3000/moduloProfesores/assignAndRemoveSolicitud`;
+      const resp = await axios.patch(endpoint, datosStudent);
+  
+      console.log("[asignarEstudiante] respuesta status:", resp.status, "data:", resp.data);
       if (resp.status === 200) {
         Alert.alert("Éxito", "Estudiante asignado y solicitud eliminada.");
         navigation.goBack();
@@ -44,7 +50,7 @@ const InfoEstudiante = ({ route, navigation }) => {
         Alert.alert("Error", "No se pudo asignar el estudiante.");
       }
     } catch (err) {
-      console.error("Error asignarEstudiante:", err);
+      console.error("Error asignarEstudiante:", err.response?.status, err.response?.data || err.message);
       Alert.alert("Error", "Ocurrió un problema al asignar.");
     }
   };

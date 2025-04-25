@@ -39,7 +39,7 @@ router.patch('/addDesempeno/:id', addDesempeno);
 router.get('/searchCarreraByuserId/:id', searchCarreraByuserId);
 router.patch('/updatePostulacionAcciones/:userId/', updatePostulacionAcciones);
 router.patch('/updateAsistenciaFeedback/:type/:id', updateAsistenciaFeedback);
-router.patch('/assignAndRemoveSolicitud/:userId/:titulo', assignAndRemoveSolicitud);
+router.patch('/assignAndRemoveSolicitud', assignAndRemoveSolicitud);
 router.patch('/setSolicitudReunion/:id', setSolicitudReunion);
 router.patch('/rechazarPostulacion/:id/', rechazarPostulacion);
 router.patch('/updateSeguimiento/:id', updateSeguimiento);
