@@ -103,9 +103,6 @@ const SeguimientoEstudiantes = () => {
             Programa: {selectedAsistencia.datosAsistencia.tituloPrograma}
           </Text>
           <Text style={styles.cardDetail}>
-            Carrera: {selectedAsistencia.userInfo.carrera}
-          </Text>
-          <Text style={styles.cardDetail}>
             Teléfono: {selectedAsistencia.userInfo.telefono}
           </Text>
           <Text style={styles.cardDetail}>
