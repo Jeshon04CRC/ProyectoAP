@@ -5,22 +5,14 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 export const postLogin = async (req, res) => {
   const { email, password } = req.body;
   console.log("Solicitud recibida en login", email);
-/*
-  if(email.endsWith("@estudiantec.cr") && email === '1234@estudiantec.cr' && password === "1234") {
-    await transporter.sendMail({
-      from: 'Inicio seccion <salascordero2003@gmail.com>',
-      to: email,
-      subject: "Inicio seccion",
-      text: "Te informamos que tu sesión ha sido iniciada.",
-      html: `<h1>Has iniciado sesión en tu cuenta</h1><p>Hola, ${email}</p>`
-    });
-*/
+
 const credenciales = await validarCredenciales(email.toLowerCase(), password);
 let id = credenciales.id;
 let tipo = credenciales.tipoUsuario;
 
 console.log("Tipo de usuario:", tipo);
   if(tipo === "Estudiante"){
+    enviarCorreo(email)
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
@@ -29,6 +21,7 @@ console.log("Tipo de usuario:", tipo);
     });
   }
   else if(tipo === "Profesor"){
+    enviarCorreo(email)
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
@@ -37,6 +30,7 @@ console.log("Tipo de usuario:", tipo);
     });
   } 
   else if(tipo === "Administrador"){
+    enviarCorreo(email)
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
@@ -45,6 +39,7 @@ console.log("Tipo de usuario:", tipo);
     });
   } 
   else if(tipo === "Escuela" || tipo === "Departamento"){
+    enviarCorreo(email)
     return res.status(200).json({
       message: "Login exitoso",
       status: "success",
@@ -53,6 +48,7 @@ console.log("Tipo de usuario:", tipo);
     });
   }
   else if(tipo === 400){
+    enviarCorreo(email)
     return res.status(401).json({
       message: "Credenciales inválidas",
       status: "error"
@@ -71,6 +67,40 @@ console.log("Tipo de usuario:", tipo);
     status: "error"
   });
 };
+
+const enviarCorreo = async (email) => {
+    let nombre = "";
+    const querySnapshot = await getDocs(collection(db, "Usuarios"));
+
+    for (const doc of querySnapshot.docs) {
+      const datos = doc.data();
+      if (datos.correo.toLowerCase() === email.toLowerCase()) {
+        nombre = datos.nombre;
+      }
+    }
+
+    console.log("Nombre del usuario:", nombre);
+    
+    await transporter.sendMail({
+      from: 'Inicio seccion <salascordero2003@gmail.com>',
+      to: email,
+      subject: "Inicio seccion",
+      text: "Te informamos que tu sesión ha sido iniciada.",
+      html: `
+          <div style="font-family: Arial, sans-serif; color: #333;">
+            <h1 style="color: #007bff;">¡Bienvenido(a) al sistema!</h1>
+            <p>Hola, <strong>${nombre}</strong>,</p>
+            <p>Nos alegra que formes parte de nuestra plataforma.</p>
+            <p>A partir de ahora podrás acceder a todas las funcionalidades que hemos preparado para ti.</p>
+            <p>Si tienes alguna duda o necesitas ayuda, no dudes en contactarnos.</p>
+            <br>
+            <p>¡Te deseamos mucho éxito!</p>
+            <p>— El equipo de ApProyect</p>
+          </div>
+        `
+    });
+    
+}
 
 
 

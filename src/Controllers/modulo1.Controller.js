@@ -294,6 +294,7 @@ export const publicarOfertas = async (req, res) => {
     }
     const docRef = await addDoc(collection(db, "Asistencias"), nuevaOferta);
     console.log("Documento creado con ID:", docRef.id);
+    correosEscuela(data.id, data.nombreCurso, data.profesor);
     return res.status(200).json({ message: "Oferta creada exitosamente"});
 
   } catch (e) {
@@ -301,6 +302,53 @@ export const publicarOfertas = async (req, res) => {
   }
 
 }
+
+const correosEscuela = async (idEscuela, nombreAsistencia, idProfesor) => {
+  let profesorAcargo = "";
+
+  try {
+    const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+    for (const doc of usuariosSnapshot.docs) {
+      const datos = doc.data();
+      if (datos.carrera === idEscuela || doc.id === idEscuela) {
+        const correo = datos.correo;
+        for (const doc1 of usuariosSnapshot.docs) {
+          const datos1 = doc.data();
+          if (doc.id === idProfesor) {
+            profesorAcargo = datos1.nombre;
+          }
+        }
+        await enviarEmailEstudiante(correo, nombreAsistencia, profesorAcargo);
+      }
+    } 
+  }
+  catch (error) {
+    console.error("Error al obtener los datos:", error);
+    return res.status(500).json({ error: "Error al obtener los datos" });
+  }
+}
+
+
+const enviarEmailEstudiante = async (correo, nombreAsistencia, profesorAcargo) => {
+  await transporter.sendMail({
+    from: 'Sistema ApProyect <salascordero2003@gmail.com>',
+    to: correo,
+    subject: "Nueva asistencia disponible",
+    text: `Se ha creado una nueva asistencia "${nombreAsistencia}" a cargo del profesor ${profesorAcargo}. Ya puedes postularte.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h1 style="color: #28a745;">¡Nueva asistencia disponible!</h1>
+        <p>Hola,</p>
+        <p>Se ha creado una nueva asistencia llamada <strong>${nombreAsistencia}</strong>,</p>
+        <p>a cargo del profesor <strong>${profesorAcargo}</strong>.</p>
+        <p>Te invitamos a postularte si estás interesado(a).</p>
+        <br>
+        <p>¡Mucho éxito!</p>
+        <p>— El equipo de ApProyect</p>
+      </div>
+    `
+  });
+};
 
 export const actualizarInfoOferta = async (req, res) => {
   const { data, id } = req.body;
