@@ -78,14 +78,16 @@ const LoginScreen = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-
+    
       <TouchableOpacity onPress={handleRegistro}>
         <Text style={styles.forgotPassword}>Registrarse</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleInicioSeccion}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      {/*
+      <TouchableOpacity onPress={handleRegistro}>
+        <Text style={styles.forgotPassword}>Registrarse</Text>
       </TouchableOpacity>
+      */}
 
       <Image source={require('../../../assets/Login/ImagenLogin.png')} style={styles.image} />
     </View>
