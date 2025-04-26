@@ -1,5 +1,8 @@
 {
   "expo": {
+    "cli": {
+      "appVersionSource": "nativeVersion"
+    },
     "name": "ApProyect",
     "slug": "ApProyect",
     "version": "1.0.0",
@@ -24,6 +27,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2b57f422-c258-457e-bab9-3582ff66208f"
+      }
     }
   }
 }
