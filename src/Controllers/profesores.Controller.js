@@ -150,49 +150,69 @@ export const getUserInfoByAsistencias = async (req, res) => {
 
 
 export const insertNewOferta = async (req, res) => {
-    const {
-        beneficios,
-        descripcion,
-        fechaCierre,
-        fechaInicio,
-        horario,
-        horasSemanal,
-        nombrePrograma,
-        objetivos,
-        requisitos,
-        tipo,
-        vacantes,
-        estado,
-        semestre
-    } = req.body;
+  const {
+      beneficios,
+      descripcion,
+      fechaCierre,  // Corresponde a fechaFin en DB
+      fechaInicio,
+      horario,
+      horasSemanal, // Corresponde a horaXSemana en DB
+      nombrePrograma, // Corresponde a tituloPrograma en DB
+      objetivos,
+      requisitos,
+      tipo,
+      vacantes, // Corresponde a cantidadVacantes en DB
+      estado,
+      semestre,
+      departamento,
+      promedioRequerido,
+      totalHoras,
+      requisitosAdicionales
+  } = req.body;
 
-    const { id } = req.params; 
+  const { id } = req.params;
 
-    try {
-        const asistenciasRef = collection(db, "Asistencias");
-        const newDoc = await addDoc(asistenciasRef, {
-            beneficio: beneficios,
-            descripcion: descripcion,
-            fechaCierre: Timestamp.fromDate(new Date(fechaCierre)),
-            fechaInicio: Timestamp.fromDate(new Date(fechaInicio)),
-            horario: horario,
-            horaXSemana: horasSemanal,
-            tituloPrograma: nombrePrograma,
-            objetivos: objetivos,
-            requisitos: requisitos,
-            tipo: tipo,
-            cantidadVacantes: vacantes,
-            semestre: semestre,
-            personaACargo: id, 
-            estado: estado, 
-            cantidadSolicitudes: "0" 
-        });
+  // Función para formatear fechas a DD/MM/YYYY
+  const formatDate = (dateString) => {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+  };
 
-        res.status(200).json({ message: "Oferta creada exitosamente", id: newDoc.id });
-    } catch (error) {
-        console.error("Error inserting new oferta:", error);
-        res.status(500).json({ message: "Error inserting new oferta" });
-    }
+  try {
+      const asistenciasRef = collection(db, "Asistencias");
+      const newDoc = await addDoc(asistenciasRef, {
+          beneficio: beneficios, // Mapeo correcto
+          descripcion: descripcion,
+          fechaFin: formatDate(fechaCierre), // Usar fechaCierre como fechaFin
+          fechaInicio: formatDate(fechaInicio),
+          horario: horario,
+          horaXSemana: horasSemanal.toString(), // Guardar como string
+          tituloPrograma: nombrePrograma,
+          objetivos: objetivos,
+          requisitos: requisitos.split(',').map(item => item.trim()), // Convertir a array
+          tipo: tipo,
+          cantidadVacantes: vacantes.toString(), // Guardar como string
+          semestre: semestre,
+          personaACargo: id,
+          estado: estado,
+          cantidadSolicitudes: 0, // Número, no string
+          departamento: departamento,
+          promedioRequerido: promedioRequerido,
+          totalHoras: totalHoras,
+          requisitosAdicionales: requisitosAdicionales,
+          postulaciones: [], // Inicializar array
+          historialCambios: [{
+              cambios: "Creación de la oferta",
+              fecha: formatDate(new Date().toISOString().split('T')[0]),
+              horaXSemana: horasSemanal.toString()
+          }] // Historial inicial
+      });
+
+      res.status(200).json({ message: "Oferta creada exitosamente", id: newDoc.id });
+  } catch (error) {
+      console.error("Error inserting new oferta:", error);
+      res.status(500).json({ message: "Error inserting new oferta" });
+  }
 }
 
 export const getAsistenciasByProfesor = async (req, res) => {

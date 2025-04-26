@@ -8,7 +8,7 @@ import URL from '../../Services/url';
 const CreacionOfertas = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { userId } = route.params;
+  const { userId, contactInfo } = route.params;
 
   const [nombrePrograma, setNombrePrograma] = useState('');
   const [objetivos, setObjetivos] = useState('');
@@ -22,6 +22,10 @@ const CreacionOfertas = () => {
   const [descripcion, setDescripcion] = useState('');
   const [requisitos, setRequisitos] = useState('');
   const [semestre, setSemestre] = useState('');
+  const [departamento, setDepartamento] = useState('');
+  const [promedioRequerido, setPromedioRequerido] = useState('');
+  const [totalHoras, setTotalHoras] = useState('');
+  const [requisitosAdicionales, setRequisitosAdicionales] = useState('');
 
   const handleCrearOferta = async () => {
     if (
@@ -70,11 +74,14 @@ const CreacionOfertas = () => {
       fechaCierre,
       beneficios,
       descripcion,
-      requisitos,
+      requisitos: requisitos, 
       semestre,
+      departamento: contactInfo.carrera,
+      promedioRequerido,
+      totalHoras,
+      requisitosAdicionales,
       estado: 'Abierto',
-      cantidadSolicitudes: 0,
-    };
+  };
 
     try {
       const apiUrl = `${URL}:3000`;
@@ -150,17 +157,37 @@ const CreacionOfertas = () => {
           <Text style={styles.label}>Descripción</Text>
           <TextInput style={[styles.input, styles.textArea]} placeholder="Ingrese descripción" multiline value={descripcion} onChangeText={setDescripcion} />
         </View>
-        {/** Requisitos */}
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Requisitos</Text>
-          <TextInput style={[styles.input, styles.textArea]} placeholder="Ingrese requisitos" multiline value={requisitos} onChangeText={setRequisitos} />
-        </View>
         {/** Semestre */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Semestre</Text>
           <TextInput style={styles.input} placeholder="Ingrese semestre" value={semestre} onChangeText={setSemestre} />
         </View>
+      <View style={styles.formGroup}>
+          <Text style={styles.label}>Promedio Requerido</Text>
+          <TextInput style={styles.input} placeholder="Ingrese promedio requerido" keyboardType="numeric" value={promedioRequerido} onChangeText={setPromedioRequerido} />
       </View>
+
+      <View style={styles.formGroup}>
+          <Text style={styles.label}>Total de Horas</Text>
+          <TextInput style={styles.input} placeholder="Ingrese total de horas" keyboardType="numeric" value={totalHoras} onChangeText={setTotalHoras} />
+      </View>
+
+      <View style={styles.formGroup}>
+          <Text style={styles.label}>Requisitos Adicionales</Text>
+          <TextInput style={styles.input} placeholder="Ingrese requisitos adicionales" value={requisitosAdicionales} onChangeText={setRequisitosAdicionales} />
+      </View>
+
+      <View style={styles.formGroup}>
+          <Text style={styles.label}>Requisitos (separar por comas)</Text>
+          <TextInput 
+              style={[styles.input, styles.textArea]} 
+              placeholder="Ej: Conocimiento en Python, Certificación Scrum"
+              value={requisitos} 
+              onChangeText={setRequisitos} 
+          />
+      </View>
+      </View>
+     
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleCrearOferta}>
           <Text style={styles.buttonText}>Crear oferta</Text>

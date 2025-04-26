@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  TextInput, 
-  TouchableOpacity 
-} from "react-native";
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from "react-native";
 import { styles } from "../../Style/Profesores/gestionAsignaturas";
 import axios from "axios";
 import URL from "../../Services/url"; 
@@ -17,7 +11,7 @@ const HistorialCard = ({ item }) => {
       if (!timestamp) return "";
       if (typeof timestamp === "object" && timestamp.seconds) {
         const date = new Date(timestamp.seconds * 1000);
-        return date.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+        return date.toISOString().split("T")[0];
       }
       return typeof timestamp === "string" ? timestamp : "";
     } catch (error) {
@@ -49,18 +43,15 @@ const GestionAsignaturas = () => {
   const [proyectos, setProyectos] = useState([]);
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
-  
   const [carouselSearchText, setCarouselSearchText] = useState("");
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [filteredProyectos, setFilteredProyectos] = useState([]);
-  
   const [historialSearchText, setHistorialSearchText] = useState("");
   const [filteredHistorial, setFilteredHistorial] = useState([]);
-  
   const route = useRoute();
   const { userId, contactInfo } = route.params;
   const navigation = useNavigation();
-  
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -69,8 +60,6 @@ const GestionAsignaturas = () => {
         if (response.status === 200) {
           setCourses(response.data);
           setFilteredCourses(response.data);
-        } else {
-          console.error("Error al obtener los cursos:", response.statusText);
         }
       } catch (error) {
         console.error("Error al obtener los cursos:", error);
@@ -80,7 +69,6 @@ const GestionAsignaturas = () => {
     };
     fetchCourses();
   }, [userId]);
-  
 
   useEffect(() => {
     const fetchHistorial = async () => {
@@ -90,72 +78,65 @@ const GestionAsignaturas = () => {
         if (response.status === 200) {
           setHistorial(response.data);
           setFilteredHistorial(response.data);
-        } else {
-          console.error("Error al obtener el historial:", response.statusText);
         }
       } catch (error) {
-        console.error("Error al obtener el historial:", error);
+        Alert.alert("No posee historial de asignaciones:");
       } finally {
         setLoading(false);
       }
     };
     fetchHistorial();
   }, [userId]);
-  
+
   const handleCarouselSearch = () => {
     const filteredC = courses.filter((item) =>
       item.nombre.toLowerCase().includes(carouselSearchText.toLowerCase())
     );
     setFilteredCourses(filteredC);
   };
-  
+
   const resetCarousel = () => {
     setCarouselSearchText("");
     setFilteredCourses(courses);
   };
-  
+
   const handleRegresar = () => {
     navigation.goBack();
   };
-  
+
   const filterHistorialByYear = () => {
     const filtered = historial.filter(
       (item) => item.fechaInicio === historialSearchText
     );
     setFilteredHistorial(filtered);
   };
-  
+
   const filterHistorialByState = () => {
     const filtered = historial.filter(
-      (item) =>
-        item.estado.toLowerCase() === historialSearchText.toLowerCase()
+      (item) => item.estado.toLowerCase() === historialSearchText.toLowerCase()
     );
     setFilteredHistorial(filtered);
   };
-  
+
   const resetHistorial = () => {
     setHistorialSearchText("");
     setFilteredHistorial(historial);
   };
-  
+
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Cargando Asistencias...
-        </Text>
+        <Text style={{ textAlign: "center", marginTop: 20 }}>Cargando Asistencias...</Text>
       </View>
     );
   }
-  
+
   return (
     <ScrollView style={styles.container}>
-      {/* Título Principal */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Gestión de Asignaturas</Text>
       </View>
       
-      {/* Carrusel de Cursos y Proyectos */}
       <Text style={styles.sectionTitle}>Carrusel de Cursos y Proyectos</Text>
       <View style={styles.searchContainer}>
         <TextInput
@@ -166,10 +147,7 @@ const GestionAsignaturas = () => {
         />
       </View>
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={handleCarouselSearch}
-        >
+        <TouchableOpacity style={styles.searchButton} onPress={handleCarouselSearch}>
           <Text style={styles.buttonText}>Buscar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={resetCarousel}>
@@ -181,11 +159,7 @@ const GestionAsignaturas = () => {
       </View>
       
       <Text style={styles.subSectionTitle}>Cursos</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.carouselContainer}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carouselContainer}>
         {filteredCourses.map((course, index) => (
           <View key={course.id || index} style={styles.card}>
             <Text style={styles.cardTitle}>{course.nombre}</Text>
@@ -196,9 +170,7 @@ const GestionAsignaturas = () => {
             <Text style={styles.cardDetail}>Profesor: {contactInfo.nombre}</Text>
             <TouchableOpacity
               style={styles.cardButton}
-              onPress={() =>
-                navigation.navigate("creacionOfertasProfesores", { course })
-              }
+              onPress={() => navigation.navigate("creacionOfertasProfesores", { course })}
             >
               <Text style={styles.cardButtonText}>Solicitar Asistente</Text>
             </TouchableOpacity>
@@ -207,11 +179,7 @@ const GestionAsignaturas = () => {
       </ScrollView>
       
       <Text style={styles.subSectionTitle}>Proyectos</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.carouselContainer}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carouselContainer}>
         {filteredProyectos.map((proyecto, index) => (
           <View key={proyecto.id || index} style={styles.card}>
             <Text style={styles.cardTitle}>{proyecto.nombre}</Text>
@@ -222,9 +190,7 @@ const GestionAsignaturas = () => {
             <Text style={styles.cardDetail}>Profesor: {contactInfo.nombre}</Text>
             <TouchableOpacity
               style={styles.cardButton}
-              onPress={() =>
-                navigation.navigate("creacionOfertasProfesores", { proyecto })
-              }
+              onPress={() => navigation.navigate("creacionOfertasProfesores", { proyecto })}
             >
               <Text style={styles.cardButtonText}>Solicitar Asistente</Text>
             </TouchableOpacity>
@@ -242,27 +208,28 @@ const GestionAsignaturas = () => {
         />
       </View>
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={filterHistorialByYear}
-        >
+        <TouchableOpacity style={styles.searchButton} onPress={filterHistorialByYear}>
           <Text style={styles.buttonText}>Filtrar Año</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={filterHistorialByState}
-        >
+        <TouchableOpacity style={styles.searchButton} onPress={filterHistorialByState}>
           <Text style={styles.buttonText}>Filtrar Estado</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={resetHistorial}>
           <Text style={styles.buttonText}>Restablecer</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.historialContainer}>
-        {filteredHistorial.map((item, index) => (
-          <HistorialCard key={`${item.id}-${index}`} item={item} />
-        ))}
-      </ScrollView>
+      
+      {filteredHistorial.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No hay asignaciones pendientes</Text>
+        </View>
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.historialContainer}>
+          {filteredHistorial.map((item, index) => (
+            <HistorialCard key={`${item.id}-${index}`} item={item} />
+          ))}
+        </ScrollView>
+      )}
     </ScrollView>
   );
 };

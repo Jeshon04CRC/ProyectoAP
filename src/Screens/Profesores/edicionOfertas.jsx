@@ -29,6 +29,10 @@ const EdicionOfertas = () => {
   const [currentOferta, setCurrentOferta] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalOferta, setModalOferta] = useState(null);
+  const [departamento, setDepartamento] = useState('');
+  const [promedioRequerido, setPromedioRequerido] = useState('');
+  const [totalHoras, setTotalHoras] = useState('');
+  const [requisitosAdicionales, setRequisitosAdicionales] = useState('');
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -80,7 +84,25 @@ const EdicionOfertas = () => {
       Alert.alert("Error", "La fecha de inicio debe ser anterior a la fecha de cierre.");
       return false;
     }
-  
+    if (typeof currentOferta.requisitos !== 'string') {
+      Alert.alert("Error", "Formato inválido en requisitos");
+      return false;
+    }
+    if (!departamento.trim()) {
+      Alert.alert("Error", "El departamento es requerido.");
+      return false;
+    }
+
+    if (!promedioRequerido || isNaN(promedioRequerido) || parseFloat(promedioRequerido) < 0) {
+      Alert.alert("Error", "Promedio requerido debe ser un número válido.");
+      return false;
+    }
+
+    if (!totalHoras || isNaN(totalHoras) || parseInt(totalHoras) <= 0) {
+      Alert.alert("Error", "Total de horas debe ser un número positivo.");
+      return false;
+    }
+
     return true;
   };
 
@@ -94,6 +116,13 @@ const EdicionOfertas = () => {
           setOfertas(response.data.map(oferta => ({
             ...oferta,
             id: oferta.asistenciaId, 
+            requisitos: Array.isArray(oferta.requisitos) 
+            ? oferta.requisitos.join(', ') 
+            : oferta.requisitos || '',
+            departamento: oferta.departamento || '',
+            promedioRequerido: oferta.promedioRequerido || '',
+            totalHoras: oferta.totalHoras?.toString() || '',
+            requisitosAdicionales: oferta.requisitosAdicionales || ''
           }))
           );
         } else {
@@ -174,7 +203,12 @@ const EdicionOfertas = () => {
 
   const handleGuardarCambios = async () => {
     if (!validarCampos()) return;
-  
+
+    const formatDateToDB = (dateString) => {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    };
+
     const body = {
       tituloPrograma: currentOferta.tituloPrograma,
       beneficio: currentOferta.beneficio,
@@ -182,12 +216,18 @@ const EdicionOfertas = () => {
       objetivos: currentOferta.objetivos,
       tipo: currentOferta.tipo,
       horario: currentOferta.horario,
-      cantidadVacantes: parseInt(currentOferta.cantidadVacantes),
+      cantidadVacantes: currentOferta.cantidadVacantes.toString(),
       semestre: currentOferta.semestre,
-      horaXSemana: parseInt(currentOferta.horaXSemana),
-      fechaInicio: currentOferta.fechaInicio,
-      fechaCierre: currentOferta.fechaCierre,
-      requisitos: currentOferta.requisitos,
+      horaXSemana: currentOferta.horaXSemana.toString(),
+      fechaInicio: formatDateToDB(currentOferta.fechaInicio),
+      fechaCierre: formatDateToDB(currentOferta.fechaCierre),
+      requisitos: currentOferta.requisitos 
+      ? currentOferta.requisitos.split(',').map(item => item.trim()) 
+      : [],
+      departamento: currentOferta.departamento,
+      promedioRequerido: currentOferta.promedioRequerido,
+      totalHoras: currentOferta.totalHoras,
+      requisitosAdicionales: currentOferta.requisitosAdicionales
     };
 
     try {
@@ -392,6 +432,48 @@ const EdicionOfertas = () => {
             placeholder="Ingrese los requisitos"
           />
 
+          <Text style={styles.label}>Promedio Requerido</Text>
+          <TextInput
+            style={styles.input}
+            value={currentOferta.promedioRequerido}
+            onChangeText={(text) =>
+              setCurrentOferta({ ...currentOferta, promedioRequerido: text })
+            }
+            keyboardType="numeric"
+          />
+
+          <Text style={styles.label}>Total de Horas</Text>
+          <TextInput
+            style={styles.input}
+            value={currentOferta.totalHoras}
+            onChangeText={(text) =>
+              setCurrentOferta({ ...currentOferta, totalHoras: text })
+            }
+            keyboardType="numeric"
+          />
+
+          <Text style={styles.label}>Requisitos Adicionales</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={currentOferta.requisitosAdicionales}
+            onChangeText={(text) =>
+              setCurrentOferta({ ...currentOferta, requisitosAdicionales: text })
+            }
+            multiline
+          />
+
+          {/* Modificar campo de requisitos */}
+          <Text style={styles.label}>Requisitos (separados por comas)</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={currentOferta.requisitos}
+            onChangeText={(text) =>
+              setCurrentOferta({ ...currentOferta, requisitos: text })
+            }
+            placeholder="Ej: Conocimiento en Python, Certificación Scrum"
+            multiline
+          />
+
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.saveButton}
@@ -420,7 +502,9 @@ const EdicionOfertas = () => {
               <Text style={styles.cancelButtonText}>Regresar</Text>
             </TouchableOpacity>
           </View>
+          
         </View>
+
       )}
     </ScrollView>
   );
