@@ -101,12 +101,6 @@ const HomePageEstudiantes = () => {
           style={styles.headerLogo}
           resizeMode="contain"
         />
-        <TouchableOpacity onPress={() => navigation.navigate('perfilEstudiante')}>
-          <Image
-            source={require('../../../assets/avataricon.png')}
-            style={styles.headerAvatar}
-          />
-        </TouchableOpacity>
       </View>
 
       {/* Sección de información del estudiante */}

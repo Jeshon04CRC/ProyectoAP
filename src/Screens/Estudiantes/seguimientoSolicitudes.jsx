@@ -151,7 +151,7 @@ const SeguimientoSolicitudes = () => {
       {/* Encabezado con logo y avatar */}
       <View style={styles.headerBar}>
         <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
-        <TouchableOpacity onPress={() => navigation.navigate('perfilEstudiante')}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={require('../../../assets/avataricon.png')} style={styles.headerAvatar} />
         </TouchableOpacity>
       </View>

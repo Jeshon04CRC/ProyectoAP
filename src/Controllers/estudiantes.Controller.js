@@ -1,7 +1,7 @@
 import { transporter } from "../Services/emails.js";
 import { Timestamp } from 'firebase/firestore';
 import { db, app } from "../Services/fireBaseConnect.js";
-import { collection, getDocs, updateDoc, doc, getDoc, addDoc, query, where, arrayUnion} from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, getDoc, addDoc, query, where, arrayUnion, arrayRemove} from "firebase/firestore";
 
 
 
@@ -285,5 +285,93 @@ export const seguimientoSolicitudes = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener las solicitudes:', error);
     return res.status(500).json({ error: 'Error al obtener las solicitudes' });
+  }
+};
+
+
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que obtiene las oportunidades favoritas de un estudiante
+//----------------------------------------------------------------------------------------------------------------
+export const oportunidadesFavoritas = async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({ error: 'Falta el ID del usuario' });
+    }
+
+    // Obtener el documento del usuario
+    const favoritosRef = collection(db, 'Favoritos');
+    const userDoc = await getDocs(favoritosRef);
+
+    for (const doc of userDoc.docs) {
+      const data = doc.data();
+      if (data.idUsuario === userId) {
+        const oportunidadesFavoritas = data.idOportunidades || [];
+        return res.status(200).json({ oportunidadesFavoritas });
+      }
+    }
+
+  } catch (error) {
+    console.error('Error al obtener las oportunidades favoritas:', error);
+    return res.status(500).json({ error: 'Error al obtener las oportunidades favoritas' });
+  }
+};
+
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que selecciona una oportunidad como favorita
+//----------------------------------------------------------------------------------------------------------------
+export const selecionarFavoritas = async (req, res) => {
+  const { userId, idOportunidad } = req.body;
+  console.log("ID de la oportunidad seleccionada:", idOportunidad);
+  try {
+
+    // Obtener el documento del usuario
+    const favoritosRef = collection(db, 'Favoritos');
+    const userDoc = await getDocs(favoritosRef);
+    for (const doc of userDoc.docs) {
+      const data = doc.data();
+      if (data.idUsuario === userId) {
+        await updateDoc(doc.ref, {
+          idOportunidades: arrayUnion(idOportunidad)
+        });
+        return res.status(200).json({ mensaje: 'Oportunidad seleccionada como favorita' });
+      }
+    }
+
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al seleccionar la oportunidad favorita' });
+  }
+};
+
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que elimina una oportunidad de la lista de favoritas
+//----------------------------------------------------------------------------------------------------------------
+export const eliminarFavoritas = async (req, res) => {
+  const { userId, idOportunidad } = req.query;
+  console.log("ID de la oportunidad eliminada:", idOportunidad);
+  try {
+
+    // Obtener el documento del usuario
+    const favoritosRef = collection(db, 'Favoritos');
+    const userDocs = await getDocs(favoritosRef);
+
+    for (const doc of userDocs.docs) {
+      const data = doc.data();
+      if (data.idUsuario === userId) {
+        // Aquí eliminamos el idOportunidad del array
+        await updateDoc(doc.ref, {
+          idOportunidades: arrayRemove(idOportunidad)
+        });
+        return res.status(200).json({ mensaje: 'Oportunidad eliminada de favoritas' });
+      }
+    }
+
+    // Si no se encontró el usuario
+    return res.status(404).json({ error: 'Usuario no encontrado' });
+
+  } catch (error) {
+    console.error('Error al eliminar la oportunidad favorita:', error);
+    return res.status(500).json({ error: 'Error al eliminar la oportunidad favorita' });
   }
 };
