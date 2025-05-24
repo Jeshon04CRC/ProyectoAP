@@ -66,5 +66,26 @@ export const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold'
-  }
+  },
+    downloadLink: {
+    color: '#2E4C85',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    fontSize: 13,
+  },
+  pdfButton: {
+  backgroundColor: '#2D6A4F',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginTop: 10,
+  marginHorizontal: 20,
+},
+
+pdfButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+}
 });

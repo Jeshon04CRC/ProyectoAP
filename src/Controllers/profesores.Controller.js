@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 import { db, app } from "../Services/fireBaseConnect.js";
 import { collection, getDocs, updateDoc, doc, getDoc, addDoc, query, where, deleteDoc, arrayUnion} from "firebase/firestore";
-
+import PDFDocument from 'pdfkit';
 
 export const getInfoProfesores = async (req, res) => {
   const { id } = req.params;
@@ -577,3 +577,6 @@ export const updateSeguimiento = async (req, res) => {
     res.status(500).json({ message: "Error al actualizar seguimiento" });
   }
 };
+
+
+

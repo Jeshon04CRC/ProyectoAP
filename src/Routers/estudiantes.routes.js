@@ -1,5 +1,5 @@
 import {Router} from "express"
-import {informacionEstudiante,registrarPerfilAcademico,obtenerOportunidades,obtenerCarreras,registrarSolicitud,seguimientoSolicitudes, oportunidadesFavoritas, selecionarFavoritas, eliminarFavoritas} 
+import {informacionEstudiante,registrarPerfilAcademico,obtenerOportunidades,obtenerCarreras,registrarSolicitud,seguimientoSolicitudes, oportunidadesFavoritas, selecionarFavoritas, eliminarFavoritas, seguimientoPDF, evaluacionPDF} 
 from "../Controllers/estudiantes.Controller.js"
 
 const router = Router()
@@ -14,6 +14,9 @@ router.get('/solicitudes/seguimiento', seguimientoSolicitudes);
 router.get('/favoritos', oportunidadesFavoritas);
 router.post('/selecionarFavoritas', selecionarFavoritas);
 router.delete('/eliminarFavoritas', eliminarFavoritas);
+
+router.get('/seguimiento/pdf', seguimientoPDF);
+router.get('/evaluacion/pdf', evaluacionPDF);
 
 
 export default router;

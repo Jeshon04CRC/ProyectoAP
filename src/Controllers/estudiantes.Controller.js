@@ -1,8 +1,8 @@
 import { transporter } from "../Services/emails.js";
 import { Timestamp } from 'firebase/firestore';
 import { db, app } from "../Services/fireBaseConnect.js";
-import { collection, getDocs, updateDoc, doc, getDoc, addDoc, query, where, arrayUnion, arrayRemove} from "firebase/firestore";
-
+import { collection, getDocs, updateDoc, doc as docRef, getDoc, addDoc, query, where, arrayUnion, arrayRemove} from "firebase/firestore";
+import PDFDocument from 'pdfkit';
 
 
 //---------------------------------------------------------------------------------------------------------------
@@ -231,6 +231,8 @@ export const seguimientoSolicitudes = async (req, res) => {
     const solicitudesRef = collection(db, 'Solicitudes');
     const asistenciasRef = collection(db, 'Asistencias');
     const usuariosRef = collection(db, 'Usuarios');
+    const asistenciasAsigRef = collection(db, 'AsistenciasAsignadas');
+
 
     // Obtener las solicitudes del estudiante
     const q = query(solicitudesRef, where('userId', '==', userId));
@@ -238,6 +240,8 @@ export const seguimientoSolicitudes = async (req, res) => {
 
     const asistencias = await getDocs(asistenciasRef);
     const usuarios = await getDocs(usuariosRef);
+
+    const asistenciasAsi = await getDocs(asistenciasAsigRef);
 
     const solicitudesMap = new Map();
 
@@ -250,17 +254,26 @@ export const seguimientoSolicitudes = async (req, res) => {
       let tipoBeca = 'Sin tipo';
       let periodo = 'Sin periodo';
       let responsable = 'No asignado';
-
+      let retroalimentacion = 'Sin retroalimentación';
+      let avances = 'Sin avances';
+      let certificados = 'Sin certificados';
       // Buscar el tipo y responsable en la colección de asistencias
       for (const asistencia of asistencias.docs) {
         const a = asistencia.data();
         if (a.tituloPrograma === data.tituloOportunidad) {
           tipoBeca = a.tipo || 'Sin tipo';
           periodo = a.semestre || 'Sin periodo';
-
           // Buscar nombre del profesor responsable
           const usuario = usuarios.docs.find(u => u.id === a.personaACargo);
           responsable = usuario?.data()?.nombre || 'No asignado';
+
+          const datosAsistencias = asistenciasAsi.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const asistenciaAux = datosAsistencias.find(u => u.userId === data.userId);
+          console.log("Asistencia Aux:", asistenciaAux);
+          retroalimentacion = asistenciaAux?.retroalimentacion || 'Sin retroalimentación';
+          avances = asistenciaAux?.desempeno || 'Sin avances';
+          certificados = asistenciaAux?.cumplimientoTareas || 'Sin certificados'; 
+
         }
       }
 
@@ -272,9 +285,9 @@ export const seguimientoSolicitudes = async (req, res) => {
         responsable,
         estado: data.estado || 'Pendiente',
         horasTrabajadas: parseInt(data.horas) || 0,
-        avances: false,
-        retroalimentacion: false,
-        certificados: false,
+        avances: avances,
+        retroalimentacion: retroalimentacion,
+        certificados: certificados,
       });
     }
 
@@ -375,3 +388,293 @@ export const eliminarFavoritas = async (req, res) => {
     return res.status(500).json({ error: 'Error al eliminar la oportunidad favorita' });
   }
 };
+
+
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que genera un PDF con el seguimiento de las solicitudes
+//----------------------------------------------------------------------------------------------------------------
+export const seguimientoPDF = async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+if (!userId) {
+      return res.status(400).json({ error: 'Falta el ID del usuario' });
+    }
+
+    // Obtener referencias necesarias
+    const solicitudesRef = collection(db, 'Solicitudes');
+    const asistenciasRef = collection(db, 'Asistencias');
+    const usuariosRef = collection(db, 'Usuarios');
+    const asistenciasAsigRef = collection(db, 'AsistenciasAsignadas');
+
+
+    // Obtener las solicitudes del estudiante
+    const q = query(solicitudesRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+
+    const asistencias = await getDocs(asistenciasRef);
+    const usuarios = await getDocs(usuariosRef);
+
+    const asistenciasAsi = await getDocs(asistenciasAsigRef);
+
+    const solicitudesMap = new Map();
+
+    for (const doc of querySnapshot.docs) {
+      const data = doc.data();
+
+      // Evitar duplicados por ID (más confiable que título)
+      if (!data.tituloOportunidad || solicitudesMap.has(doc.id)) continue;
+
+      let tipoBeca = 'Sin tipo';
+      let periodo = 'Sin periodo';
+      let responsable = 'No asignado';
+      let retroalimentacion = 'Sin retroalimentación';
+      let avances = 'Sin avances';
+      let certificados = 'Sin certificados';
+      let pago = 'Sin pago';
+      let nombre = data.nombre || 'Sin nombre';
+      // Buscar el tipo y responsable en la colección de asistencias
+      for (const asistencia of asistencias.docs) {
+        const a = asistencia.data();
+        if (a.tituloPrograma === data.tituloOportunidad) {
+          tipoBeca = a.tipo || 'Sin tipo';
+          periodo = a.semestre || 'Sin periodo';
+          // Buscar nombre del profesor responsable
+          const usuario = usuarios.docs.find(u => u.id === a.personaACargo);
+          responsable = usuario?.data()?.nombre || 'No asignado';
+
+          const datosAsistencias = asistenciasAsi.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const asistenciaAux = datosAsistencias.find(u => u.userId === data.userId);
+          console.log("Asistencia Aux:", asistenciaAux);
+          retroalimentacion = asistenciaAux?.retroalimentacion || 'Sin retroalimentación';
+          avances = asistenciaAux?.desempeno || 'Sin avances';
+          certificados = asistenciaAux?.cumplimientoTareas || 'Sin certificados'; 
+          pago = asistenciaAux?.pago || 'Sin pago';
+
+        }
+      }
+
+      solicitudesMap.set(doc.id, {
+        id: doc.id,
+        nombre: nombre,
+        titulo: data.tituloOportunidad || 'Sin título',
+        tipoBeca,
+        periodo,
+        responsable,
+        estado: data.estado || 'Pendiente',
+        horasTrabajadas: parseInt(data.horas) || 0,
+        avances: avances,
+        retroalimentacion: retroalimentacion,
+        certificados: certificados,
+        pago: pago
+      });
+    }
+
+    const solicitudes = Array.from(solicitudesMap.values());
+
+    // Crear documento PDF
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=seguimiento.pdf');
+    doc.pipe(res);
+
+    // Encabezado
+    doc.fontSize(20).fillColor('#0A0A0A').text('Reporte de Seguimiento', { align: 'center' });
+    doc.moveDown();
+
+    const fecha = new Date().toLocaleDateString('es-CR');
+    doc.fontSize(10).fillColor('gray').text(`Generado el: ${fecha}`, { align: 'right' });
+    doc.moveDown();
+
+    doc.moveTo(doc.x, doc.y).lineTo(550, doc.y).stroke(); // Línea separadora
+    doc.moveDown();
+
+    if (solicitudes.length > 0) {
+      doc.fontSize(14).fillColor('#1F4E79').text(`Usuario: ${solicitudes[0].nombre}`);
+      doc.moveDown();
+    } else {
+      doc.fontSize(14).fillColor('red').text('Usuario: No encontrado');
+      doc.moveDown();
+    }
+
+    solicitudes.forEach((sol, index) => {
+      doc.fontSize(13).fillColor('#2E74B5').text(`Solicitud ${index + 1}: ${sol.titulo}`);
+      doc.moveDown(0.3);
+
+      doc.fontSize(11).fillColor('black')
+        .text(`- Tipo de Beca: ${sol.tipoBeca}`, { indent: 20 })
+        .text(`- Periodo: ${sol.periodo}`, { indent: 20 })
+        .text(`- Responsable: ${sol.responsable}`, { indent: 20 })
+        .text(`- Estado: ${sol.estado}`, { indent: 20 })
+        .text(`- Horas Trabajadas: ${sol.horasTrabajadas}`, { indent: 20 })
+        .text(`- Avances: ${sol.avances}`, { indent: 20 })
+        .text(`- Retroalimentación: ${sol.retroalimentacion}`, { indent: 20 })
+        .text(`- Certificados: ${sol.certificados}`, { indent: 20 })
+        .text(`- Pago: ${sol.pago}`, { indent: 20 });
+
+      doc.moveDown();
+      doc.moveTo(doc.x, doc.y).lineTo(550, doc.y).dash(1, { space: 2 }).stroke(); // Línea separadora punteada
+      doc.undash();
+      doc.moveDown();
+    });
+
+    doc.end();
+
+  } catch (error) {
+    console.error('Error al generar el PDF:', error);
+    res.status(500).send('Error generando el PDF');
+  }
+};
+
+//---------------------------------------------------------------------------------------------------------------
+// Funcion que genera un PDF con la evaluacion de las solicitudes
+//----------------------------------------------------------------------------------------------------------------
+export const evaluacionPDF = async (req, res) => {
+  const { userId } = req.query;
+  try {
+      if (!userId) {
+        return res.status(400).json({ message: "Falta el parámetro userId." });
+      }
+
+      // 1. Obtener asistencias a cargo del usuario
+      const asistenciasRef = collection(db, "Asistencias");
+      const qAsistencias = query(asistenciasRef, where("personaACargo", "==", userId));
+      const snapshotAsistencias = await getDocs(qAsistencias);
+      const usuariosRef = collection(db, 'Usuarios');
+
+      const usuarios = await getDocs(usuariosRef);
+
+      const asistenciaIds = snapshotAsistencias.docs.map(doc => doc.id);
+      if (asistenciaIds.length === 0) {
+        return res.status(404).json({ message: "No se encontraron asistencias para este profesor." });
+      }
+
+      // 2. Obtener asignaciones en chunks (máx. 10 por consulta)
+      const asignadasRef = collection(db, "AsistenciasAsignadas");
+      const chunks = [];
+      const idsCopy = [...asistenciaIds];
+      while (idsCopy.length) chunks.push(idsCopy.splice(0, 10));
+
+      const asistenciasRelacionadas = [];
+      for (const chunk of chunks) {
+        const qAsign = query(asignadasRef, where("asistenciaId", "in", chunk));
+        const snapAsign = await getDocs(qAsign);
+
+        for (const asignDoc of snapAsign.docs) {
+          const dataAsign = asignDoc.data();
+          const asistDocSnap = await getDoc(docRef(db, "Asistencias", dataAsign.asistenciaId));
+
+          if (asistDocSnap.exists()) {
+            asistenciasRelacionadas.push({
+              asignacionId: asignDoc.id,
+              datosAsignacion: dataAsign,
+              datosAsistencia: asistDocSnap.data(),
+            });
+          }
+        }
+      }
+
+      // 3. Obtener asistencias cerradas del usuario
+      const qCerradas = query(
+        asistenciasRef,
+        where("personaACargo", "==", userId),
+        where("estado", "==", "Cerrado")
+      );
+      const snapCerradas = await getDocs(qCerradas);
+      const asistenciasCerradas = snapCerradas.docs.map(doc => ({
+        asistenciaId: doc.id,
+        datosAsistencia: doc.data(),
+      }));
+
+      // 4. Filtrar cerradas que no estén asignadas
+      const titulosAsignadas = new Set(
+        asistenciasRelacionadas.map(a => a.datosAsistencia.tituloPrograma.trim().toLowerCase())
+      );
+      const cerradasFiltradas = asistenciasCerradas.filter(c => {
+        const titulo = c.datosAsistencia.tituloPrograma.trim().toLowerCase();
+        return !titulosAsignadas.has(titulo);
+      });
+
+      // 5. Simular solicitudes (debes reemplazarlo con datos reales si aplica)
+      const solicitudes = [
+        ...asistenciasRelacionadas.map(a => ({
+          nombre: a.datosAsistencia.nombre || "Desconocido",
+          titulo: a.datosAsistencia.tituloPrograma,
+          tipoBeca: a.datosAsistencia.beneficio || "N/A",
+          periodo: a.datosAsistencia.semestre || "N/A",
+          responsable: a.datosAsistencia.responsable || "N/A",
+          estado: a.datosAsistencia.estado || "N/A",
+          horasTotales: a.datosAsistencia.totalHoras || 0,
+          avances: a.datosAsignacion.desempeno || "N/A",
+          retroalimentacion: a.datosAsignacion.retroalimentacion || "N/A",
+          certificados: a.datosAsignacion.cumplimientoTareas || "N/A",
+          pago: a.datosAsignacion.pago || "N/A",
+        })),
+        ...cerradasFiltradas.map(c => ({
+          nombre: "Sin asignación",
+          titulo: c.datosAsistencia.tituloPrograma,
+          tipoBeca: "N/A",
+          periodo: "N/A",
+          responsable: "N/A",
+          estado: "Cerrado",
+          horasTrabajadas: 0,
+          avances: "N/A",
+          retroalimentacion: "N/A",
+          certificados: "N/A",
+          pago: "N/A",
+        })),
+      ];
+
+      let responsable = 'No asignado';
+      const usuario = usuarios.docs.find(u => u.id === userId);
+      responsable = usuario?.data()?.nombre || 'No asignado';
+
+      console.log("Solicitudes para el PDF:", asistenciasRelacionadas);
+
+      // 6. Crear documento PDF
+      const doc = new PDFDocument({ margin: 50 });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=seguimiento.pdf');
+      doc.pipe(res);
+
+      // Encabezado
+      doc.fontSize(20).fillColor('#0A0A0A').text('Reporte de Seguimiento', { align: 'center' });
+      doc.moveDown();
+      const fecha = new Date().toLocaleDateString('es-CR');
+      doc.fontSize(10).fillColor('gray').text(`Generado el: ${fecha}`, { align: 'right' });
+      doc.moveDown().moveTo(doc.x, doc.y).lineTo(550, doc.y).stroke().moveDown();
+
+      // Nombre (del primero que tenga)
+      if (solicitudes.length > 0) {
+        doc.fontSize(14).fillColor('#1F4E79').text(`Usuario: ${responsable}`);
+      } else {
+        doc.fontSize(14).fillColor('red').text('Usuario: No encontrado');
+      }
+      doc.moveDown();
+
+      // Contenido de cada solicitud
+      solicitudes.forEach((sol, index) => {
+        doc.fontSize(13).fillColor('#2E74B5').text(`Solicitud ${index + 1}: ${sol.titulo}`);
+        doc.moveDown(0.3);
+
+        doc.fontSize(11).fillColor('black')
+          .text(`- Tipo de Beca: ${sol.tipoBeca}`, { indent: 20 })
+          .text(`- Periodo: ${sol.periodo}`, { indent: 20 })
+          .text(`- Estado: ${sol.estado}`, { indent: 20 })
+          .text(`- Horas Totales: ${sol.horasTotales}`, { indent: 20 })
+          .text(`- Avances: ${sol.avances}`, { indent: 20 })
+          .text(`- Retroalimentación: ${sol.retroalimentacion}`, { indent: 20 })
+          .text(`- Certificados: ${sol.certificados}`, { indent: 20 })
+          .text(`- Pago: ${sol.pago}`, { indent: 20 });
+
+        doc.moveDown();
+        doc.moveTo(doc.x, doc.y).lineTo(550, doc.y).dash(1, { space: 2 }).stroke();
+        doc.undash().moveDown();
+      });
+
+      doc.end();
+    } catch (error) {
+      console.error('❌ Error al generar el PDF:', error);
+      res.status(500).send('Error generando el PDF');
+    }
+}

@@ -1,6 +1,10 @@
 import { transporter } from "../Services/emails.js";
 import { db, app } from "../Services/fireBaseConnect.js";
 import { collection, getDocs, updateDoc, doc, addDoc, deleteDoc } from "firebase/firestore";
+import { Parser } from 'json2csv';
+import archiver from 'archiver';
+import stream from 'stream';
+
 
 
 //PARA USUARIOS
@@ -243,3 +247,52 @@ export const monitoreoAsistencia = async (req, res) => {
         return res.status(500).json({ error: "Error al extraer las asistencias" });
     }
 }
+
+
+export const respaldoMasivo = async (req, res) => {
+    console.log("Iniciando respaldo masivo...");
+    try {
+        const colecciones = [
+        'Asistencias',
+        'AsistenciasAsignadas',
+        'Cursos',
+        'Favoritos',
+        'Pagos',
+        'PoliticasDepartamentos',
+        'Programas',
+        'Solicitudes',
+        'Usuarios'
+        ];
+
+        const zipStream = new stream.PassThrough();
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        // Enlazamos el zip con el stream de salida
+        archive.pipe(zipStream);
+
+        // Iniciamos la descarga
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', 'attachment; filename="respaldo_masivo.zip"');
+        zipStream.pipe(res);
+
+        for (const nombre of colecciones) {
+        const snapshot = await getDocs(collection(db, nombre));
+        const datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        if (datos.length > 0) {
+            const fields = Object.keys(datos[0]);
+            const parser = new Parser({ fields });
+            const csv = parser.parse(datos);
+
+            archive.append(csv, { name: `${nombre}.csv` });
+        } else {
+            archive.append('No hay datos disponibles', { name: `${nombre}.csv` });
+        }
+        }
+
+        await archive.finalize();
+    } catch (error) {
+        console.error('Error en respaldo masivo:', error);
+        return res.status(500).json({ error: 'Error al generar respaldo masivo' });
+    }
+};

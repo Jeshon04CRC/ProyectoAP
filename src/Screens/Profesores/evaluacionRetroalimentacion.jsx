@@ -11,6 +11,9 @@ import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import URL from '../../Services/url';
 import { styles } from '../../Style/Profesores/evaluacionRetroalimentacion';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform, Button } from 'react-native';
+
 
 const EvaluacionRetroalimentacion = ({ route }) => {
   const { userId } = route.params;
@@ -146,6 +149,39 @@ const EvaluacionRetroalimentacion = ({ route }) => {
     }
   };
 
+  const descargarPDF = async () => {
+    console.log("Descargando PDF...");
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'Usuario no encontrado.');
+        return;
+      }
+
+      const response = await axios.get(`${apiUrl}/evaluacion/pdf`, {
+        params: { userId },
+        responseType: 'blob',
+      });
+
+      if (Platform.OS === 'web') {
+        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        link.setAttribute('download', 'seguimiento.pdf');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(urlBlob);
+      } else {
+        Alert.alert('No compatible', 'La descarga solo está disponible en la versión Web.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo descargar el PDF.');
+      console.error(error);
+    }
+  };
+
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Historial de Evaluación</Text>
@@ -182,6 +218,13 @@ const EvaluacionRetroalimentacion = ({ route }) => {
           </View>
         ))}
       </ScrollView>
+
+      
+      {/* BOTÓN PARA GENERAR PDF */}
+      <TouchableOpacity onPress={descargarPDF} style={styles.pdfButton}>
+        <Text style={styles.pdfButtonText}>📄 Generar PDF</Text>
+      </TouchableOpacity>
+      
 
       <Text style={styles.sectionTitle}>Evaluación y Retroalimentación</Text>
       <Text style={styles.label}>Seleccione registro:</Text>

@@ -8,7 +8,8 @@ import { obtenerUsuarios,
         aceptarOferta,
         eliminarOferta,
         actualizarOferta,
-        monitoreoAsistencia
+        monitoreoAsistencia,
+        respaldoMasivo
         } from "../Controllers/admin.Controller.js"
 
 const router = Router()
@@ -26,6 +27,7 @@ router.put('/admin/actualizarOferta', actualizarOferta);
 
 router.get('/admin/monitoreoAsistencia', monitoreoAsistencia);
 
+router.get('/respaldos/masivo', respaldoMasivo);
 
 
 export default router;

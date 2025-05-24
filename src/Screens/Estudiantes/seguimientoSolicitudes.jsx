@@ -1,10 +1,3 @@
-//---------------------------------------------------------------------------------------------------------------
-
-// Seguimiento de actividades - Visualización de historial, monitoreo de horas, evaluaciones recibidas 
-// y descarga de certificados.
-
-//----------------------------------------------------------------------------------------------------------------
-
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -14,7 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,30 +16,21 @@ import axios from 'axios';
 import { styles } from '../../Style/Estudiantes/seguimientoSolicitudes';
 import URL from '../../Services/url';
 
-//--------------------------------------
-//  Componente principal
-//--------------------------------------
-
 const SeguimientoSolicitudes = () => {
-  const navigation = useNavigation(); // Hook para navegar entre pantallas
-  const [busqueda, setBusqueda] = useState(''); // Estado para texto del buscador
-  const [seguimientoData, setSeguimientoData] = useState([]); // Datos originales
-  const [filtradas, setFiltradas] = useState([]); // Datos filtrados por búsqueda
+  const navigation = useNavigation();
+  const [busqueda, setBusqueda] = useState('');
+  const [seguimientoData, setSeguimientoData] = useState([]);
+  const [filtradas, setFiltradas] = useState([]);
 
-  // Hook que se ejecuta cada vez que la pantalla gana el foco
   useFocusEffect(
     useCallback(() => {
       const fetchSolicitudes = async () => {
         try {
-          // Obtiene el userId guardado localmente
           const userId = await AsyncStorage.getItem('userId');
-
-          // Solicita al backend las solicitudes de ese usuario
           const response = await axios.get(`${URL}:3000/solicitudes/seguimiento`, {
             params: { userId }
           });
 
-          // Elimina duplicados basándose en el título
           const unicos = [];
           const titulosVistos = new Set();
 
@@ -56,7 +41,6 @@ const SeguimientoSolicitudes = () => {
             }
           }
 
-          // Actualiza los estados con los datos únicos
           setSeguimientoData(unicos);
           setFiltradas(unicos);
         } catch (error) {
@@ -65,14 +49,9 @@ const SeguimientoSolicitudes = () => {
         }
       };
 
-      fetchSolicitudes(); // Llama la función cuando la pantalla se enfoca
+      fetchSolicitudes();
     }, [])
   );
-
-//--------------------------------------
-// Filtra los datos según lo ingresado 
-// en el buscador
-//--------------------------------------
 
   const realizarBusqueda = () => {
     const texto = busqueda.toLowerCase();
@@ -84,82 +63,94 @@ const SeguimientoSolicitudes = () => {
     setFiltradas(resultado);
   };
 
-//--------------------------------------
-// Renderización del componente
-//--------------------------------------
-  
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Tipo de beca:</Text>
-        <Text style={styles.value}>{item.tipoBeca}</Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Período:</Text>
-        <Text style={styles.value}>{item.periodo}</Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Responsable:</Text>
-        <Text style={styles.value}>{item.responsable}</Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Estado:</Text>
-        <Text style={styles.badgeGreen}>{item.estado}</Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Horas trabajadas:</Text>
-        <Text style={item.alertaHoras ? styles.badgeOrange : styles.value}>
-          {item.horasTrabajadas}
-        </Text>
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Avances:</Text>
-        {item.avances ? (
-          <TouchableOpacity onPress={() => Alert.alert('Avance', 'Descargando archivo de avances...')}>
-            <Text style={styles.downloadLink}>Descargar</Text>
-          </TouchableOpacity>
-        ) : (
-          <Text style={styles.value}>No disponible</Text>
-        )}
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Retroalimentación:</Text>
-        {item.retroalimentacion ? (
-          <TouchableOpacity onPress={() => Alert.alert('Retroalimentación', 'Descargando archivo...')}>
-            <Text style={styles.downloadLink}>Descargar</Text>
-          </TouchableOpacity>
-        ) : (
-          <Text style={styles.value}>No disponible</Text>
-        )}
-      </View>
-      <View style={styles.cardRow}>
-        <Text style={styles.label}>Certificados:</Text>
-        {item.certificados ? (
-          <TouchableOpacity onPress={() => Alert.alert('Certificado', 'Descargando archivo...')}>
-            <Text style={styles.downloadLink}>Descargar</Text>
-          </TouchableOpacity>
-        ) : (
-          <Text style={styles.value}>No disponible</Text>
-        )}
-      </View>
-    </View>
-  );
+  const descargarPDF = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'Usuario no encontrado.');
+        return;
+      }
 
-  // Render principal del componente
+      const response = await axios.get(`${URL}:3000/seguimiento/pdf`, {
+        params: { userId },
+        responseType: 'blob',
+      });
+
+      if (Platform.OS === 'web') {
+        const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = urlBlob;
+        link.setAttribute('download', 'seguimiento.pdf');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(urlBlob);
+      } else {
+        Alert.alert('No compatible', 'La descarga solo está disponible en la versión Web.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo descargar el PDF.');
+      console.error(error);
+    }
+  };
+
+const renderItem = ({ item }) => (
+  <View style={styles.card}>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Tipo de beca:</Text>
+      <Text style={styles.value}>{item.tipoBeca}</Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Período:</Text>
+      <Text style={styles.value}>{item.periodo}</Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Responsable:</Text>
+      <Text style={styles.value}>{item.responsable}</Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Estado:</Text>
+      <Text style={styles.badgeGreen}>{item.estado}</Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Horas trabajadas:</Text>
+      <Text style={item.alertaHoras ? styles.badgeOrange : styles.value}>
+        {item.horasTrabajadas}
+      </Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Avances:</Text>
+      <Text style={styles.value}>
+        {item.avances || 'Sin avances'}
+      </Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Retroalimentación:</Text>
+      <Text style={styles.value}>
+        {item.retroalimentacion || 'Sin retroalimentación'}
+      </Text>
+    </View>
+    <View style={styles.cardRow}>
+      <Text style={styles.label}>Certificados:</Text>
+      <Text style={styles.value}>
+        {item.certificados || 'Sin certificados'}
+      </Text>
+    </View>
+  </View>
+);
+
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Encabezado con logo y avatar */}
       <View style={styles.headerBar}>
         <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={()  => navigation.goBack()}>
           <Image source={require('../../../assets/avataricon.png')} style={styles.headerAvatar} />
         </TouchableOpacity>
       </View>
 
-      {/* Título de pantalla */}
       <Text style={styles.header}>Seguimiento de actividades</Text>
 
-      {/* Buscador */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -172,7 +163,11 @@ const SeguimientoSolicitudes = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de solicitudes */}
+      {/* BOTÓN PARA GENERAR PDF */}
+      <TouchableOpacity onPress={descargarPDF} style={styles.pdfButton}>
+        <Text style={styles.pdfButtonText}>📄 Generar PDF</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={filtradas}
         renderItem={renderItem}

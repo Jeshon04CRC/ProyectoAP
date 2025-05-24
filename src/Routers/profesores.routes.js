@@ -45,4 +45,5 @@ router.patch('/rechazarPostulacion/:id/', rechazarPostulacion);
 router.patch('/updateSeguimiento/:id', updateSeguimiento);
 
 
+
 export default router;
