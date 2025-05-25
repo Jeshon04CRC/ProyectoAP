@@ -52,6 +52,19 @@ const GestionAsignaturas = () => {
   const { userId, contactInfo } = route.params;
   const navigation = useNavigation();
 
+
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'login' }],
+    });
+  }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {

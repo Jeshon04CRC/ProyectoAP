@@ -6,6 +6,7 @@ import { useRoute } from '@react-navigation/native';
 import URL from '../../Services/url';
 import axios from 'axios';
 
+
 const datosIniciales = [
   { id: '1', estudiante: 'Tomas', carrera: 'Computación', tipo: 'Exoneración', monto: 14500, semestre: 'II Semestre', estado: 'Aprobada' },
   { id: '2', estudiante: 'Laura', carrera: 'Administración', tipo: 'Pago', monto: 5000, semestre: 'I Semestre', estado: 'Aprobada' },
@@ -19,6 +20,19 @@ export default function ListaEstudiantes() {
   const [datos, setDatos] = useState(datosIniciales);
   const route = useRoute();
   const { userId } = route.params; // Obtener el userId de los parámetros de la ruta
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {

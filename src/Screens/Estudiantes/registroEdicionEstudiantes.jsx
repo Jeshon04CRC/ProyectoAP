@@ -33,6 +33,17 @@ const RegistroPerfilAcademico = () => {
   const [documento, setDocumento] = useState(null);
   const [carrerasDisponibles, setCarrerasDisponibles] = useState([]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // Hook que se ejecuta al cargar la pantalla
   useEffect(() => {
     const cargarDatos = async () => {

@@ -27,6 +27,19 @@ export default function HistorialAsistenciaScreen() {
   const route = useRoute();
   const { userId } = route.params; // Obtener el userId de los parámetros de la ruta
 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await handleInformacion();

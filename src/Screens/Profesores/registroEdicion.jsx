@@ -35,6 +35,17 @@ const RegistroEdicion = () => {
     }
   }, [contactInfo]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const guardarCambios = async () => {
     if (showPasswordSection) {
       if (!password || !confirmPassword) {

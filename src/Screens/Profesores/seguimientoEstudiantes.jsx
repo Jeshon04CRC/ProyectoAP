@@ -16,6 +16,17 @@ const SeguimientoEstudiantes = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     const apiUrl = `${URL}:3000`;
     const fetchData = async () => {
       try {

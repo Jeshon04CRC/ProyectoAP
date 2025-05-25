@@ -39,6 +39,19 @@ const FormularioAplicacion = () => {
     comentarios: ''
   });
 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   // Obtiene los datos personales automáticamente al cargar el componente
   useEffect(() => {
     const fetchDatosPersonales = async () => {

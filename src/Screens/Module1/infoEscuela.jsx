@@ -22,6 +22,17 @@ export default function ContactInfoScreen() {
   const { userId } = route.params;
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       const datos = await handleInformacion();
       if (datos) {

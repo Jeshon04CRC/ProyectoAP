@@ -88,6 +88,17 @@ const EvaluacionRetroalimentacion = ({ route }) => {
   }, [userId]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     let key = selectedKey;
     if (key === "custom" && customKey.trim()) key = customKey.trim().toLowerCase();
 

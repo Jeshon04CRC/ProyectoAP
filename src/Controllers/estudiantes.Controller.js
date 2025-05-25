@@ -1,7 +1,7 @@
 import { transporter } from "../Services/emails.js";
 import { Timestamp } from 'firebase/firestore';
 import { db, app } from "../Services/fireBaseConnect.js";
-import { collection, getDocs, updateDoc, doc as docRef, getDoc, addDoc, query, where, arrayUnion, arrayRemove} from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, doc as docRef, getDoc, addDoc, query, where, arrayUnion, arrayRemove} from "firebase/firestore";
 import PDFDocument from 'pdfkit';
 
 

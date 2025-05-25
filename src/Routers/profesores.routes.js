@@ -19,6 +19,7 @@ import {
     setSolicitudReunion,
     rechazarPostulacion,
     updateSeguimiento,
+    insertNewOferta2,
     } 
 from "../Controllers/profesores.Controller.js";
 
@@ -30,6 +31,7 @@ router.get('/getCursos/:id', getAllCourses);
 router.get('/getHistorial/:id', getAllHistorial);
 router.get('/getUserInfoByAsistencias/:id', getUserInfoByAsistencias);
 router.post('/insertNewOferta/:id', insertNewOferta);
+router.post('/insertNewOferta2/:id', insertNewOferta2);
 router.get('/getAsistenciasByProfesor/:id', getAsistenciasByProfesor);
 router.get('/getSolicitudesRelacionadasConAsistencias/:id', getSolicitudesRelacionadasConAsistencias);
 router.patch('/updateOferta/:id', updateOferta);

@@ -15,6 +15,9 @@ import { styles } from '../../Style/Estudiantes/detallesOportunidad';
 //--------------------------------------
 
 const DetalleOportunidad = () => {
+
+
+
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -43,6 +46,18 @@ const DetalleOportunidad = () => {
 //--------------------------------------
 // Renderización de la pantalla principal
 //--------------------------------------
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <ScrollView style={styles.container}>

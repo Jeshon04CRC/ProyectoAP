@@ -5,6 +5,7 @@ import { styles } from '../../Style/Login/login';
 import axios from 'axios'; 
 import URL from '../../Services/url.js'; // 👈 IMPORTANTE
 import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 IMPORTANTE
+import { ScrollView } from 'react-native';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -57,41 +58,43 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inicio de Sesión</Text>
-      <Text style={styles.subtitle}>Gestión de Asistencias, Tutorías y Proyectos</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Inicio de Sesión</Text>
+        <Text style={styles.subtitle}>Gestión de Asistencias, Tutorías y Proyectos</Text>
 
-      <Text style={styles.label}>Correo Electrónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="correo@ejemplo.com"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+        <Text style={styles.label}>Correo Electrónico</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="correo@ejemplo.com"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-      <Text style={styles.label}>Contraseña</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="********"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-    
-    {/*
-        <TouchableOpacity onPress={handleRegistro}>
-        <Text style={styles.forgotPassword}>Registrarse</Text>
+        <Text style={styles.label}>Contraseña</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="********"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      
+      {/*
+          <TouchableOpacity onPress={handleRegistro}>
+          <Text style={styles.forgotPassword}>Registrarse</Text>
+          </TouchableOpacity>
+
+      */}
+
+        <TouchableOpacity style={styles.button} onPress={handleInicioSeccion}>
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
 
-    */}
-
-      <TouchableOpacity style={styles.button} onPress={handleInicioSeccion}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
-
-      <Image source={require('../../../assets/Login/ImagenLogin.png')} style={styles.image} />
-    </View>
+        <Image source={require('../../../assets/Login/ImagenLogin.png')} style={styles.image} />
+      </View>
+    </ScrollView>
   );
 };
 

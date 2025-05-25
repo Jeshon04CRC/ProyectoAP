@@ -14,7 +14,6 @@ import { useRoute } from '@react-navigation/native';
 import URL from '../../Services/url';
 import axios from 'axios';
 
-
 export default function ListaEstudiantes() {
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [busqueda, setBusqueda] = useState('');
@@ -26,6 +25,19 @@ export default function ListaEstudiantes() {
   const navigator = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {

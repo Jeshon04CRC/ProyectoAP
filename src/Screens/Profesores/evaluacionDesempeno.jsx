@@ -13,6 +13,20 @@ const EvaluacionDesempeno = () => {
   const [desempenoGeneral, setDesempenoGeneral] = useState("Bueno");
   const [retroalimentacion, setRetroalimentacion] = useState("");
 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
+
   const handleGuardar = async () => {
     try {
       if (!desempenoGeneral || !retroalimentacion) {

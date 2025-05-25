@@ -215,6 +215,68 @@ export const insertNewOferta = async (req, res) => {
   }
 }
 
+export const insertNewOferta2 = async (req, res) => {
+  const {
+      beneficio,
+      descripcion,
+      fechaCierre,  // Corresponde a fechaFin en DB
+      fechaInicio,
+      horario,
+      horaXSemana, // Corresponde a horaXSemana en DB
+      tituloPrograma, // Corresponde a tituloPrograma en DB
+      objetivos,
+      requisitos,
+      tipo,
+      cantidadVacantes, // Corresponde a cantidadVacantes en DB
+      estado = "Abierto",
+      semestre,
+      departamento,
+      promedioRequerido,
+      totalHoras,
+      requisitosAdicionales
+  } = req.body;
+
+  const { id } = req.params;
+
+
+
+  try {
+      const asistenciasRef = collection(db, "Asistencias");
+      const newDoc = await addDoc(asistenciasRef, {
+          beneficio: beneficio, // Mapeo correcto
+          descripcion: descripcion,
+          fechaFin: fechaCierre, // Usar fechaCierre como fechaFin
+          fechaInicio: fechaInicio,
+          horario: horario,
+          horaXSemana: horaXSemana.toString(), // Guardar como string
+          tituloPrograma: tituloPrograma,
+          objetivos: objetivos,
+          requisitos: requisitos, // Convertir a array
+          tipo: tipo,
+          cantidadVacantes: cantidadVacantes.toString(), // Guardar como string
+          semestre: semestre,
+          personaACargo: id,
+          estado: estado,
+          cantidadSolicitudes: 0, // Número, no string
+          departamento: departamento,
+          promedioRequerido: promedioRequerido,
+          totalHoras: totalHoras,
+          requisitosAdicionales: requisitosAdicionales,
+          postulaciones: [], // Inicializar array
+          historialCambios: [{
+              cambios: "Creación de la oferta",
+              fecha: new Date().toISOString().split('T')[0],
+              horaXSemana: horaXSemana.toString()
+          }] // Historial inicial
+      });
+
+      res.status(200).json({ message: "Oferta creada exitosamente", id: newDoc.id });
+  } catch (error) {
+      console.error("Error inserting new oferta:", error);
+      res.status(500).json({ message: "Error inserting new oferta" });
+  }
+}
+
 export const getAsistenciasByProfesor = async (req, res) => {
     const { id } = req.params;
     try {

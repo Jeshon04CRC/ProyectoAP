@@ -44,6 +44,17 @@ const HomePageEstudiantes = () => {
     "Seguimiento de actividades": "seguimientoSolicitudes",
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   // useEffect se ejecuta al montar el componente
   useEffect(() => {
     const fetchContactInfo = async () => {

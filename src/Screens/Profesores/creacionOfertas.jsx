@@ -5,6 +5,7 @@ import { styles } from '../../Style/Profesores/creacionOfertas';
 import axios from 'axios';
 import URL from '../../Services/url';
 
+
 const CreacionOfertas = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -102,6 +103,17 @@ const CreacionOfertas = () => {
   };
 
   const handleRegresar = () => navigation.goBack();
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'login' }],
+    });
+  }, 1800000); // 20 segundos
+
+  return () => clearTimeout(timer);
+}, []);
 
   return (
     <ScrollView style={styles.container}>

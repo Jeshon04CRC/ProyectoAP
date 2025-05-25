@@ -33,6 +33,7 @@ const EdicionOfertas = () => {
   const [promedioRequerido, setPromedioRequerido] = useState('');
   const [totalHoras, setTotalHoras] = useState('');
   const [requisitosAdicionales, setRequisitosAdicionales] = useState('');
+  const [modoClonar, setModoClonar] = useState(false);
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -40,6 +41,11 @@ const EdicionOfertas = () => {
 
 
   const validarCampos = () => {
+    if (!currentOferta) {
+      Alert.alert("Error", "No hay datos de la oferta.");
+      return false;
+    }
+
     const {
       tituloPrograma,
       beneficio,
@@ -52,44 +58,34 @@ const EdicionOfertas = () => {
       horaXSemana,
       fechaInicio,
       fechaCierre,
+      requisitos,
+      departamento,
+      promedioRequerido,
+      totalHoras,
+      requisitosAdicionales
     } = currentOferta;
-  
-    if (!tituloPrograma || !beneficio || !descripcion || !objetivos || !tipo || !horario || !semestre) {
+
+    if (
+      !tituloPrograma || !beneficio || !descripcion || !objetivos ||
+      !tipo || !horario || !semestre || !requisitos ||
+      !departamento || !promedioRequerido || !totalHoras || !requisitosAdicionales
+    ) {
       Alert.alert("Error", "Por favor complete todos los campos obligatorios.");
       return false;
     }
-  
+
     if (!cantidadVacantes || isNaN(cantidadVacantes) || parseInt(cantidadVacantes) <= 0) {
       Alert.alert("Error", "La cantidad de vacantes debe ser un número mayor que cero.");
       return false;
     }
-  
+
     if (!horaXSemana || isNaN(horaXSemana) || parseInt(horaXSemana) <= 0) {
       Alert.alert("Error", "Las horas por semana deben ser un número mayor que cero.");
       return false;
     }
-  
-    const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!fechaInicio || !fechaRegex.test(fechaInicio)) {
-      Alert.alert("Error", "La fecha de inicio debe tener el formato AAAA-MM-DD.");
-      return false;
-    }
-  
-    if (!fechaCierre || !fechaRegex.test(fechaCierre)) {
-      Alert.alert("Error", "La fecha de cierre debe tener el formato AAAA-MM-DD.");
-      return false;
-    }
-  
-    if (new Date(fechaInicio) >= new Date(fechaCierre)) {
-      Alert.alert("Error", "La fecha de inicio debe ser anterior a la fecha de cierre.");
-      return false;
-    }
-    if (typeof currentOferta.requisitos !== 'string') {
-      Alert.alert("Error", "Formato inválido en requisitos");
-      return false;
-    }
-    if (!departamento.trim()) {
-      Alert.alert("Error", "El departamento es requerido.");
+
+    if (typeof requisitos !== 'string') {
+      Alert.alert("Error", "Formato inválido en requisitos.");
       return false;
     }
 
@@ -105,6 +101,17 @@ const EdicionOfertas = () => {
 
     return true;
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
 
   
   useEffect(() => {
@@ -201,8 +208,14 @@ const EdicionOfertas = () => {
     }
   };
 
+  const handleClonar = (oferta) => {
+    handlePickerChange(oferta.asistenciaId.toString());
+    setModoClonar(true);
+    setSelectedOfertaId(""); // Limpia el picker
+  };
+
   const handleGuardarCambios = async () => {
-    if (!validarCampos()) return;
+    if (!validarCampos()) return  alert("Por favor complete todos los campos obligatorios.");
 
     const formatDateToDB = (dateString) => {
       const [year, month, day] = dateString.split('-');
@@ -244,13 +257,57 @@ const EdicionOfertas = () => {
       Alert.alert("Error", "Error al actualizar la oferta.");
     }
   };
+
+  const handleGuardarClon = async () => {
+    if (!validarCampos()) return alert("Por favor complete todos los campos obligatorios.");
+
+    const body = {
+      tituloPrograma: currentOferta.tituloPrograma,
+      beneficio: currentOferta.beneficio,
+      descripcion: currentOferta.descripcion,
+      objetivos: currentOferta.objetivos,
+      tipo: currentOferta.tipo,
+      horario: currentOferta.horario,
+      cantidadVacantes: currentOferta.cantidadVacantes.toString(),
+      semestre: currentOferta.semestre,
+      horaXSemana: currentOferta.horaXSemana.toString(),
+      fechaInicio: currentOferta.fechaInicio,
+      fechaCierre: currentOferta.fechaCierre,
+      requisitos: currentOferta.requisitos 
+      ? currentOferta.requisitos.split(',').map(item => item.trim()) 
+      : [],
+      departamento: currentOferta.departamento,
+      promedioRequerido: currentOferta.promedioRequerido,
+      totalHoras: currentOferta.totalHoras,
+      requisitosAdicionales: currentOferta.requisitosAdicionales
+    };
+    console.log("Cuerpo de la solicitud:", body); 
+    try {
+      console.log("Cuerpo de la solicitud:", body);
+      const apiUrl = `${URL}:3000`;
+      const response = await axios.post(`${apiUrl}/moduloProfesores/insertNewOferta2/${userId}`,
+        body
+      );
+      if (response.status === 200) {
+        Alert.alert("Éxito", "Oferta clonada exitosamente.");
+        setModoClonar(false);
+        setSelectedOfertaId("");
+        setCurrentOferta(null);
+      } else {
+        Alert.alert("Error", "Hubo un problema al clonar la oferta.");
+      }
+    } catch (error) {
+      console.error("Error al clonar la oferta:", error.message);
+      Alert.alert("Error", "Error al clonar la oferta.");
+    }
+  };
   
   const handleRegresar = () => {
     navigation.goBack();
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       {/* Carrusel de Ofertas */}
       <Text style={styles.header}>Ofertas Disponibles</Text>
       <ScrollView
@@ -275,6 +332,13 @@ const EdicionOfertas = () => {
             >
               <Text style={styles.cardButtonText}>Ver más</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.cardButton}
+                onPress={() => handleClonar(oferta)}
+              >
+                <Text style={styles.cardButtonText}>Clonar</Text>
+              </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
@@ -288,23 +352,27 @@ const EdicionOfertas = () => {
       />
 
       {/* Picker para elegir la oferta a editar */}
-      <Text style={styles.sectionTitle}>Editar Oferta</Text>
-      <Picker
-        selectedValue={selectedOfertaId}
-        style={styles.picker}
-        onValueChange={(itemValue) => handlePickerChange(itemValue)}
-      >
-        <Picker.Item label="Seleccione una oferta" value="" />
-        {ofertas
-          .filter(oferta => oferta.estado?.toLowerCase().trim() !== "cerrado")
-          .map((oferta, index) => (
-          <Picker.Item
-            key={oferta.asistenciaId}
-            label={oferta.tituloPrograma}
-            value={oferta.asistenciaId.toString()} 
-          />
-        ))}
-      </Picker>
+      <Text style={styles.sectionTitle}>
+        {modoClonar ? "Clonar Oferta" : "Editar Oferta"}
+      </Text>
+      {!modoClonar && (
+        <Picker
+          selectedValue={selectedOfertaId}
+          style={styles.picker}
+          onValueChange={(itemValue) => handlePickerChange(itemValue)}
+        >
+          <Picker.Item label="Seleccione una oferta" value="" />
+          {ofertas
+            .filter(oferta => oferta.estado?.toLowerCase().trim() !== "cerrado")
+            .map((oferta, index) => (
+              <Picker.Item
+                key={oferta.asistenciaId}
+                label={oferta.tituloPrograma}
+                value={oferta.asistenciaId.toString()} 
+              />
+            ))}
+        </Picker>
+      )}
 
       {/* Formulario de edición */}
       {currentOferta && (
@@ -475,34 +543,51 @@ const EdicionOfertas = () => {
           />
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleGuardarCambios}
-            >
-              <Text style={styles.saveButtonText}>Guardar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleDelete}
-            >
-              <Text style={styles.cancelButtonText}>Eliminar</Text>
-            </TouchableOpacity>
+            {modoClonar ? (
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={() => {
+                  console.log("Click guardar clonación");
+                  handleGuardarClon();
+                }}
+              >
+                <Text style={styles.saveButtonText}>Guardar Clonación</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleGuardarCambios}
+              >
+                <Text style={styles.saveButtonText}>Guardar</Text>
+              </TouchableOpacity>
+            )}
+            {!modoClonar && (
+              <>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={handleDelete}
+                >
+                  <Text style={styles.cancelButtonText}>Eliminar</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleClose}
-            >
-              <Text style={styles.cancelButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleRegresar}
-            >
-              <Text style={styles.cancelButtonText}>Regresar</Text>
-            </TouchableOpacity>
-          </View>
-          
+          {!modoClonar && (
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleClose}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleRegresar}
+              >
+                <Text style={styles.cancelButtonText}>Regresar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
       )}

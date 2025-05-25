@@ -22,6 +22,7 @@ const SeguimientoSolicitudes = () => {
   const [seguimientoData, setSeguimientoData] = useState([]);
   const [filtradas, setFiltradas] = useState([]);
 
+
   useFocusEffect(
     useCallback(() => {
       const fetchSolicitudes = async () => {

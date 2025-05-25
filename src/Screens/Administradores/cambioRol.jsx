@@ -39,6 +39,17 @@ const CambioRol = () => {
     }
   };
 
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+  
   return (
     <ScrollView style={styles.container}>
       {/* Header */}

@@ -38,6 +38,17 @@ export default function EditarOfertaScreen() {
 
 
     useEffect(() => {
+    const timer = setTimeout(() => {
+        navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+        });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
         console.log("Ejecutando useEffect, oferta:", oferta);
         const fetchData = async () => {
             await handleInformacionOferta();

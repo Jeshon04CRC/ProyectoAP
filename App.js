@@ -1,5 +1,6 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import SessionTimeout  from './src/Services/sessionTimeout ';
 
 import LoginScreen from './src/Screens/Login/login'; // Asegúrate de que la ruta sea correcta
 import RegisterScrreen from './src/Screens/Login/register'; // Asegúrate de que la ruta sea correcta
@@ -57,12 +58,19 @@ import EditarOferta from './src/Screens/Administradores/editarOfertas';
 
 
 const Stack = createStackNavigator();
+const navigationRef = createNavigationContainerRef();
+
+function navigate(name, params) {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(name, params);
+  }
+}
 
 export default function App() {
   // Return the main navigation container with stack navigator
   return (
-    <NavigationContainer>
-
+    <NavigationContainer ref={navigationRef}>
+      <SessionTimeout onTimeout={() => navigate('login')}>
         <Stack.Navigator initialRouteName="login">
 
         {/* Login and Registration Screens */}
@@ -122,7 +130,8 @@ export default function App() {
         <Stack.Screen name="ValidacionOfertas" component={ValidacionOfertas} options={{title: "Validacion ofertas "}} />
         <Stack.Screen name="EditarOferta" component={EditarOferta} options={{title: "Validacion ofertas "}} />
 
-      </Stack.Navigator>
+        </Stack.Navigator>
+      </SessionTimeout>
     </NavigationContainer>
   );
 }

@@ -10,6 +10,19 @@ const InfoEstudiante = ({ route, navigation }) => {
   const [carreraName, setCarreraName] = useState(student.carrera || "");
   console.log("studente: ",student)
 
+
+  useEffect(() => {
+  const timer = setTimeout(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'login' }],
+    });
+  }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   useEffect(() => {
     const fetchCarrera = async () => {
       try {

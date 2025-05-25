@@ -22,7 +22,21 @@ const historialOfertas = [
   }
 ];
 
+
+
 export default function PerfilEstudiante() {
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>Perfil del estudiante</Text>

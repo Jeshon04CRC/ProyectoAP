@@ -16,6 +16,19 @@ const BusquedaOportunidades = () => {
   const [favoritos, setFavoritos] = useState([]); // IDs de oportunidades favoritas
   const [soloFavoritos, setSoloFavoritos] = useState(false); // Filtro toggle
 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   useEffect(() => {
     const fetchOportunidades = async () => {
       try {

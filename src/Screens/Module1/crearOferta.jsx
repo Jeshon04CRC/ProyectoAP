@@ -8,6 +8,8 @@ import axios from "axios";
 import URL from '../../Services/url';
 import { useNavigation } from '@react-navigation/native';
 
+
+
 export default function CrearOfertaScreen () {
     const [nombreCurso, setNombreCurso] = useState('');
     const [profesor, setProfesor] = useState('');
@@ -32,6 +34,18 @@ export default function CrearOfertaScreen () {
 
     const router = useRoute();
     const { userId } = router.params;
+
+    useEffect(() => {
+    const timer = setTimeout(() => {
+        navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+        });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+    }, []);
+
 
     useEffect(() => {
         const cargarProfesores = async () => {

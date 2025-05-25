@@ -5,6 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import axios from "axios";
 import URL from '../../Services/url';
 
+
 export default function OfertasScreen() {
   const [search, setSearch] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState("Todo");
@@ -12,6 +13,17 @@ export default function OfertasScreen() {
   const [ofertas, setOfertas] = useState();
   const router = useRoute();
   const { userId } = router.params;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
       const fetchData = async () => {

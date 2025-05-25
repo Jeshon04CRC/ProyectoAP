@@ -13,6 +13,9 @@ import { useRoute } from '@react-navigation/native';
 import URL from '../../Services/url'; // Asegúrate de que la ruta sea correcta
 import axios from 'axios';
 
+
+
+
 const beneficiosBD = [
   {
     id: '1',
@@ -44,6 +47,19 @@ export default function BeneficiosScreen(){
     const route = useRoute();
     const { userId } = route.params; // Obtener el userId de los parámetros de la ruta
   
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
     useEffect(() => {
       const fetchData = async () => {
         const data = await handleInformacion();

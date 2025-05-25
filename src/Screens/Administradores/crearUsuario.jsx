@@ -23,6 +23,7 @@ const CrearUsuario = () => {
   const [departamento, setDepartamento] = useState('');
   const [rol, setRol] = useState('Estudiante');
 
+
   const crearUsuario = () => {
     if (!nombre || !correo || !carrera || !telefono || !departamento || !rol) {
       Alert.alert('Faltan datos', 'Por favor complete todos los campos.');
@@ -41,6 +42,17 @@ const CrearUsuario = () => {
     Alert.alert('Usuario creado', `${nombre} fue registrado como ${rol}.`);
     navigation.goBack();
   };
+
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <ScrollView style={styles.container}>

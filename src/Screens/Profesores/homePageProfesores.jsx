@@ -68,6 +68,17 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+  
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await handleInformacion();

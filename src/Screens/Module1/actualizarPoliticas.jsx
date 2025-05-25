@@ -2,8 +2,23 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, ScrollView, Image } from 'react-native';
 import { Button } from 'react-native-paper';
 import { styles } from '../../Style/Module1/actualizarPoliticas.js';
+import { useEffect } from 'react';
+
 
 export default function PolicyUpdateScreen() {
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 20 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const [formData, setFormData] = useState({
     promedio: '',
     horas: '',

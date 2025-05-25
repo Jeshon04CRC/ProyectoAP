@@ -31,6 +31,7 @@ const HomePageAdmin = () => {
     "Validación de ofertas publicadas": "ValidacionOfertas"
   };
 
+
   // Aquí defines la función que se llamará cuando presionen el botón
   const handleRespaldoMasivo = async () => {
     try {
@@ -62,6 +63,7 @@ const HomePageAdmin = () => {
       alert('Ocurrió un error al descargar el respaldo.');
     }
   };
+
 
   return (
     <ScrollView style={styles.container}>
