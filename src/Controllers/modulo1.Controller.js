@@ -211,8 +211,10 @@ export const informacionOfertas = async (req, res) => {
 
     for(const doc of asistenciasSnapshot.docs) {
         const datos = doc.data();
-        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision")) {
-
+        console.log(datos.departamento, userId);
+        console.log(datos.estado);
+        console.log(datos.departamento === userId, datos.estado === "Abierto");
+        if (datos.departamento === userId && (datos.estado === "Abierto" || datos.estado === "Revision"|| datos.estado === "Bloqueado")) {
           for (const doc1 of usuariosSnapshot.docs) {
             const datosUsuario = doc1.data();
             if (doc1.id === datos.personaACargo) {
@@ -231,7 +233,7 @@ export const informacionOfertas = async (req, res) => {
               };
               ofertasActuales.push(ofertas);
             }
-          }
+          }   
         }
       } 
     return res.status(200).json({ofertasActuales});
@@ -769,3 +771,31 @@ export const historialBeneficiarios = async (req, res) => {
     return res.status(401).json({ error: "Error al obtener informacion" });
   }
 }
+
+export const bloquearOferta = async (req, res) => {
+  const { ofertaId, bandera } = req.body;
+
+  try {
+    const docRef = doc(db, 'Asistencias', ofertaId); // 'Asistencias' es la colección, y ofertaId es el ID del documento
+
+    // Actualiza el estado de la oferta a "Bloqueado"
+    if (bandera === 1){
+            await updateDoc(docRef, {
+        estado: "Bloqueado"
+      });
+    }
+    else
+    if (bandera === 2){
+            await updateDoc(docRef, {
+        estado: "Abierto"
+      });
+    }
+
+    console.log("Oferta bloqueada correctamente");
+    return res.status(200).json({ message: "Oferta bloqueada correctamente" });
+
+  } catch (error) {
+    console.error("Error al bloquear la oferta:", error);
+    return res.status(400).json({ error: "Error al bloquear la oferta" });
+  }
+};

@@ -28,8 +28,8 @@ export default function ProfileRegistrationScreen(){
     const fetchData = async () => {
       const datos = await handleInformacion();
       if (datos) {
-        const { nombre, facultad } = datos;
-        setSchoolName(nombre || '');
+        const { carrera, facultad } = datos;
+        setSchoolName(carrera || '');
         setFaculty(facultad || '');
       }      
     };

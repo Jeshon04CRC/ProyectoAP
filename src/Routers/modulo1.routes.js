@@ -17,7 +17,8 @@ import {informacionAdmin,
         obtenerDatosCrearOferta,
         crearPagoOferta,
         estudiantesPostulados,
-        historialBeneficiarios
+        historialBeneficiarios,
+        bloquearOferta
 } 
 from "../Controllers/modulo1.Controller.js"
 
@@ -51,5 +52,7 @@ router.post("/escuelas/crearPagoOferta", crearPagoOferta)
 router.get("/escuelas/estudiantesPostulados", estudiantesPostulados)
 
 router.get("/escuelas/historialBeneficiarios", historialBeneficiarios)
+
+router.put("/escuelas/bloquearOferta", bloquearOferta) // Cambia el controlador según lo que necesites hacer
 
 export default router;

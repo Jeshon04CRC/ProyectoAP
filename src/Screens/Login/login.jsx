@@ -6,6 +6,10 @@ import axios from 'axios';
 import URL from '../../Services/url.js'; // 👈 IMPORTANTE
 import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 IMPORTANTE
 import { ScrollView } from 'react-native';
+import sha256 from 'js-sha256';
+
+
+
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -17,9 +21,12 @@ const LoginScreen = () => {
   };
 
   const handleInicioSeccion = async () => {
+
+    console.log("Contrasena: ", sha256(password));
+    contrasenaCifrada = sha256(password)
     try {
       const apiUrl = `${URL}:3000`;
-      const response = await axios.post(`${apiUrl}/login`, { email, password });
+      const response = await axios.post(`${apiUrl}/login`, { email, password : contrasenaCifrada });
 
       if (response.status === 200) {
         const { rol, id } = response.data;

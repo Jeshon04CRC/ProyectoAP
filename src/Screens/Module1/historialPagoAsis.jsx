@@ -78,11 +78,6 @@ export default function ListaEstudiantes() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.cardsContainer}>
-        <Card title="Exoneración de Matrícula" value={beneficioExoneracion} />
-        <Card title="Pagos por Hora" value={beneficioPago} />
-      </View>
-
       <View style={styles.filtersRow}>
         <View style={styles.dropdownContainer}>
           <Picker
