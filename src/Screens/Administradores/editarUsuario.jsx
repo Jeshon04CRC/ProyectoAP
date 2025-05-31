@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Platform
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -97,7 +98,7 @@ const EditarUsuario = () => {
     }
   };
 
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.headerBar}>
@@ -203,6 +204,16 @@ const EditarUsuario = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default EditarUsuario;

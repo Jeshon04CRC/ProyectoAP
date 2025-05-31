@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { styles } from '../../Style/Profesores/seguimientoEstudiantes';
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -82,7 +82,7 @@ const SeguimientoEstudiantes = () => {
     );
   }
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Seguimiento de estudiantes</Text>
       
@@ -153,6 +153,16 @@ const SeguimientoEstudiantes = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default SeguimientoEstudiantes;

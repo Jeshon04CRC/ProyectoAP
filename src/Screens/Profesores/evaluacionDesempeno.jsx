@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -20,7 +20,7 @@ const EvaluacionDesempeno = () => {
         index: 0,
         routes: [{ name: 'login' }],
       });
-    }, 1800000); // 20 segundos
+    }, 1800000); // 30 minutos
 
     return () => clearTimeout(timer);
   }, []);
@@ -55,7 +55,7 @@ const EvaluacionDesempeno = () => {
     navigation.goBack();
   };
 
-  return (
+  const contenido = (
     <ScrollView contentContainerStyle={styles.container}>
       {/* El título muestra el nombre del estudiante */}
       <Text style={styles.title}>Evaluación de desempeño de {student.nombre}</Text>
@@ -101,6 +101,16 @@ const EvaluacionDesempeno = () => {
       </View>
     </ScrollView>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default EvaluacionDesempeno;

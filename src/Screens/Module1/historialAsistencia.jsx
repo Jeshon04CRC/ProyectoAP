@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Modal,
   Pressable,
+  Platform
 } from 'react-native';
 import { useEffect } from 'react';
 import { styles } from '../../Style/Module1/historialAsistencia';
@@ -107,7 +108,7 @@ export default function HistorialAsistenciaScreen() {
     </View>
   );
 
-  return (
+  const contenido = (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Historial de asistencia</Text>
 
@@ -180,4 +181,14 @@ export default function HistorialAsistenciaScreen() {
       />
     </SafeAreaView>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 }

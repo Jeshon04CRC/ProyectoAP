@@ -141,7 +141,7 @@ const renderItem = ({ item }) => (
 );
 
 
-  return (
+  const contenido =  (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerBar}>
         <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
@@ -177,6 +177,16 @@ const renderItem = ({ item }) => (
       />
     </SafeAreaView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default SeguimientoSolicitudes;

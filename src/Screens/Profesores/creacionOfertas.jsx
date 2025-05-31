@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { styles } from '../../Style/Profesores/creacionOfertas';
 import axios from 'axios';
 import URL from '../../Services/url';
-
 
 const CreacionOfertas = () => {
   const navigation = useNavigation();
@@ -82,7 +81,7 @@ const CreacionOfertas = () => {
       totalHoras,
       requisitosAdicionales,
       estado: 'Abierto',
-  };
+    };
 
     try {
       const apiUrl = `${URL}:3000`;
@@ -105,17 +104,17 @@ const CreacionOfertas = () => {
   const handleRegresar = () => navigation.goBack();
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'login' }],
-    });
-  }, 1800000); // 20 segundos
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'login' }],
+      });
+    }, 1800000); // 30 minutos
 
-  return () => clearTimeout(timer);
-}, []);
+    return () => clearTimeout(timer);
+  }, []);
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Crear Nueva Oferta</Text>
       <View style={styles.formContainer}>
@@ -210,6 +209,16 @@ const CreacionOfertas = () => {
       </View>
     </ScrollView>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default CreacionOfertas;

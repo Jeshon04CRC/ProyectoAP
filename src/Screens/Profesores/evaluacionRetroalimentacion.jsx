@@ -5,14 +5,15 @@ import {
   ScrollView, 
   TextInput, 
   TouchableOpacity, 
-  Alert 
+  Alert,
+  Platform
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import URL from '../../Services/url';
 import { styles } from '../../Style/Profesores/evaluacionRetroalimentacion';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform, Button } from 'react-native';
+import { Button } from 'react-native';
 
 
 const EvaluacionRetroalimentacion = ({ route }) => {
@@ -193,7 +194,7 @@ const EvaluacionRetroalimentacion = ({ route }) => {
   };
 
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       <Text style={styles.sectionTitle}>Historial de Evaluación</Text>
       <ScrollView horizontal style={styles.carouselContainer}>
@@ -281,6 +282,16 @@ const EvaluacionRetroalimentacion = ({ route }) => {
       </TouchableOpacity>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default EvaluacionRetroalimentacion;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import axios from 'axios';
 import { styles } from '../../Style/Profesores/infoEstudiante';
 import URL from '../../Services/url';
@@ -107,7 +107,7 @@ const InfoEstudiante = ({ route, navigation }) => {
   };
   
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       {/* Datos del estudiante */}
       <View style={styles.sectionContainer}>
@@ -159,6 +159,15 @@ const InfoEstudiante = ({ route, navigation }) => {
       </TouchableOpacity>
     </ScrollView>
   );
-};
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
 
+  return contenido;
+};
 export default InfoEstudiante;

@@ -7,7 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert
+  View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert, Platform
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Selector tipo dropdown
 import * as DocumentPicker from 'expo-document-picker'; // Selección de archivos
@@ -138,7 +138,7 @@ const RegistroPerfilAcademico = () => {
 // Renderización del componente
 //--------------------------------------
   
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       {/* Encabezado */}
       <View style={styles.headerBar}>
@@ -237,6 +237,16 @@ const RegistroPerfilAcademico = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default RegistroPerfilAcademico;

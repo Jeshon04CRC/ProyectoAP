@@ -1,10 +1,10 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 import { modalStyles } from '../../Style/Profesores/ofertaModal';	
 
 const OfertaModal = ({ visible, oferta, contactInfo, onClose }) => {
   if (!oferta) return null;
-  return (
+  const contenido = (
     <Modal animationType="slide" transparent={true} visible={visible}>
       <View style={modalStyles.centeredView}>
         <View style={modalStyles.modalView}>
@@ -30,6 +30,16 @@ const OfertaModal = ({ visible, oferta, contactInfo, onClose }) => {
       </View>
     </Modal>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default OfertaModal;

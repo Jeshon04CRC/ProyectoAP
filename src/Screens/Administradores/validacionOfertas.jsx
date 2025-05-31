@@ -7,7 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/gestionRolesUsuarios';
@@ -195,7 +196,7 @@ const ValidacionOfertas = () => {
     </View>
   );
 
-  return (
+  const contenido =  (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.headerBar}>
@@ -246,6 +247,16 @@ const ValidacionOfertas = () => {
       </View>
     </SafeAreaView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default ValidacionOfertas;

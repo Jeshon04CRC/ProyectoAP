@@ -13,6 +13,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Para navegación entre pantallas
 import { styles } from '../../Style/Estudiantes/homePageEstudiantes'; // Archivo de estilos
@@ -103,7 +104,7 @@ const HomePageEstudiantes = () => {
 // Renderización de la pantalla principal
 //--------------------------------------
 
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       {/* Encabezado con logo y avatar */}
       <View style={styles.headerBar}>
@@ -174,6 +175,16 @@ const HomePageEstudiantes = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default HomePageEstudiantes;

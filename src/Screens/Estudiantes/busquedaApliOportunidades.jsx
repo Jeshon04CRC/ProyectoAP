@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, ScrollView, TextInput, TouchableOpacity, Image, Switch
+  View, Text, ScrollView, TextInput, TouchableOpacity, Image, Switch, Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Estudiantes/busquedaApliOportunidades';
@@ -101,7 +101,7 @@ const BusquedaOportunidades = () => {
     ? resultadosFiltrados.filter(item => favoritos.includes(item.id))
     : resultadosFiltrados;
 
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       <View style={styles.headerBar}>
         <Image source={require('../../../assets/LogoTec.png')} style={styles.headerLogo} resizeMode="contain" />
@@ -165,6 +165,15 @@ const BusquedaOportunidades = () => {
       </View>
     </ScrollView>
   );
-};
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
 
+  return contenido;
+};
 export default BusquedaOportunidades;

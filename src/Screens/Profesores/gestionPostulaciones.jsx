@@ -5,7 +5,8 @@ import {
   TextInput, 
   ScrollView, 
   TouchableOpacity, 
-  Alert 
+  Alert,
+  Platform
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { styles } from "../../Style/Profesores/gestionPostulaciones";
@@ -112,7 +113,7 @@ const GestionPostulaciones = () => {
     );
   }
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Gestión de Postulaciones</Text>
 
@@ -198,6 +199,16 @@ const GestionPostulaciones = () => {
       </View>
     </ScrollView>
   );
+
+    if (Platform.OS === 'web') {
+      return (
+        <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+          {contenido}
+        </div>
+      );
+    }
+  
+    return contenido;
 };
 
 export default GestionPostulaciones;

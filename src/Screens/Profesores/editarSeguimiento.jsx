@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { styles } from '../../Style/Profesores/editarSeguimiento'; 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
@@ -63,7 +63,7 @@ const EditarSeguimiento = () => {
     navigation.goBack();
   };
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.header}>Editar Seguimiento</Text>
 
@@ -143,6 +143,16 @@ const EditarSeguimiento = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default EditarSeguimiento;

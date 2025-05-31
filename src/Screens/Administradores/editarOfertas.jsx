@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { styles } from '../../Style/Administradores/editarUsuario'; // reutilizando estilos
-import URL from '../../Services/url'; // Asegúrate de que la URL es correcta
-import axios from 'axios'; // Asegúrate de que axios está instalado y correctamente importado
-import DateTimePicker from '@react-native-community/datetimepicker'; // Importamos DateTimePicker
+import { styles } from '../../Style/Administradores/editarUsuario';
+import URL from '../../Services/url';
+import axios from 'axios';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const EditarOferta = () => {
   const navigation = useNavigation();
@@ -39,26 +39,19 @@ const EditarOferta = () => {
       return;
     }
     try {
-      const nombreUsuario = route.params.nombre; // Asegúrate de que el ID del usuario se pasa como parámetro
-
-      console.log('Campo seleccionado:', campoSeleccionado);
-      console.log('Nuevo valor:', nuevoValor);
-      
+      const nombreUsuario = route.params.nombre;
       const apiUrl = `${URL}:3000`;
-      const response = await axios.put(`${apiUrl}/admin/actualizarOferta`, {
+      await axios.put(`${apiUrl}/admin/actualizarOferta`, {
         nombreUsuario: nombreUsuario,
         campoSeleccionado: campoSeleccionado,
         nuevoValor: nuevoValor,
       });
-
     }
     catch (error) {
       console.error('Error al guardar cambios:', error);
       alert('Error al guardar cambios. Por favor, inténtelo de nuevo más tarde.');
       return;
     }
-
-    console.log(`Campo actualizado: ${campoSeleccionado} → ${nuevoValor}`);
     alert(`Se actualizó el campo ${campoSeleccionado}`);
     navigation.goBack();
   };
@@ -80,9 +73,9 @@ const EditarOferta = () => {
   };
 
   const onChangeFecha = (event, selectedDate) => {
-    setMostrarPicker(Platform.OS === 'ios'); // iOS mantiene el picker visible
+    setMostrarPicker(Platform.OS === 'ios');
     if (selectedDate) {
-      const fechaFormateada = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      const fechaFormateada = selectedDate.toISOString().split('T')[0];
       setFechaSeleccionada(selectedDate);
       setNuevoValor(fechaFormateada);
     }
@@ -94,13 +87,12 @@ const EditarOferta = () => {
         index: 0,
         routes: [{ name: 'login' }],
       });
-    }, 1800000); // 20 segundos
-
+    }, 1800000);
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <ScrollView style={styles.container}>
+  const contenido = (
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerBar}>
         <TouchableOpacity onPress={() => navigation.navigate('HomePageAdmin')}>
@@ -129,27 +121,22 @@ const EditarOferta = () => {
         <Text style={styles.label}>Nombre:</Text>
         <Text style={styles.input}>{nombre}</Text>
       </View>
-
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Tipo:</Text>
         <Text style={styles.input}>{tipo}</Text>
       </View>
-
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Fecha de inicio:</Text>
         <Text style={styles.input}>{fechaInicio}</Text>
       </View>
-
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Fecha de cierre:</Text>
         <Text style={styles.input}>{fechaCierre}</Text>
       </View>
-
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Estado:</Text>
         <Text style={styles.input}>{estado}</Text>
       </View>
-
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Horas totales:</Text>
         <Text style={styles.input}>{horasSemana}</Text>
@@ -159,7 +146,6 @@ const EditarOferta = () => {
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Seleccionar campo a editar</Text>
       </View>
-
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={campoSeleccionado}
@@ -238,6 +224,20 @@ const EditarOferta = () => {
           <Text style={styles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
       </View>
+    </View>
+  );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
+      {contenido}
     </ScrollView>
   );
 };

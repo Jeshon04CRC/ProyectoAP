@@ -5,7 +5,8 @@ import {
   ScrollView, 
   TextInput, 
   TouchableOpacity, 
-  Alert
+  Alert,
+  Platform
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { styles } from "../../Style/Profesores/edicionOfertas";
@@ -306,7 +307,7 @@ const EdicionOfertas = () => {
     navigation.goBack();
   };
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       {/* Carrusel de Ofertas */}
       <Text style={styles.header}>Ofertas Disponibles</Text>
@@ -593,6 +594,16 @@ const EdicionOfertas = () => {
       )}
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default EdicionOfertas;

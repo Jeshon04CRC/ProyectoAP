@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Platform
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/monitoreoActividades';
@@ -87,7 +88,7 @@ const MonitoreoActividades = () => {
     </View>
   );
 
-  return (
+  const contenido =  (
     <SafeAreaView style={styles.container}>
       {/* Header con logo y perfil */}
       <View style={styles.headerBar}>
@@ -137,6 +138,16 @@ const MonitoreoActividades = () => {
       </TouchableOpacity>
     </SafeAreaView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default MonitoreoActividades;

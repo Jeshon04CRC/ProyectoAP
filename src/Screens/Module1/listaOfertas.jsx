@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, TextInput} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, TextInput, Platform} from "react-native";
 import {styles} from "../../Style/Module1/publiOferta";
 import { useRoute } from '@react-navigation/native';
 import axios from "axios";
@@ -84,7 +84,7 @@ export default function OfertasScreen() {
     setOfertas(filtradas);
   };
 
-  return (
+  const contenido = (
     <View style={styles.container}>
       <Text style={styles.title}>Estados de las ofertas</Text>
       <View style={styles.filters}>
@@ -121,4 +121,14 @@ export default function OfertasScreen() {
       />
     </View>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 }

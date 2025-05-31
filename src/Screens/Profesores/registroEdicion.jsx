@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Platform
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Profesores/registroEdicion';
@@ -79,7 +80,7 @@ const RegistroEdicion = () => {
 
   const regresar = () => navigation.goBack();
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
@@ -184,6 +185,16 @@ const RegistroEdicion = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default RegistroEdicion;

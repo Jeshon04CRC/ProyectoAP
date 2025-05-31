@@ -12,7 +12,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert
+  Alert, Platform
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
@@ -124,7 +124,7 @@ const FormularioAplicacion = () => {
   };
 
   // Renderizado del formulario
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       {/* Barra de encabezado con logo y botón de regreso */}
       <View style={styles.headerBar}>
@@ -210,6 +210,16 @@ const FormularioAplicacion = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default FormularioAplicacion;

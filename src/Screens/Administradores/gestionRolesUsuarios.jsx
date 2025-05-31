@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/gestionRolesUsuarios';
@@ -176,7 +177,7 @@ const GestionUsuariosRoles = () => {
     </View>
   );
 
-  return (
+  const contenido =  (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.headerBar}>
@@ -234,6 +235,16 @@ const GestionUsuariosRoles = () => {
       </View>
     </SafeAreaView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default GestionUsuariosRoles;

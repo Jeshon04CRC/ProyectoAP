@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, Platform } from "react-native";
 import { styles } from "../../Style/Profesores/gestionAsignaturas";
 import axios from "axios";
 import URL from "../../Services/url"; 
@@ -144,7 +144,7 @@ const GestionAsignaturas = () => {
     );
   }
 
-  return (
+  const contenido = (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Gestión de Asignaturas</Text>
@@ -245,6 +245,16 @@ const GestionAsignaturas = () => {
       )}
     </ScrollView>
   );
+
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default GestionAsignaturas;

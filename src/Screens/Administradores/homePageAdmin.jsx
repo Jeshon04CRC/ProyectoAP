@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../../Style/Administradores/homePageAdmin';
@@ -65,7 +66,7 @@ const HomePageAdmin = () => {
   };
 
 
-  return (
+  const contenido =  (
     <ScrollView style={styles.container}>
       {/* Header institucional */}
       <View style={styles.headerBar}>
@@ -139,6 +140,16 @@ const HomePageAdmin = () => {
       </View>
     </ScrollView>
   );
+  
+  if (Platform.OS === 'web') {
+    return (
+      <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+        {contenido}
+      </div>
+    );
+  }
+
+  return contenido;
 };
 
 export default HomePageAdmin;
