@@ -52,12 +52,17 @@ export default function PanelEstaditico() {
     ],
   };
 
+  // Opciones para gráficos, sin separación ni margen extra
   const options = {
     indexAxis: 'y',
+    maintainAspectRatio: false,
+    layout: {
+      padding: 0,
+    },
     scales: {
       x: {
         beginAtZero: true,
-        max: totalEstudiantes > 0 ? totalEstudiantes : undefined,
+        max: undefined, // Quita el max para que no se vea "alejado"
         title: {
           display: true,
           text: 'Cantidad',
@@ -67,6 +72,9 @@ export default function PanelEstaditico() {
     plugins: {
       legend: { display: false },
     },
+    barThickness: 24, // Opcional: barras más delgadas
+    categoryPercentage: 0.7, // Opcional: barras más juntas
+    barPercentage: 0.7,      // Opcional: barras más juntas
   };
 
   return (
@@ -91,8 +99,8 @@ export default function PanelEstaditico() {
               </tr>
             </tbody>
           </table>
-          <div style={{ maxWidth: 350, margin: '0 auto 32px auto' }}>
-            <Bar data={dataActivos} options={options} height={120} width={350} />
+          <div style={{ width: 600, height: 200, margin: '0 auto 32px auto' }}>
+            <Bar data={dataActivos} options={options} />
           </div>
 
           <h3>Estudiantes Postulados</h3>
@@ -110,8 +118,8 @@ export default function PanelEstaditico() {
               </tr>
             </tbody>
           </table>
-          <div style={{ maxWidth: 350, margin: '0 auto' }}>
-            <Bar data={dataPostulados} options={options} height={120} width={350} />
+          <div style={{ width: 600, height: 200, margin: '0 auto' }}>
+            <Bar data={dataPostulados} options={options} />
           </div>
         </>
       )}
