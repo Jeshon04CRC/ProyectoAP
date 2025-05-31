@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { styles } from '../../Style/Module1/crearOferta';  // Importamos los estilos
+import { styles } from '../../Style/Module1/crearOferta';
 import { useRoute } from '@react-navigation/native';
 import axios from "axios";
 import URL from '../../Services/url';
 import { useNavigation } from '@react-navigation/native';
-
-
 
 export default function CrearOfertaScreen () {
     const [nombreCurso, setNombreCurso] = useState('');
@@ -36,26 +34,24 @@ export default function CrearOfertaScreen () {
     const { userId } = router.params;
 
     useEffect(() => {
-    const timer = setTimeout(() => {
-        navigation.reset({
-        index: 0,
-        routes: [{ name: 'login' }],
-        });
-    }, 1800000); // 20 segundos
+        const timer = setTimeout(() => {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'login' }],
+            });
+        }, 1800000); // 20 minutos
 
-    return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
     }, []);
-
 
     useEffect(() => {
         const cargarProfesores = async () => {
             const data = await handleInformacionProfesor();
             setListaProfesores(data);
         };
-    
         cargarProfesores();
     }, []);
-    
+
     const handleInformacionProfesor = async () => {
         try {
             const apiUrl = `${URL}:3000`;
@@ -64,16 +60,16 @@ export default function CrearOfertaScreen () {
         } catch (error) {
             console.error("Error al hacer la solicitud:", error);
             alert("Error de red o del servidor.");
-            return null;
+            return [];
         }
     }
 
-    const handleConfirmInicio = (event, selectedDate) => {
-        if (selectedDate) setFechaInicio(selectedDate);
+    // --- Cambios para el calendario en web ---
+    const handleFechaInicioWeb = (e) => {
+        setFechaInicio(new Date(e.target.value));
     };
-
-    const handleConfirmCierre = (event, selectedDate) => {
-        if (selectedDate) setFechaCierre(selectedDate);
+    const handleFechaCierreWeb = (e) => {
+        setFechaCierre(new Date(e.target.value));
     };
 
     const handleCrearOferta = async () => {
@@ -89,10 +85,9 @@ export default function CrearOfertaScreen () {
             cursosPrevios: cursosPrevios,
             descripcion: descripcion,
             requisitos: requisitosAdicionales,
-            fechaInicio: fechaInicio.toISOString().split('T')[0], // Formato YYYY-MM-DD
-            fechaCierre: fechaCierre.toISOString().split('T')[0], // Formato YYYY-MM-DD
+            fechaInicio: fechaInicio.toISOString().split('T')[0],
+            fechaCierre: fechaCierre.toISOString().split('T')[0],
         };
-            // Validar que todos los campos estén presentes
         const camposRequeridos = [
             "id", "nombreCurso", "profesor", "tipo", 
             "estudiantes", "horas", "beneficio", "descripcion", 
@@ -108,24 +103,20 @@ export default function CrearOfertaScreen () {
             return;
         }
 
-    console.log("Datos de la oferta:", data); // Verifica los datos antes de enviarlos
-        console.log("Datos de la oferta:", data); // Verifica los datos antes de enviarlos
         try {
             const apiUrl = `${URL}:3000`;
             const response = await axios.post(`${apiUrl}/escuelas/publiOferta`, { data: data });
-            console.log("Respuesta del servidor:", response.data); // Verifica la respuesta del servidor
             alert("Oferta creada exitosamente.");
             navigation.goBack();
         }
         catch (error) {
             console.error("Error al hacer la solicitud:", error);
             alert("Error de red o del servidor.");
-        
         }
     };
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
+    const contenido = (
+        <View style={styles.container}>
             <Text style={styles.title}>Crear nueva oferta</Text>
             <Text>Nombre de la oferta</Text>
             <TextInput style={styles.input} value={nombreCurso} onChangeText={setNombreCurso} />
@@ -138,7 +129,7 @@ export default function CrearOfertaScreen () {
                 <Picker.Item label="Seleccione un profesor" value="" />
                 {listaProfesores.map((prof) => (
                     <Picker.Item
-                        key={prof.id} // depende de la estructura
+                        key={prof.id}
                         label={prof.titulo}
                         value={prof.id}
                     />
@@ -172,42 +163,66 @@ export default function CrearOfertaScreen () {
                 </View>
             </View>
             <View style={styles.row}>
-            <View style={styles.halfInput}>
-                <Text>Fecha de inicio</Text>
-                <TouchableOpacity onPress={() => setShowInicio(true)} style={styles.input}>
-                    <Text>{fechaInicio.toISOString().split('T')[0]}</Text>
-                </TouchableOpacity>
-                {showInicio && (
-                    <DateTimePicker
-                        value={fechaInicio}
-                        mode="date"
-                        display="default"
-                        onChange={(event, selectedDate) => {
-                            setShowInicio(false); // Ocultar picker
-                            if (selectedDate) setFechaInicio(selectedDate);
-                        }}
-                    />
-                )}
-            </View>
+                <View style={styles.halfInput}>
+                    <Text>Fecha de inicio</Text>
+                    {Platform.OS === 'web' ? (
+                        <input
+                            type="date"
+                            className="input-date"
+                            style={{ ...styles.input, padding: 8, fontSize: 16 }}
+                            value={fechaInicio.toISOString().split('T')[0]}
+                            onChange={handleFechaInicioWeb}
+                        />
+                    ) : (
+                        <>
+                            <TouchableOpacity onPress={() => setShowInicio(true)} style={styles.input}>
+                                <Text>{fechaInicio.toISOString().split('T')[0]}</Text>
+                            </TouchableOpacity>
+                            {showInicio && (
+                                <DateTimePicker
+                                    value={fechaInicio}
+                                    mode="date"
+                                    display="default"
+                                    onChange={(event, selectedDate) => {
+                                        setShowInicio(false);
+                                        if (selectedDate) setFechaInicio(selectedDate);
+                                    }}
+                                />
+                            )}
+                        </>
+                    )}
+                </View>
 
-            <View style={styles.halfInput}>
-                <Text>Fecha de cierre</Text>
-                <TouchableOpacity onPress={() => setShowCierre(true)} style={styles.input}>
-                    <Text>{fechaCierre.toISOString().split('T')[0]}</Text>
-                </TouchableOpacity>
-                {showCierre && (
-                    <DateTimePicker
-                        value={fechaCierre}
-                        mode="date"
-                        display="default"
-                        onChange={(event, selectedDate) => {
-                            setShowCierre(false); // Ocultar picker
-                            if (selectedDate) setFechaCierre(selectedDate);
-                        }}
-                    />
-                )}
+                <View style={styles.halfInput}>
+                    <Text>Fecha de cierre</Text>
+                    {Platform.OS === 'web' ? (
+                        <input
+                            type="date"
+                            className="input-date"
+                            style={{ ...styles.input, padding: 8, fontSize: 16 }}
+                            value={fechaCierre.toISOString().split('T')[0]}
+                            onChange={handleFechaCierreWeb}
+                        />
+                    ) : (
+                        <>
+                            <TouchableOpacity onPress={() => setShowCierre(true)} style={styles.input}>
+                                <Text>{fechaCierre.toISOString().split('T')[0]}</Text>
+                            </TouchableOpacity>
+                            {showCierre && (
+                                <DateTimePicker
+                                    value={fechaCierre}
+                                    mode="date"
+                                    display="default"
+                                    onChange={(event, selectedDate) => {
+                                        setShowCierre(false);
+                                        if (selectedDate) setFechaCierre(selectedDate);
+                                    }}
+                                />
+                            )}
+                        </>
+                    )}
+                </View>
             </View>
-        </View>
             <Text style={styles.title}>Políticas internas</Text>
 
             <Text>Promedio mínimo requerido</Text>
@@ -253,9 +268,23 @@ export default function CrearOfertaScreen () {
                 onChangeText={setDescripcion}
             />
 
-            <TouchableOpacity style={styles.button} onPress={() => handleCrearOferta()}>
+            <TouchableOpacity style={styles.button} onPress={handleCrearOferta}>
                 <Text style={styles.buttonText}>Crear oferta</Text>
             </TouchableOpacity>
+        </View>
+    );
+
+    if (Platform.OS === 'web') {
+        return (
+            <div style={{ height: '100vh', overflowY: 'auto', background: '#fff' }}>
+                {contenido}
+            </div>
+        );
+    }
+
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            {contenido}
         </ScrollView>
     );
-};
+}
