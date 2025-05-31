@@ -9,7 +9,8 @@ import { obtenerUsuarios,
         eliminarOferta,
         actualizarOferta,
         monitoreoAsistencia,
-        respaldoMasivo
+        respaldoMasivo,
+        datosEstadistica
         } from "../Controllers/admin.Controller.js"
 
 const router = Router()
@@ -28,6 +29,8 @@ router.put('/admin/actualizarOferta', actualizarOferta);
 router.get('/admin/monitoreoAsistencia', monitoreoAsistencia);
 
 router.get('/respaldos/masivo', respaldoMasivo);
+
+router.get('/admin/obtenerDatosEstadistica', datosEstadistica);
 
 
 export default router;

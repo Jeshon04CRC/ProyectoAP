@@ -54,7 +54,7 @@ import EditarUsuario from './src/Screens/Administradores/editarUsuario';
 import MonitoreoActividades from './src/Screens/Administradores/monitoreoActividades';
 import ValidacionOfertas from './src/Screens/Administradores/validacionOfertas';
 import EditarOferta from './src/Screens/Administradores/editarOfertas';
-
+import PanelEstaditico from './src/Screens/panelEstaditico'; // Asegúrate de que la ruta sea correcta
 
 
 const Stack = createStackNavigator();
@@ -129,6 +129,8 @@ export default function App() {
         <Stack.Screen name="MonitoreoActividades" component={MonitoreoActividades} options={{title: "Monitoreo de actividades"}} />
         <Stack.Screen name="ValidacionOfertas" component={ValidacionOfertas} options={{title: "Validacion ofertas "}} />
         <Stack.Screen name="EditarOferta" component={EditarOferta} options={{title: "Validacion ofertas "}} />
+        <Stack.Screen name="PanelEstaditico" component={PanelEstaditico} options={{title: "Panel Estadístico"}} />
+
 
         </Stack.Navigator>
       </SessionTimeout>

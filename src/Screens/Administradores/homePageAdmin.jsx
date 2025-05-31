@@ -104,6 +104,15 @@ const HomePageAdmin = () => {
           </TouchableOpacity>
         ))}
 
+        {/* Botón Panel Estadístico */}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: '#2196F3', marginTop: 10 }]}
+          onPress={() => navigation.navigate('PanelEstaditico')}
+        >
+          <Text style={[styles.buttonText, { color: '#fff' }]}>Panel Estadístico</Text>
+          
+        </TouchableOpacity>
+
         {/* Botón Respaldo Masivo */}
         <TouchableOpacity
           style={[styles.button, { backgroundColor: '#4CAF50', marginTop: 10 }]}

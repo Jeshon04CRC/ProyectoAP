@@ -296,3 +296,32 @@ export const respaldoMasivo = async (req, res) => {
         return res.status(500).json({ error: 'Error al generar respaldo masivo' });
     }
 };
+
+
+export const datosEstadistica = async (req, res) => {
+    try {
+        const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
+        const asistenciasSnapshot = await getDocs(collection(db, "Solicitudes"));
+
+        const totalUsuarios = usuariosSnapshot.size;
+        const estudiantesPostulados = asistenciasSnapshot.size
+
+        let estudiantesActivos = 0;
+
+        usuariosSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.estado === true) {
+                estudiantesActivos++;
+            }
+        });
+
+        return res.status(200).json({
+            totalUsuarios,
+            estudiantesActivos,
+            estudiantesPostulados
+        });
+    } catch (error) {
+        console.error("Error al obtener datos estadísticos:", error);
+        return res.status(500).json({ error: "Error al obtener datos estadísticos" });
+    }
+};
