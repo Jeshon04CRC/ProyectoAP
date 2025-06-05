@@ -337,22 +337,37 @@ export const oportunidadesFavoritas = async (req, res) => {
 export const selecionarFavoritas = async (req, res) => {
   const { userId, idOportunidad } = req.body;
   console.log("ID de la oportunidad seleccionada:", idOportunidad);
-  try {
 
-    // Obtener el documento del usuario
+  try {
     const favoritosRef = collection(db, 'Favoritos');
-    const userDoc = await getDocs(favoritosRef);
-    for (const doc of userDoc.docs) {
+    const snapshot = await getDocs(favoritosRef);
+
+    let encontrado = false;
+
+    for (const doc of snapshot.docs) {
       const data = doc.data();
       if (data.idUsuario === userId) {
+        // Ya existe el documento del usuario, se actualiza
         await updateDoc(doc.ref, {
           idOportunidades: arrayUnion(idOportunidad)
         });
-        return res.status(200).json({ mensaje: 'Oportunidad seleccionada como favorita' });
+        encontrado = true;
+        break;
       }
     }
 
+    // Si no se encontró un documento con ese usuario, se crea uno nuevo
+    if (!encontrado) {
+      await addDoc(favoritosRef, {
+        idUsuario: userId,
+        idOportunidades: [idOportunidad]
+      });
+    }
+
+    return res.status(200).json({ mensaje: 'Oportunidad seleccionada como favorita' });
+
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: 'Error al seleccionar la oportunidad favorita' });
   }
 };
