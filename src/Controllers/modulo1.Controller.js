@@ -506,31 +506,31 @@ export const informacionEstudiante = async (req, res) => {
   const historialAsistencia = [];
   try {
     const usuariosSnapshot = await getDocs(collection(db, "Usuarios"));
-    const asistenciasSnapshot = await getDocs(collection(db, "Asistencias"));
+    const asistenciasSnapshot = await getDocs(collection(db, "Solicitudes"));
 
     for (const doc of usuariosSnapshot.docs) {
       const datos = doc.data();
       if (doc.id === userId) {
-        for(const doc of usuariosSnapshot.docs) {
-          if (doc.id === datos.carrera) {
-            const carrera = doc.data().nombre;
-            estudiante.carrera = carrera;
+        for(const doc1 of usuariosSnapshot.docs) {
+          if (doc1.id === datos.carrera) {
+            const carrera = doc1.data().nombre;
+            estudiante.carrera = carrera || 'Sin carrera';
           }
         }
-        estudiante.correo = datos.correo;
-        estudiante.nombre = datos.nombre;
-        estudiante.nivelAcademico = datos.nivelAcademico;
-        estudiante.ponderado = datos.ponderado;
-        estudiante.cursosAprobados = datos.cursosAprovados.length;
+        estudiante.correo = datos.correo || 'Sin correo';
+        estudiante.nombre = datos.nombre || 'Sin nombre';
+        estudiante.nivelAcademico = datos.nivelAcademico || 'Sin nivel';
+        estudiante.ponderado = datos.ponderado || 'Sin ponderado';
+        estudiante.cursosAprobados = datos.cursosAprovados.length || 0; 
       }
     }
     for(const doc of asistenciasSnapshot.docs) {
       const datos = doc.data();
-      if(datos.postulaciones.includes(userId)) {
+      if(doc.id === userId) {
         const asistencia = {
-          fecha: datos.fechaInicio || '00/00/2025', 
-          titulo: datos.tituloPrograma || 'Sin curso',
-          horas: datos.totalHoras
+          fecha: datos.fecha || '00/00/2025', 
+          titulo: datos.tituloOportunidad || 'Sin curso',
+          horas: datos.horas || 'Sin horas',
         };
         historialAsistencia.push(asistencia);
       }
